@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
+import 'skeleton_loading.dart';
 
 /// Loading state of a screen backed by a provider.
 enum ViewStatus { idle, loading, success, error }
@@ -30,7 +31,7 @@ class AsyncView extends StatelessWidget {
     switch (status) {
       case ViewStatus.idle:
       case ViewStatus.loading:
-        return const Center(child: CircularProgressIndicator());
+        return const SkeletonLoading();
       case ViewStatus.error:
         return MessageView(
           icon: Icons.cloud_off_outlined,
@@ -71,7 +72,18 @@ class MessageView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 56, color: theme.colorScheme.outline),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: theme.colorScheme.primaryContainer,
+              ),
+              child: Icon(
+                icon,
+                size: 48,
+                color: theme.colorScheme.onPrimaryContainer,
+              ),
+            ),
             const SizedBox(height: 12),
             Text(
               message,

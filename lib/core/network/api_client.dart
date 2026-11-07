@@ -73,6 +73,10 @@ class ApiClient {
       request.extra['retried'] = true;
       final token = await _tokens.readAccessToken();
       request.headers['Authorization'] = 'Bearer $token';
+      // Multipart bodies are finalized by Dio; retries need fresh streams.
+      if (request.data is FormData) {
+        request.data = (request.data as FormData).clone();
+      }
       handler.resolve(await _dio.fetch(request));
     } on DioException catch (e) {
       handler.next(e);
@@ -139,6 +143,32 @@ class ApiClient {
         ),
       ),
     );
+  }
+
+  /// Uploads a replacement file using the same multipart contract as POST.
+  Future<dynamic> putMultipart(
+    String path, {
+    required String fileField,
+    required String filePath,
+    String? fileName,
+    Map<String, dynamic>? fields,
+    Duration? timeout,
+  }) async {
+    return _send(() async {
+      final form = FormData.fromMap({
+        ...?fields,
+        fileField: await MultipartFile.fromFile(filePath, filename: fileName),
+      });
+      return _dio.put(
+        path,
+        data: form,
+        options: Options(
+          contentType: 'multipart/form-data',
+          receiveTimeout: timeout ?? const Duration(seconds: 90),
+          sendTimeout: timeout ?? const Duration(seconds: 90),
+        ),
+      );
+    });
   }
 
   /// POST with a longer timeout for slow AI endpoints (generation / grading).

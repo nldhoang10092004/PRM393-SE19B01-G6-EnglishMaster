@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/gradient_hero_card.dart';
 import '../../../../core/utils/validators.dart';
 import '../providers/auth_provider.dart';
 
@@ -46,14 +47,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final auth = context.watch<AuthProvider>();
     return Scaffold(
       appBar: AppBar(title: const Text(AppStrings.forgotPassword)),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(AppStrings.resetHint),
+              const GradientHeroCard(
+                title: AppStrings.forgotPassword,
+                subtitle: AppStrings.resetHint,
+                icon: Icons.mark_email_read_outlined,
+              ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _email,

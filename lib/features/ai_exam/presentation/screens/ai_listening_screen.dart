@@ -110,9 +110,37 @@ class AiListeningScreen extends StatelessWidget {
                 ),
               ],
               if (state.result case final result?) ...[
-                Text(
-                  AiExamStrings.listeningScore(result.score, result.total),
-                  style: Theme.of(context).textTheme.headlineSmall,
+                Card(
+                  color: Theme.of(context).colorScheme.secondaryContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.emoji_events_outlined,
+                          size: 36,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          AiExamStrings.listeningScore(
+                            result.score,
+                            result.total,
+                          ),
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 16),
+                        LinearProgressIndicator(
+                          value: result.total == 0
+                              ? 0
+                              : (result.score / result.total).clamp(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 for (final answer in result.results)

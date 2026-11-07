@@ -79,7 +79,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .errorContainer,
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Icon(Icons.delete_outline),
                             ),
@@ -122,6 +122,17 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                             },
                             child: Card(
                               child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .tertiaryContainer,
+                                  child: Icon(
+                                    Icons.translate_rounded,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onTertiaryContainer,
+                                  ),
+                                ),
                                 title: Text(word.front),
                                 subtitle: Text(
                                   AppStrings.wordDetails(

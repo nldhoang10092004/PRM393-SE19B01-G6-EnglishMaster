@@ -3,6 +3,21 @@ class AppStrings {
   AppStrings._();
 
   // Common
+  static const changeAvatar = 'Đổi ảnh đại diện';
+  static const choosePhoto = 'Chọn ảnh từ thư viện';
+  static const takePhoto = 'Chụp ảnh';
+  static const avatarUpdated = 'Đã cập nhật ảnh đại diện';
+  static const avatarUploadError = 'Chưa thể cập nhật ảnh. Bạn thử lại nhé!';
+  static const photoPickerError =
+      'Không thể mở ảnh. Vui lòng kiểm tra quyền truy cập ảnh hoặc máy ảnh.';
+  static const viewAll = 'Xem tất cả';
+  static const continueLearning = 'Tiếp tục học';
+  static const discoverCourses = 'Khám phá khóa học';
+  static const accountSettings = 'Cài đặt tài khoản';
+  static const correctAnswers = 'Câu đúng';
+  static const wrongAnswers = 'Câu sai';
+  static const pendingAnswers = 'Chờ chấm';
+  static const loadingContent = 'Đang tải nội dung';
   static const unknownInitial = '?';
   static const unavailableValue = '—';
   static const appName = 'EnglishMaster';

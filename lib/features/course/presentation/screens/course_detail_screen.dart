@@ -101,16 +101,27 @@ class _Header extends StatelessWidget {
     final rating = provider.rating;
     return SliverAppBar(
       pinned: true,
-      expandedHeight: 200,
+      expandedHeight: 240,
       backgroundColor: scheme.primary,
       foregroundColor: scheme.onPrimary,
-      title: Text(course.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: Text(
+        course.name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: scheme.onPrimary),
+      ),
       flexibleSpace: FlexibleSpaceBar(
         collapseMode: CollapseMode.pin,
         background: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [scheme.primary, scheme.tertiary],
+              colors: [
+                scheme.primary,
+                Color.alphaBlend(
+                  scheme.primary.withValues(alpha: .8),
+                  scheme.tertiary,
+                ),
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -199,6 +210,7 @@ class _Chapters extends StatelessWidget {
               shape: const Border(),
               collapsedShape: const Border(),
               initiallyExpanded: i == 0,
+              leading: CircleAvatar(child: Text('${i + 1}')),
               onExpansionChanged: (open) {
                 if (open) provider.loadProgressFor(videos);
               },
@@ -228,7 +240,9 @@ class _VideoTile extends StatelessWidget {
     return ListTile(
       leading: Icon(
         done ? Icons.check_circle : Icons.play_circle_outline_rounded,
-        color: done ? Colors.green : Theme.of(context).colorScheme.primary,
+        color: done
+            ? Theme.of(context).colorScheme.tertiary
+            : Theme.of(context).colorScheme.primary,
       ),
       title: Text(video.name),
       trailing: video.isPreview

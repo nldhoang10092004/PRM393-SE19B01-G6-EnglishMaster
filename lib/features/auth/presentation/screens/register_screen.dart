@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/gradient_hero_card.dart';
 import '../../../../core/utils/validators.dart';
 import '../providers/auth_provider.dart';
 
@@ -82,6 +83,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const GradientHeroCard(
+                  title: AppStrings.createAccount,
+                  subtitle: AppStrings.tagline,
+                  icon: Icons.rocket_launch_rounded,
+                ),
+                const SizedBox(height: 24),
                 TextFormField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,

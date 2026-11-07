@@ -20,11 +20,12 @@ class ProfileProvider extends ChangeNotifier {
   String? statsError;
   ({int streak, int attempts, int words})? stats;
   bool busy = false;
+  bool uploadingAvatar = false;
   bool _disposed = false;
 
   /// Loads required details; secondary failures leave the profile usable.
   Future<void> load() async {
-    if (status == ViewStatus.loading || busy) return;
+    if (status == ViewStatus.loading || busy || uploadingAvatar) return;
     status = ViewStatus.loading;
     error = null;
     avatarError = null;
@@ -63,6 +64,24 @@ class ProfileProvider extends ChangeNotifier {
       status = ViewStatus.error;
     }
     notifyListeners();
+  }
+
+  /// Keeps the previous avatar on failure and publishes success to all listeners.
+  Future<bool> uploadAvatar(String filePath) async {
+    if (uploadingAvatar || status == ViewStatus.loading) return false;
+    uploadingAvatar = true;
+    avatarError = null;
+    notifyListeners();
+    try {
+      avatarUrl = await repository.uploadAvatar(filePath);
+      return true;
+    } catch (_) {
+      avatarError = AppStrings.avatarUploadError;
+      return false;
+    } finally {
+      uploadingAvatar = false;
+      notifyListeners();
+    }
   }
 
   /// Refreshes detail after saving because blank fields are ignored by the API.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../ai_exam_strings.dart';
+import '../../../../core/widgets/gradient_hero_card.dart';
 import 'ai_listening_screen.dart';
 import 'ai_review_history_screen.dart';
 import 'ai_speaking_screen.dart';
@@ -40,39 +41,79 @@ class AiExamHubScreen extends StatelessWidget {
     ];
     return Scaffold(
       appBar: AppBar(title: const Text(AiExamStrings.hub)),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: cards.length + 1,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Text(
-                AiExamStrings.intro,
-                style: Theme.of(context).textTheme.titleMedium,
+      body: CustomScrollView(
+        slivers: [
+          const SliverPadding(
+            padding: EdgeInsets.all(16),
+            sliver: SliverToBoxAdapter(
+              child: GradientHeroCard(
+                title: AiExamStrings.hub,
+                subtitle: AiExamStrings.intro,
+                icon: Icons.auto_awesome_rounded,
               ),
-            );
-          }
-          final (title, subtitle, icon, page) = cards[index - 1];
-          return Card(
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(16),
-              leading: CircleAvatar(
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                child: Icon(
-                  icon,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
-              ),
-              title: Text(title),
-              subtitle: Text(subtitle),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () =>
-                  Navigator.of(context)
-                      .push(MaterialPageRoute<void>(builder: (_) => page)),
             ),
-          );
-        },
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            sliver: SliverGrid.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: MediaQuery.sizeOf(context).width < 340 ? 1 : 2,
+                mainAxisExtent: 250,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: cards.length,
+              itemBuilder: (context, index) {
+                final (title, subtitle, icon, page) = cards[index];
+                final scheme = Theme.of(context).colorScheme;
+                final palette = [
+                  scheme.primaryContainer,
+                  scheme.tertiaryContainer,
+                  scheme.secondaryContainer,
+                  scheme.surfaceContainerHigh,
+                ];
+                return Card(
+                  color: palette[index],
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () => Navigator.of(context)
+                        .push(MaterialPageRoute<void>(builder: (_) => page)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: scheme.surface.withValues(
+                              alpha: .7,
+                            ),
+                            child: Icon(icon, color: scheme.onSurface),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            title,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: Text(
+                              subtitle,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
+                          const Align(
+                            alignment: Alignment.centerRight,
+                            child: Icon(Icons.arrow_forward_rounded),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

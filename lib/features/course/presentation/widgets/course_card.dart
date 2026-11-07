@@ -24,16 +24,16 @@ class CourseCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(
-                width: 56,
-                height: 56,
+                width: 64,
+                height: 72,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: bg,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
                   course.initials,

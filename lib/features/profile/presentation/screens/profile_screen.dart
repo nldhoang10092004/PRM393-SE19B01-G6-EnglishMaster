@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 
 import '../../../membership/presentation/screens/membership_screen.dart';
 
-import '../../../../core/config/app_config.dart';
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/widgets/app_network_image.dart';
+import '../../../../core/widgets/user_avatar.dart';
+import '../../../../core/widgets/stat_tile.dart';
+import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../quiz/presentation/screens/quiz_history_screen.dart';
@@ -17,7 +20,8 @@ import 'edit_profile_screen.dart';
 
 /// Student identity, membership and account actions.
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, this.imagePicker});
+  final ImagePicker? imagePicker;
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
@@ -27,20 +31,79 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      if (mounted) context.read<ProfileProvider>().load();
+      if (mounted) _load();
     });
   }
 
-  String? _avatar(String? value) {
-    if (value == null || value.trim().isEmpty) return null;
-    final uri = Uri.tryParse(value);
-    if (uri == null) return null;
-    final resolved = uri.hasScheme
-        ? uri
-        : Uri.parse(AppConfig.apiBaseUrl).resolveUri(uri);
-    return (resolved.scheme == 'http' || resolved.scheme == 'https')
-        ? resolved.toString()
-        : null;
+  Future<void> _load() async {
+    final state = context.read<ProfileProvider>();
+    await state.load();
+    if (!mounted || kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
+      return;
+    }
+    try {
+      final lost = await (widget.imagePicker ?? ImagePicker())
+          .retrieveLostData();
+      if (!mounted) return;
+      if (lost.files?.isNotEmpty ?? false) {
+        await _upload(lost.files!.first);
+      } else if (lost.exception != null) {
+        _showMessage(AppStrings.photoPickerError);
+      }
+    } catch (_) {
+      /* A platform without recovery still supports normal picking. */
+    }
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _upload(XFile file) async {
+    if (!mounted) return;
+    final state = context.read<ProfileProvider>();
+    final ok = await state.uploadAvatar(file.path);
+    _showMessage(
+      ok
+          ? AppStrings.avatarUpdated
+          : state.avatarError ?? AppStrings.avatarUploadError,
+    );
+  }
+
+  Future<void> _pickAvatar() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text(AppStrings.choosePhoto),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text(AppStrings.takePhoto),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null || !mounted) return;
+    try {
+      final file = await (widget.imagePicker ?? ImagePicker()).pickImage(
+        source: source,
+        maxWidth: 512,
+        imageQuality: 85,
+      );
+      if (file != null && mounted) await _upload(file);
+    } catch (_) {
+      _showMessage(AppStrings.photoPickerError);
+    }
   }
 
   @override
@@ -58,7 +121,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final name = profile.fullName.isEmpty
               ? AppStrings.student
               : profile.fullName;
-          final avatar = _avatar(state.avatarUrl);
           final membership = state.membership;
           return RefreshIndicator(
             onRefresh: state.load,
@@ -71,28 +133,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       children: [
-                        CircleAvatar(
-                          radius: 40,
-                          child: ClipOval(
-                            child: avatar == null
-                                ? Text(
-                                    name.characters.first.toUpperCase(),
-                                    style: theme.textTheme.headlineMedium,
-                                  )
-                                : AppNetworkImage(
-                                    url: avatar,
-                                    width: 80,
-                                    height: 80,
-                                    error: Text(
-                                      name.characters.first.toUpperCase(),
-                                      style: theme.textTheme.headlineMedium,
+                        Semantics(
+                          label: AppStrings.changeAvatar,
+                          button: true,
+                          child: InkWell(
+                            key: const Key('change_avatar'),
+                            onTap: state.uploadingAvatar ? null : _pickAvatar,
+                            customBorder: const CircleBorder(),
+                            child: SizedBox(
+                              width: 92,
+                              height: 92,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  UserAvatar(
+                                    url: state.avatarUrl,
+                                    name: name,
+                                    radius: 40,
+                                  ),
+                                  if (state.uploadingAvatar)
+                                    const SizedBox(
+                                      width: 88,
+                                      height: 88,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 3,
+                                      ),
+                                    ),
+                                  Positioned(
+                                    right: 0,
+                                    bottom: 0,
+                                    child: CircleAvatar(
+                                      radius: 16,
+                                      backgroundColor:
+                                          theme.colorScheme.primary,
+                                      child: Icon(
+                                        Icons.camera_alt_rounded,
+                                        size: 18,
+                                        color: theme.colorScheme.onPrimary,
+                                      ),
                                     ),
                                   ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Text(name, style: theme.textTheme.headlineSmall),
-                        Text(profile.email),
+                        Text(
+                          name,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineSmall,
+                        ),
+                        Text(profile.email, textAlign: TextAlign.center),
                         const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -153,63 +245,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.edit_outlined),
-                  title: const Text(AppStrings.editProfile),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    state.clearError();
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const EditProfileScreen(),
+                const SizedBox(height: 16),
+                const SectionHeader(title: AppStrings.accountSettings),
+                const SizedBox(height: 8),
+                Card(
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.edit_outlined),
+                        title: const Text(AppStrings.editProfile),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          state.clearError();
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const EditProfileScreen(),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.lock_outline),
-                  title: const Text(AppStrings.changePassword),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    state.clearError();
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const ChangePasswordScreen(),
+                      ListTile(
+                        leading: const Icon(Icons.lock_outline),
+                        title: const Text(AppStrings.changePassword),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          state.clearError();
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const ChangePasswordScreen(),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.bookmark_border),
-                  title: const Text(AppStrings.vocabulary),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const VocabularyScreen(),
+                      ListTile(
+                        leading: const Icon(Icons.bookmark_border),
+                        title: const Text(AppStrings.vocabulary),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const VocabularyScreen(),
+                            ),
+                          );
+                          if (mounted) await state.load();
+                        },
                       ),
-                    );
-                    if (mounted) await state.load();
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.notifications_outlined),
-                  title: const Text(AppStrings.studyReminder),
-                  subtitle: const Text(AppStrings.manageReminders),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () =>
-                      Navigator.of(context).pushNamed('/settings/reminder'),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.history),
-                  title: const Text(AppStrings.quizHistory),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (_) => const QuizHistoryScreen(),
-                    ),
+                      ListTile(
+                        leading: const Icon(Icons.notifications_outlined),
+                        title: const Text(AppStrings.studyReminder),
+                        subtitle: const Text(AppStrings.manageReminders),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () =>
+                            Navigator.of(context)
+                                .pushNamed('/settings/reminder'),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.history),
+                        title: const Text(AppStrings.quizHistory),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const QuizHistoryScreen(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                const SizedBox(height: 12),
                 ListTile(
                   leading: Icon(Icons.logout, color: theme.colorScheme.error),
                   title: const Text(AppStrings.logout),
@@ -228,13 +331,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _stat(BuildContext context, int? count, String label) => Column(
-    children: [
-      Text(
-        count?.toString() ?? AppStrings.unavailableValue,
-        style: Theme.of(context).textTheme.titleLarge,
+  Widget _stat(BuildContext context, int? count, String label) => Expanded(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3),
+      child: StatTile(
+        value: count?.toString() ?? AppStrings.unavailableValue,
+        label: label,
       ),
-      Text(label),
-    ],
+    ),
   );
 }

@@ -119,6 +119,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                           ),
                         ],
                         Card(
+                          color: Theme.of(context).colorScheme.primaryContainer,
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Text(
@@ -152,7 +153,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                                             .primaryContainer
                                       : Theme.of(context).colorScheme.surface,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(14),
                                     side: BorderSide(
                                       color: selected
                                           ? Theme.of(context)

@@ -5,6 +5,7 @@ import '../../../membership/presentation/widgets/upgrade_membership_banner.dart'
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/gradient_hero_card.dart';
 import '../../data/quiz_repository.dart';
 import '../providers/quiz_provider.dart';
 import 'quiz_taking_screen.dart';
@@ -28,12 +29,11 @@ class QuizDetailScreen extends StatelessWidget {
           builder: (_) => ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text(
-                state.quiz!.title,
-                style: Theme.of(context).textTheme.headlineSmall,
+              GradientHeroCard(
+                title: state.quiz!.title,
+                subtitle: state.quiz!.description,
+                icon: Icons.quiz_rounded,
               ),
-              const SizedBox(height: 12),
-              Text(state.quiz!.description),
               const SizedBox(height: 16),
               Text(AppStrings.questionCount(state.questions.length)),
               const SizedBox(height: 8),

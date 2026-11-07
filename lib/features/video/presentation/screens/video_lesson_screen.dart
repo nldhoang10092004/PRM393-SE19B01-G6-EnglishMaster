@@ -181,11 +181,17 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
                 },
                 builder: (context) => ListView(
                   children: [
-                    AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: _chewie == null
-                          ? const Center(child: CircularProgressIndicator())
-                          : Chewie(controller: _chewie!),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: _chewie == null
+                              ? const Center(child: CircularProgressIndicator())
+                              : Chewie(controller: _chewie!),
+                        ),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16),
@@ -194,7 +200,7 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
                         children: [
                           Text(
                             video?.name ?? '',
-                            style: theme.textTheme.titleMedium,
+                            style: theme.textTheme.headlineSmall,
                           ),
                           const SizedBox(height: 8),
                           if (video?.isPreview ?? false)
@@ -206,9 +212,9 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
                           provider.isCompleted
                               ? FilledButton.tonalIcon(
                                   onPressed: null,
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.check_circle,
-                                    color: Colors.green,
+                                    color: theme.colorScheme.tertiary,
                                   ),
                                   label: const Text(AppStrings.completed),
                                 )

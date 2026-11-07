@@ -23,13 +23,19 @@ class StreakCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final theme = Theme.of(context);
-    final onColor = scheme.onPrimary;
+    final onColor = scheme.onSecondaryContainer;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         gradient: LinearGradient(
-          colors: [scheme.primary, scheme.tertiary],
+          colors: [
+            scheme.secondaryContainer,
+            Color.alphaBlend(
+              scheme.secondaryContainer.withValues(alpha: .75),
+              scheme.surface,
+            ),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

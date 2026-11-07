@@ -9,11 +9,14 @@ class AiPromptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
+    color: Theme.of(context).colorScheme.primaryContainer,
     child: Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Icon(Icons.auto_awesome_rounded),
+          const SizedBox(height: 12),
           Text(
             AiExamStrings.prompt,
             style: Theme.of(context).textTheme.labelLarge,

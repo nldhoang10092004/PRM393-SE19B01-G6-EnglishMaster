@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/section_header.dart';
+import '../../../course/presentation/widgets/course_preview_card.dart';
 import '../../../course/presentation/providers/course_list_provider.dart';
 import '../../../course/presentation/screens/course_detail_screen.dart';
 import '../../../course/presentation/widgets/course_card.dart';
@@ -24,6 +26,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _catalogKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -49,7 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final streakValue = context.select<StreakProvider, StreakStatus>(
       (p) => p.streak,
     );
-    final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -69,12 +71,59 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SliverToBoxAdapter(child: _AiPracticeCard()),
+              if (courses.courses.isNotEmpty) ...[
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                    child: SectionHeader(
+                      title: AppStrings.continueLearning,
+                      onViewAll: () {
+                        final target = _catalogKey.currentContext;
+                        if (target != null) {
+                          Scrollable.ensureVisible(
+                            target,
+                            duration: const Duration(milliseconds: 250),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 220,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: courses.courses.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) {
+                        final course = courses.courses[index];
+                        return SizedBox(
+                          width: 256,
+                          child: CoursePreviewCard(
+                            course: course,
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => CourseDetailScreen(
+                                  courseId: course.id,
+                                  title: course.name,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                  child: Text(
-                    AppStrings.allCourses,
-                    style: theme.textTheme.titleLarge,
+                  child: SectionHeader(
+                    key: _catalogKey,
+                    title: AppStrings.allCourses,
                   ),
                 ),
               ),

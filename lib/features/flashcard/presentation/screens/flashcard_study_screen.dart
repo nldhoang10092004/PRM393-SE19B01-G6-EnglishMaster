@@ -160,8 +160,36 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                     child: Column(
                       children: [
                         LinearProgressIndicator(value: state.fraction),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 5,
+                          runSpacing: 5,
+                          alignment: WrapAlignment.center,
+                          children: List.generate(
+                            math.min(state.total, 12),
+                            (i) => Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color:
+                                    i <=
+                                        (state.fraction *
+                                                math.min(state.total, 12))
+                                            .floor()
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context)
+                                          .colorScheme
+                                          .outlineVariant,
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 8),
-                        Row(
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 4,
+                          alignment: WrapAlignment.spaceBetween,
                           children: [
                             Text(
                               AppStrings.cardPosition(
@@ -170,7 +198,6 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                               ),
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
-                            const Spacer(),
                             Text(
                               AppStrings.studyProgress(
                                 state.masteredCount,
@@ -217,6 +244,18 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                                 ),
                                 child: Card(
                                   margin: const EdgeInsets.all(16),
+                                  elevation: 4,
+                                  shadowColor: Theme.of(context)
+                                      .colorScheme
+                                      .shadow
+                                      .withValues(alpha: .16),
+                                  color: back
+                                      ? Theme.of(context)
+                                            .colorScheme
+                                            .tertiaryContainer
+                                      : Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer,
                                   child: SizedBox.expand(
                                     child: Center(
                                       child: SingleChildScrollView(
@@ -334,7 +373,15 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                               onPressed: state.busy
                                   ? null
                                   : () => state.answer(mastered: false),
-                              child: const Text(AppStrings.again),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                              ),
+                              child: const Text(
+                                AppStrings.again,
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -343,7 +390,13 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                               onPressed: state.busy
                                   ? null
                                   : () => state.answer(mastered: true),
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                ),
+                              ),
                               child: Text(
+                                textAlign: TextAlign.center,
                                 state.busy
                                     ? AppStrings.saving
                                     : AppStrings.gotIt,

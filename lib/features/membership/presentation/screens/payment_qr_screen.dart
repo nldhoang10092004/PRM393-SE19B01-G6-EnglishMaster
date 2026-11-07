@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../data/membership_repository.dart';
 import '../../data/models/membership_models.dart';
 import '../../membership_strings.dart';
@@ -83,12 +84,24 @@ class _PaymentView extends StatelessWidget {
         Text(formatVnd(order.amount), style: theme.textTheme.headlineMedium),
         const SizedBox(height: 16),
         Container(
-          color: Colors.white,
+          decoration: BoxDecoration(
+            color: AppTheme.qrPaper,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
+          ),
           padding: const EdgeInsets.all(12),
           child: QrImageView(
             data: order.qrCode,
             size: 240,
-            backgroundColor: Colors.white,
+            backgroundColor: AppTheme.qrPaper,
+            eyeStyle: const QrEyeStyle(
+              eyeShape: QrEyeShape.square,
+              color: AppTheme.qrInk,
+            ),
+            dataModuleStyle: const QrDataModuleStyle(
+              dataModuleShape: QrDataModuleShape.square,
+              color: AppTheme.qrInk,
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -146,7 +159,11 @@ class _PaymentView extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 40),
-        const Icon(Icons.check_circle, color: Colors.green, size: 96),
+        Icon(
+          Icons.check_circle,
+          color: Theme.of(context).colorScheme.tertiary,
+          size: 96,
+        ),
         const SizedBox(height: 16),
         Text(
           MembershipStrings.paidTitle,

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/gradient_hero_card.dart';
 import '../../data/models/membership_models.dart';
 import '../../membership_strings.dart';
 import '../providers/membership_provider.dart';
@@ -64,6 +65,13 @@ class _MembershipScreenState extends State<MembershipScreen> {
         builder: (context) => ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            const GradientHeroCard(
+              title: MembershipStrings.title,
+              subtitle: MembershipStrings.choosePlan,
+              icon: Icons.workspace_premium_rounded,
+              warm: true,
+            ),
+            const SizedBox(height: 12),
             _CurrentCard(info: state.current),
             const SizedBox(height: 20),
             Text(
@@ -176,8 +184,13 @@ class _PlanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Card(
+      color: selected
+          ? scheme.primaryContainer
+          : best
+          ? scheme.secondaryContainer
+          : scheme.surfaceContainerLow,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         side: BorderSide(
           color: selected ? scheme.primary : scheme.outlineVariant,
           width: selected ? 2 : 1,
@@ -213,20 +226,22 @@ class _PlanCard extends StatelessWidget {
                           Chip(
                             label: const Text(MembershipStrings.bestValue),
                             visualDensity: VisualDensity.compact,
-                            backgroundColor: scheme.tertiaryContainer,
+                            backgroundColor: scheme.secondaryContainer,
                           ),
                       ],
                     ),
+                    const SizedBox(height: 4),
                     Text(
                       '${MembershipStrings.duration(plan.durationDays)} · '
                       '${MembershipStrings.perDay(formatVnd(plan.pricePerDay))}',
                     ),
+                    const SizedBox(height: 12),
+                    Text(
+                      formatVnd(plan.price),
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                   ],
                 ),
-              ),
-              Text(
-                formatVnd(plan.price),
-                style: Theme.of(context).textTheme.titleMedium,
               ),
             ],
           ),
@@ -287,8 +302,8 @@ class _VoucherBox extends StatelessWidget {
                   child: Text(
                     '${MembershipStrings.discount(formatVnd(voucher.discountAmount))} · '
                     '${MembershipStrings.finalPrice(formatVnd(voucher.finalPrice))}',
-                    style: const TextStyle(
-                      color: Colors.green,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.tertiary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

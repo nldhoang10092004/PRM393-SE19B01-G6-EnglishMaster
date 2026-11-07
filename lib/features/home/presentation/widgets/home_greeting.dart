@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../profile/presentation/providers/profile_provider.dart';
+import '../../../../core/widgets/user_avatar.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 
@@ -24,21 +28,14 @@ class HomeGreeting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final name = userName?.trim() ?? '';
-    final initial = name.isEmpty ? null : name.substring(0, 1).toUpperCase();
+    final profile = context.watch<ProfileProvider?>();
+    final name = (userName ?? profile?.profile?.fullName)?.trim() ?? '';
     final greeting = greetingFor((now ?? DateTime.now()).hour);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: theme.colorScheme.primaryContainer,
-            foregroundColor: theme.colorScheme.onPrimaryContainer,
-            child: initial == null
-                ? const Icon(Icons.person_rounded)
-                : Text(initial),
-          ),
+          UserAvatar(url: profile?.avatarUrl, name: name),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

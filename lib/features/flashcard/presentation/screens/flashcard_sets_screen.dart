@@ -69,7 +69,7 @@ class _FlashcardSetsScreenState extends State<FlashcardSetsScreen> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 300,
-                    mainAxisExtent: 218,
+                    mainAxisExtent: 256,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                   ),

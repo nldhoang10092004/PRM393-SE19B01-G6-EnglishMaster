@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/gradient_hero_card.dart';
 import '../providers/reminder_provider.dart';
 
 /// Route name of [ReminderSettingsScreen]; the integrator registers it.
@@ -21,34 +22,49 @@ class ReminderSettingsScreen extends StatelessWidget {
       body: !p.isLoaded
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.all(16),
               children: [
-                SwitchListTile(
-                  secondary: const Icon(Icons.notifications_active_outlined),
-                  title: const Text(AppStrings.dailyReminder),
-                  subtitle: const Text(AppStrings.dailyReminderHint),
-                  value: settings.enabled,
-                  onChanged: (v) =>
-                      context.read<ReminderProvider>().setEnabled(v),
+                const GradientHeroCard(
+                  title: AppStrings.studyReminder,
+                  subtitle: AppStrings.dailyReminderHint,
+                  icon: Icons.notifications_active_rounded,
+                  warm: true,
                 ),
-                ListTile(
-                  leading: const Icon(Icons.schedule_outlined),
-                  title: const Text(AppStrings.reminderTime),
-                  trailing: Text(
-                    settings.time.format(context),
-                    style: theme.textTheme.titleMedium,
+                const SizedBox(height: 16),
+                Card(
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        secondary: const Icon(
+                          Icons.notifications_active_outlined,
+                        ),
+                        title: const Text(AppStrings.dailyReminder),
+                        subtitle: const Text(AppStrings.dailyReminderHint),
+                        value: settings.enabled,
+                        onChanged: (v) =>
+                            context.read<ReminderProvider>().setEnabled(v),
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.schedule_outlined),
+                        title: const Text(AppStrings.reminderTime),
+                        trailing: Text(
+                          settings.time.format(context),
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        onTap: () async {
+                          final provider = context.read<ReminderProvider>();
+                          final picked = await showTimePicker(
+                            context: context,
+                            initialTime: settings.time,
+                          );
+                          if (picked != null) await provider.setTime(picked);
+                        },
+                      ),
+                    ],
                   ),
-                  onTap: () async {
-                    final provider = context.read<ReminderProvider>();
-                    final picked = await showTimePicker(
-                      context: context,
-                      initialTime: settings.time,
-                    );
-                    if (picked != null) await provider.setTime(picked);
-                  },
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   child: OutlinedButton.icon(
                     onPressed: () =>
                         context.read<ReminderProvider>().sendTest(),

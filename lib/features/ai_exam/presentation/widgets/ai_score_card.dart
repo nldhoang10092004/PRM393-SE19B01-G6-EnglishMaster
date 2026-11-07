@@ -54,6 +54,7 @@ class AiScoreCard extends StatelessWidget {
     };
     final feedback = _feedback(context, score.feedback);
     return Card(
+      color: Theme.of(context).colorScheme.tertiaryContainer,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -65,6 +66,8 @@ class AiScoreCard extends StatelessWidget {
               '${AiExamStrings.overall}: ${score.overall.toStringAsFixed(1)}/9',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
+            const SizedBox(height: 12),
+            LinearProgressIndicator(value: (score.overall / 9).clamp(0, 1)),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,

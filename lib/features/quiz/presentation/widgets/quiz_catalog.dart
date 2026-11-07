@@ -53,23 +53,38 @@ class QuizCatalog extends StatelessWidget {
                   return Card(
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
-                      leading: Icon(
-                        quiz.type == 1
-                            ? Icons.headphones_outlined
-                            : Icons.quiz_outlined,
-                        color: Theme.of(context).colorScheme.primary,
+                      leading: CircleAvatar(
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .primaryContainer,
+                        child: Icon(
+                          quiz.type == 1
+                              ? Icons.headphones_outlined
+                              : Icons.quiz_outlined,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer,
+                        ),
                       ),
-                      title: Text(quiz.title),
-                      subtitle: Text(
-                        quiz.description.isEmpty
-                            ? (quiz.type == 1
-                                  ? AppStrings.listeningQuiz
-                                  : AppStrings.practiceQuiz)
-                            : quiz.description,
+                      title: Text(
+                        quiz.title,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      trailing: best == null
-                          ? const Icon(Icons.chevron_right)
-                          : Chip(label: Text(AppStrings.bestScore(best))),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            quiz.description.isEmpty
+                                ? (quiz.type == 1
+                                      ? AppStrings.listeningQuiz
+                                      : AppStrings.practiceQuiz)
+                                : quiz.description,
+                          ),
+                          if (best != null)
+                            Chip(label: Text(AppStrings.bestScore(best))),
+                        ],
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
                       onTap: quiz.isActive
                           ? () async {
                               await Navigator.of(context).push(

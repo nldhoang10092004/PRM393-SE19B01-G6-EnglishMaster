@@ -34,6 +34,20 @@ class ProfileRepository {
     await _api.get('/api/user/profile/avatar') as Map,
   ).asStringOrNull('avatarUrl');
 
+  /// Replaces the avatar; File matches AvatarUploadRequest.File in the API.
+  Future<String> uploadAvatar(String filePath) async {
+    final response = Map<String, dynamic>.from(
+      await _api.putMultipart(
+        '/api/user/profile/avatar',
+        fileField: 'File',
+        filePath: filePath,
+      ) as Map,
+    );
+    final url = response.asString('avatarUrl');
+    if (url.trim().isEmpty) throw const FormatException('Missing avatarUrl');
+    return url;
+  }
+
   /// Retrieves active membership and dates.
   Future<MembershipStatus> membership() async => MembershipStatus.fromJson(
     Map<String, dynamic>.from(

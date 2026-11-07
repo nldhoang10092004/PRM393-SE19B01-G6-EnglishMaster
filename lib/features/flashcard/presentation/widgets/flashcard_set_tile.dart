@@ -22,9 +22,17 @@ class FlashcardSetTile extends StatelessWidget {
       builder: (context, state, _) {
         final total = state.set?.items.length;
         final mastered = state.progress.where((p) => p.isMastered).length;
+        final scheme = Theme.of(context).colorScheme;
+        final palettes = [
+          scheme.primaryContainer,
+          scheme.secondaryContainer,
+          scheme.tertiaryContainer,
+          scheme.surfaceContainerHigh,
+        ];
         return Card(
+          color: palettes[set.id.abs() % palettes.length],
           child: InkWell(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
             onTap: () async {
               await Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -38,9 +46,28 @@ class FlashcardSetTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.style_outlined,
-                    color: Theme.of(context).colorScheme.primary,
+                  SizedBox(
+                    width: 46,
+                    height: 46,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox.expand(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                            color: scheme.onSurfaceVariant,
+                            value: total == null || total == 0
+                                ? 0
+                                : (mastered / total).clamp(0, 1),
+                          ),
+                        ),
+                        Icon(
+                          Icons.style_rounded,
+                          size: 22,
+                          color: scheme.onSurface,
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(

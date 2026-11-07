@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/gradient_hero_card.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/utils/validators.dart';
 import '../providers/auth_provider.dart';
@@ -61,24 +62,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Icon(
-                      Icons.school_rounded,
-                      size: 72,
-                      color: theme.colorScheme.primary,
+                    const GradientHeroCard(
+                      title: AppStrings.appName,
+                      subtitle: AppStrings.tagline,
+                      icon: Icons.school_rounded,
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      AppStrings.appName,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      AppStrings.tagline,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 28),
                     TextFormField(
                       key: const Key('login_identifier'),
                       controller: _identifier,

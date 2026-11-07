@@ -59,6 +59,10 @@ void main() {
       find.text(MembershipStrings.activeUntil('02/01/2030')),
       findsOneWidget,
     );
+    await tester.scrollUntilVisible(
+      find.textContaining(MembershipStrings.pay),
+      180,
+    );
     expect(find.textContaining(MembershipStrings.pay), findsOneWidget);
   });
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/score_ring.dart';
+import '../../../../core/widgets/stat_tile.dart';
 import '../providers/quiz_provider.dart';
 
 /// Server score, correct/total counts and expandable submitted-answer review.
@@ -16,26 +18,37 @@ class QuizResultScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          Center(
-            child: SizedBox(
-              width: 160,
-              height: 160,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox.expand(
-                    child: CircularProgressIndicator(
-                      value: (result.score / 100).clamp(0, 1),
-                      strokeWidth: 10,
-                    ),
-                  ),
-                  Text(
-                    AppStrings.percentage(result.score),
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ],
+          ScoreRing(
+            fraction: result.score / 100,
+            label: AppStrings.percentage(result.score),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: StatTile(
+                  value: result.correct.toString(),
+                  label: AppStrings.correctAnswers,
+                  icon: Icons.check_circle_outline,
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: StatTile(
+                  value: result.wrong.toString(),
+                  label: AppStrings.wrongAnswers,
+                  icon: Icons.close_rounded,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: StatTile(
+                  value: result.pending.toString(),
+                  label: AppStrings.pendingAnswers,
+                  icon: Icons.hourglass_empty_rounded,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           Text(
