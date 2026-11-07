@@ -14,6 +14,7 @@ class AppStrings {
   static const saving = 'Đang lưu…';
   static const student = 'Học viên';
   static const notSet = 'Chưa cập nhật';
+  /// Builds a greeting line that includes the student's name.
   static String greetingName(String greeting, String name) =>
       '$greeting, $name';
   static const unexpectedError =
@@ -26,6 +27,7 @@ class AppStrings {
   static const passwordMismatch = 'Mật khẩu xác nhận không khớp';
   static const invalidOtp = 'Mã OTP chỉ được gồm chữ số';
   static const phoneDigits = 'Vui lòng nhập từ 9 đến 11 chữ số';
+  /// Error text shown when a required form field is empty.
   static String requiredField(String field) => '$field không được để trống';
 
   // Network
@@ -34,6 +36,7 @@ class AppStrings {
       'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.';
   static const sessionExpired =
       'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+  /// Error text for a failed server call, based on the HTTP status.
   static String serverError(int? status) => status == null
       ? genericError
       : 'Đã xảy ra lỗi (mã $status). Vui lòng thử lại.';
@@ -61,6 +64,7 @@ class AppStrings {
   static const createAccount = 'Đăng ký';
   static const resend = 'Gửi lại';
   static const sendOtp = 'Gửi mã OTP';
+  /// Message shown when a feature is limited to student accounts.
   static String studentOnly(String? role) =>
       'Ứng dụng dành cho học viên. Vui lòng dùng trang web cho tài khoản ${switch (role?.toUpperCase()) {
         'ADMIN' => 'quản trị viên',
@@ -83,10 +87,14 @@ class AppStrings {
   static const reviewHint = 'Chia sẻ trải nghiệm của bạn (không bắt buộc)';
   static const invalidCourse =
       'Không thể đọc dữ liệu khóa học. Vui lòng thử lại.';
+  /// Label naming the teacher of a course.
   static String teacherBy(String name) => 'Giảng viên: $name';
+  /// Summary of the average course rating and the rating count.
   static String ratingSummary(double average, int total) =>
       '${average.toStringAsFixed(1)} ($total)';
+  /// Count label for lessons.
   static String lessonCount(int count) => '$count bài học';
+  /// Count label for star ratings.
   static String starCount(int count) => '$count sao';
 
   // Flashcard
@@ -114,7 +122,9 @@ class AppStrings {
   static const nextCard = 'Thẻ sau';
   static const studyUnmastered = 'Học tiếp thẻ chưa thuộc';
   static const masteredBadge = 'Đã thuộc';
+  /// Flashcard position label, such as card 3 of 11.
   static String cardPosition(int current, int total) => 'Thẻ $current/$total';
+  /// Study summary showing mastered cards out of the total and the review count.
   static String studySummaryTotal(int mastered, int total, int reviews) =>
       'Đã thuộc $mastered/$total thẻ · $reviews lượt ôn trong phiên này.';
   static const openToStudy = 'Mở để học';
@@ -127,14 +137,20 @@ class AppStrings {
   static const setLoadError = 'Không thể tải bộ thẻ này.';
   static const recordLearningError =
       'Không thể lưu kết quả học. Vui lòng thử lại.';
+  /// Progress label showing mastered cards out of the total.
   static String masteredTotal(int count, int total) =>
       'Đã thuộc $count / $total thẻ';
+  /// Study summary showing the card count and the review count.
   static String studySummary(int count, int reviews) =>
       'Đã thuộc $count thẻ sau $reviews lượt ôn tập.';
+  /// Progress label showing studied and remaining card counts.
   static String studyProgress(int count, int remaining) =>
       'Đã thuộc $count thẻ · Còn $remaining thẻ';
+  /// Count label for flashcards.
   static String cardCount(int count) => '$count thẻ';
+  /// Label showing how many flashcards are mastered.
   static String masteredCount(int count) => 'Đã thuộc $count thẻ';
+  /// One learning-history line combining an action and its date.
   static String historyEntry(String action, String date) => '$action · $date';
 
   // Home
@@ -162,6 +178,7 @@ class AppStrings {
   static const permissionDenied =
       'Chưa được cấp quyền thông báo. Bạn hãy bật quyền trong cài đặt hệ thống.';
   static const testReminder = 'Đây là thông báo nhắc học thử.';
+  /// Reminder text encouraging the student to keep the study streak.
   static String keepStreak(int days) => 'Giữ chuỗi $days ngày học của bạn nhé!';
   static const reminderUpdateError =
       'Không thể cập nhật lời nhắc. Vui lòng thử lại.';
@@ -200,6 +217,7 @@ class AppStrings {
       'Cần có gói hội viên để làm bài kiểm tra của khóa học.';
   static const manageReminders = 'Cài đặt giờ nhắc học và thông báo';
   static const logout = 'Đăng xuất';
+  /// Label showing the membership expiry date.
   static String membershipExpires(String date) => 'Hết hạn: $date';
 
   // Quiz
@@ -256,21 +274,31 @@ class AppStrings {
   static const practiceQuiz = 'Bài kiểm tra luyện tập';
   static const noAttempts = 'Chưa có lượt làm bài kiểm tra.';
   static const refreshQuizzes = 'Tải lại bài kiểm tra';
+  /// Count label for quiz questions.
   static String questionCount(int count) => '$count câu hỏi';
+  /// Formats a quiz score as a percentage string.
   static String percentage(num score, {int decimals = 1}) =>
       '${score.toStringAsFixed(decimals)}%';
+  /// Label showing how many quiz answers are correct.
   static String correctCount(int count, int total) => 'Đúng $count/$total câu';
+  /// Label showing wrong answers and answers pending grading.
   static String pendingCount(int wrong, int pending) =>
       '$wrong câu sai · $pending câu chờ chấm';
+  /// Review text comparing the student's answer with the correction.
   static String answerReview(String answer, String correction) =>
       'Câu trả lời của bạn: $answer${correction.isEmpty ? '' : '\nĐáp án đúng: $correction'}';
+  /// Confirmation text showing how many questions were answered.
   static String submitSummary(int answered, int total) =>
       'Đã trả lời $answered/$total câu. Câu chưa trả lời sẽ được tính là sai.';
+  /// Progress label for the current quiz question.
   static String questionProgress(int current, int total) =>
       'Câu $current/$total';
+  /// Label showing the best quiz score.
   static String bestScore(num score) =>
       'Cao nhất: ${score.toStringAsFixed(0)}%';
+  /// Title for a quiz identified by its id.
   static String quizNumber(int id) => 'Bài kiểm tra #$id';
+  /// Localized label for a quiz attempt status.
   static String attemptStatus(String status) => switch (status.toUpperCase()) {
     'IN_PROGRESS' || 'STARTED' => 'Đang làm bài',
     'COMPLETED' || 'GRADED' => 'Đã chấm điểm',
@@ -279,6 +307,7 @@ class AppStrings {
     'ABANDONED' => 'Chưa hoàn thành',
     _ => 'Chưa rõ trạng thái',
   };
+  /// Summary line combining an attempt status and its date.
   static String attemptSummary(String status, String date) =>
       '${attemptStatus(status)}\n$date';
   static const answerSeparator = ' / ';
@@ -288,6 +317,7 @@ class AppStrings {
   static const streakUnavailable = 'Không thể tải chuỗi ngày học';
   static const studyToday = 'Học hôm nay để duy trì chuỗi ngày học nhé!';
   static const studiedToday = 'Bạn đã học hôm nay rồi. Giỏi lắm!';
+  /// Label for the number of consecutive study days.
   static String streakDays(int days) => '$days ngày liên tiếp';
 
   // Video
@@ -319,7 +349,9 @@ class AppStrings {
   static const deleteWordError = 'Không thể xóa từ vựng.';
   static const undo = 'Hoàn tác';
   static const restoreWordError = 'Không thể khôi phục từ vựng.';
+  /// Confirmation text shown after a word is removed.
   static String wordRemoved(String word) => 'Đã xóa $word';
+  /// Detail text combining a word's meaning and example.
   static String wordDetails(String meaning, String example) =>
       '$meaning${example.isEmpty ? '' : '\n$example'}';
 

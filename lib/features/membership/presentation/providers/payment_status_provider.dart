@@ -6,6 +6,7 @@ import '../../data/membership_repository.dart';
 import '../../data/models/membership_models.dart';
 import '../../membership_strings.dart';
 
+/// Phases of a payment as shown on the payment screen.
 enum PaymentPhase { waiting, paid, canceled, expired }
 
 /// Polls the order status until it leaves PENDING or the countdown ends.
@@ -36,6 +37,7 @@ class PaymentStatusProvider extends ChangeNotifier {
   Timer? _clock;
   bool _disposed = false;
 
+  /// Whether the payment is still waiting for confirmation.
   bool get isWaiting => phase == PaymentPhase.waiting;
 
   /// "mm:ss" of the remaining time.
@@ -44,6 +46,7 @@ class PaymentStatusProvider extends ChangeNotifier {
     return '${(s ~/ 60).toString().padLeft(2, '0')}:${(s % 60).toString().padLeft(2, '0')}';
   }
 
+  /// Starts polling the order status and the countdown timer.
   void start() {
     if (_poll != null || !isWaiting) return;
     _poll = Timer.periodic(pollInterval, (_) => check(silent: true));

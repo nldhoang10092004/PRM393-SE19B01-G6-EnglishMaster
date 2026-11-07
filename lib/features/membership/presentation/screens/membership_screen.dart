@@ -8,6 +8,7 @@ import '../../membership_strings.dart';
 import '../providers/membership_provider.dart';
 import 'payment_qr_screen.dart';
 
+/// Formats an amount in Vietnamese number style followed by the đ symbol.
 String formatVnd(num amount) =>
     '${NumberFormat.decimalPattern('vi').format(amount.round())}đ';
 

@@ -22,9 +22,13 @@ class AuthProvider extends ChangeNotifier {
   bool _busy = false;
   String? _error;
 
+  /// Current authentication status.
   AuthStatus get status => _status;
+  /// The signed-in session, or null when signed out.
   AuthSession? get session => _session;
+  /// Whether an auth request is in progress.
   bool get isBusy => _busy;
+  /// Last auth error message, or null.
   String? get error => _error;
 
   /// Called once at startup to restore a saved session.
@@ -36,6 +40,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Signs in with an email or username and password.
   Future<bool> login(String emailOrUsername, String password) => _run(() async {
     final session = await _repository.login(emailOrUsername.trim(), password);
     if (!session.isStudent) {
@@ -46,9 +51,11 @@ class AuthProvider extends ChangeNotifier {
     _status = AuthStatus.authenticated;
   });
 
+  /// Sends a one-time code to the given email.
   Future<bool> sendOtp(String email) =>
       _run(() => _repository.sendOtp(email.trim()));
 
+  /// Creates a new account using the given details and OTP.
   Future<bool> register({
     required String email,
     required String username,
@@ -64,9 +71,11 @@ class AuthProvider extends ChangeNotifier {
     _status = AuthStatus.authenticated;
   });
 
+  /// Requests a password reset for the given email.
   Future<bool> forgotPassword(String email) =>
       _run(() => _repository.forgotPassword(email.trim()));
 
+  /// Logs out on the server and clears the local session.
   Future<void> logout() async {
     await _repository.logout();
     _session = null;
@@ -82,6 +91,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Clears the last auth error and notifies listeners.
   void clearError() {
     if (_error == null) return;
     _error = null;

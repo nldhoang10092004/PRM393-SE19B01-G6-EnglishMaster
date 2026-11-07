@@ -66,12 +66,14 @@ class MembershipProvider extends ChangeNotifier {
     return regular.reduce((a, b) => b.pricePerDay < a.pricePerDay ? b : a);
   }
 
+  /// Selects a plan and clears any voucher applied to the previous one.
   void select(MembershipPlan plan) {
     if (selected?.id == plan.id) return;
     selected = plan;
     clearVoucher();
   }
 
+  /// Removes the applied voucher and its error message.
   void clearVoucher() {
     voucher = null;
     voucherError = null;
@@ -81,6 +83,7 @@ class MembershipProvider extends ChangeNotifier {
   /// Price after the applied voucher.
   double get payable => voucher?.finalPrice ?? selected?.price ?? 0;
 
+  /// Validates the entered voucher code against the selected plan.
   Future<void> applyVoucher(String rawCode) async {
     final plan = selected;
     final code = rawCode.trim();

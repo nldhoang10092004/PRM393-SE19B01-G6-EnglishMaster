@@ -13,12 +13,14 @@ extension JsonMapX on Map<String, dynamic> {
     return null;
   }
 
+  /// Reads a value as an int, converting numbers and numeric strings.
   int asInt(String key, {int fallback = 0}) {
     final v = pick(key);
     if (v is num) return v.toInt();
     return int.tryParse('$v') ?? fallback;
   }
 
+  /// Reads a value as an int, or null when it cannot be parsed.
   int? asIntOrNull(String key) {
     final v = pick(key);
     if (v == null) return null;
@@ -26,17 +28,21 @@ extension JsonMapX on Map<String, dynamic> {
     return int.tryParse('$v');
   }
 
+  /// Reads a value as a double, converting numbers and numeric strings.
   double asDouble(String key, {double fallback = 0}) {
     final v = pick(key);
     if (v is num) return v.toDouble();
     return double.tryParse('$v') ?? fallback;
   }
 
+  /// Reads a value as a string, using the fallback when it is missing.
   String asString(String key, {String fallback = ''}) =>
       pick(key)?.toString() ?? fallback;
 
+  /// Reads a value as a string, or null when it is missing.
   String? asStringOrNull(String key) => pick(key)?.toString();
 
+  /// Reads a value as a bool, accepting booleans, numbers and 'true' text.
   bool asBool(String key, {bool fallback = false}) {
     final v = pick(key);
     if (v is bool) return v;
@@ -45,9 +51,11 @@ extension JsonMapX on Map<String, dynamic> {
     return fallback;
   }
 
+  /// Reads a value as a DateTime, or null when it cannot be parsed.
   DateTime? asDate(String key) =>
       DateTime.tryParse(pick(key)?.toString() ?? '');
 
+  /// Reads a value as a list of JSON objects.
   List<Map<String, dynamic>> asList(String key) => asMapList(pick(key));
 }
 

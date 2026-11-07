@@ -18,14 +18,19 @@ lib/
   main.dart                 entry point: builds services, runApp
   app.dart                  MultiProvider + MaterialApp + AuthGate
   core/
-    config/                 AppConfig (API_BASE_URL via --dart-define)
-    network/                ApiClient (auth header, cookie, refresh), ApiException
+    config/                 AppConfig (API_BASE_URL via --dart-define, default = deployed HTTPS API)
+    l10n/                   AppStrings: every Vietnamese UI string, grouped by feature
+    network/                ApiClient (auth header, cookie, refresh, multipart, slow AI calls), ApiException
     router/                 AppRoutes (named routes)
     storage/                TokenStorage (secure storage, in-memory for tests)
-    theme/                  AppTheme (Material 3)
+    theme/                  AppTheme (Material 3, shared button/card/input shapes)
     utils/                  json helpers, validators, formatters
     widgets/                shared widgets (AsyncView, MessageView)
+  features/
+    auth/  home/  course/  video/  streak/  flashcard/  vocabulary/
+    quiz/  profile/  notifications/  membership/  ai_exam/
   features/<feature>/
+    <feature>_providers.dart  static providers() registered in app.dart
     data/
       models/               <name>.dart
       <feature>_repository.dart
@@ -41,7 +46,9 @@ test/
 ## Rules
 * File names `snake_case.dart`, classes `PascalCase`, one public widget per file.
 * Every public class and non-trivial method has a `///` doc comment (course requirement).
-* UI text in English. Use `Theme.of(context)` colors, no hard-coded colors.
+* UI text in Vietnamese, always through `AppStrings` (or a feature `*Strings` class); learning
+  content from the API stays as-is. Use `Theme.of(context)` colors, no hard-coded colors.
+* Long-running AI calls show `AiGeneratingView`; media players live in the provider, not in lazy lists.
 * Loading / error / empty states through `AsyncView`.
 * Lists: `ListView.builder` / `GridView.builder`; `const` constructors wherever possible.
 * Pull-to-refresh (`RefreshIndicator`) on list screens.

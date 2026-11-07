@@ -16,8 +16,11 @@ class StreakProvider extends ChangeNotifier {
   StreakStatus _streak = StreakStatus.empty;
   String? _error;
 
+  /// Loading status of the streak data.
   ViewStatus get status => _status;
+  /// Current study streak information.
   StreakStatus get streak => _streak;
+  /// Last error message, or null.
   String? get error => _error;
 
   /// Loads the streak. The previous value stays visible on refresh failures.

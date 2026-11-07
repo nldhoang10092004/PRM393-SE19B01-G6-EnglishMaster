@@ -25,11 +25,17 @@ class CourseDetailProvider extends ChangeNotifier {
   String? _error;
   String? _actionError;
 
+  /// Loading status of the course detail page.
   ViewStatus get status => _status;
+  /// The loaded course details, or null before loading.
   CourseDetail? get course => _course;
+  /// Rating summary of the course.
   CourseRating get rating => _rating;
+  /// Feedback left on the course.
   List<CourseFeedback> get feedbacks => _feedbacks;
+  /// Whether a feedback submission is in progress.
   bool get isSubmitting => _submitting;
+  /// Last error message, or null.
   String? get error => _error;
 
   /// Error of the last user action (e.g. submitting a review), null when none.

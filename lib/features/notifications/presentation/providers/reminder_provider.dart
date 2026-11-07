@@ -14,7 +14,9 @@ class ReminderProvider extends ChangeNotifier {
   bool _loaded = false;
   String? _error;
 
+  /// Current reminder settings.
   ReminderSettings get settings => _settings;
+  /// Whether saved reminder settings have been loaded.
   bool get isLoaded => _loaded;
 
   /// Last error (e.g. permission denied), null when none.

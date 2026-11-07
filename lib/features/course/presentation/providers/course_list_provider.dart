@@ -16,8 +16,11 @@ class CourseListProvider extends ChangeNotifier {
   List<CourseSummary> _courses = const [];
   String? _error;
 
+  /// Loading status of the course list.
   ViewStatus get status => _status;
+  /// Courses loaded for the list screen.
   List<CourseSummary> get courses => _courses;
+  /// Last error message, or null.
   String? get error => _error;
 
   /// Loads the courses. Keeps the old list visible while refreshing

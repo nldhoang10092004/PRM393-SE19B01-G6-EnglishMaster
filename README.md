@@ -1,28 +1,76 @@
 # EnglishMaster (PRM393 – SE19B01 – Group 6)
 
-Flutter mobile app for students of the EnglishMaster platform: courses with video lessons,
-flashcards, quizzes, saved vocabulary, learning streak and daily study reminders.
-The backend REST API is reused from the team's earlier OJT project (EasyEnglish API) and is
-deployed separately; it is not part of this repository.
+Ứng dụng di động Flutter giúp học viên học tiếng Anh: khóa học có video bài giảng, thẻ ghi nhớ (flashcard)
+có ảnh, bài kiểm tra Listening/Reading, luyện thi Nói – Nghe – Viết được AI chấm điểm, chuỗi ngày học,
+nhắc học hằng ngày và mua gói hội viên qua mã QR (PayOS).
 
-## Tech stack
-Flutter 3.47 / Dart 3.13 · Provider · Dio (+ cookie jar, token refresh) · flutter_secure_storage ·
-shared_preferences · video_player + chewie · flutter_local_notifications · mocktail (tests)
+Backend REST API được tái sử dụng từ project OJT trước đây của nhóm (EasyEnglish API), đã được chuyển
+sang PostgreSQL và triển khai riêng; mã nguồn API **không** nằm trong repository này.
 
-## Run
+## Tính năng
+
+| Nhóm | Chức năng |
+|---|---|
+| Tài khoản | Đăng nhập, đăng ký bằng OTP email, quên mật khẩu, tự làm mới phiên (refresh token), đăng xuất |
+| Trang chủ | Lời chào theo buổi, thẻ chuỗi ngày học, lối tắt luyện thi AI, danh sách khóa học |
+| Khóa học | Chi tiết khóa học, chương – bài học, đánh giá, bài kiểm tra của khóa |
+| Video | Phát video, lưu và tiếp tục tiến độ xem, đánh dấu hoàn thành |
+| Thẻ ghi nhớ | Bộ thẻ có ảnh và phiên âm, học lật thẻ, qua lại giữa các thẻ, tiến độ đã thuộc, lịch sử |
+| Từ vựng | Lưu từ từ thẻ, tìm kiếm, vuốt để xoá có hoàn tác |
+| Bài kiểm tra | Bài hệ thống và bài của khóa; Listening có audio, Reading có đoạn văn và ảnh; chấm điểm, lịch sử |
+| Luyện thi AI | Nói (ghi âm → Deepgram → Gemini chấm), Nghe (Gemini soạn đề + Murf đọc), Viết (Gemini chấm band IELTS), lịch sử chấm bài; nhận xét bằng tiếng Việt |
+| Hội viên | Chọn gói, mã giảm giá, thanh toán bằng VietQR (PayOS), tự kiểm tra trạng thái thanh toán |
+| Hồ sơ | Xem/sửa thông tin, đổi mật khẩu, trạng thái hội viên, cài đặt nhắc học (local notification) |
+
+## Công nghệ
+
+- **Flutter 3.47 / Dart 3.13**, Material 3, giao diện tiếng Việt (`flutter_localizations`, `intl`).
+- **State management:** Provider (`ChangeNotifier`), kiến trúc Screen → Provider → Repository → ApiClient.
+- **Mạng:** Dio + cookie jar (refresh token HttpOnly), tự refresh khi gặp 401.
+- **Lưu trữ local:** `flutter_secure_storage` (token), `shared_preferences` (cài đặt nhắc học), cookie jar.
+- **Media:** `video_player` + `chewie`, `audioplayers`, `record` (ghi âm), `qr_flutter`.
+- **Thông báo:** `flutter_local_notifications` + `timezone`.
+- **Kiểm thử:** `flutter_test`, `mocktail` (unit + widget test, repository giả).
+
+Backend (triển khai riêng): ASP.NET Core 10, EF Core + PostgreSQL, Docker trên VPS ARM64, HTTPS qua
+Cloudflare Tunnel; tích hợp Gemini, Deepgram, Murf, PayOS, Gmail SMTP, Cloudflare R2.
+
+## Chạy ứng dụng
+
 ```bash
 flutter pub get
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5213   # API on the host, Android emulator
+flutter run                                   # dùng API đã triển khai: https://em-api.ondevora.shop
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5213   # dùng API chạy trên máy (emulator)
 ```
 
-## Test & build
+Tài khoản demo: `student1` / `Student@123` (có gói hội viên), `student2` / `Student@123`.
+
+> Emulator: để ghi âm Luyện nói, bật **Extended controls → Microphone → "Virtual microphone uses host
+> audio input"** (tự tắt mỗi lần khởi động lại emulator).
+
+## Kiểm thử và build
+
 ```bash
 flutter analyze
 flutter test
-flutter build apk --release --dart-define=API_BASE_URL=https://<api-host>
+flutter build apk --release
+flutter build apk --release --split-per-abi   # APK nhỏ hơn cho từng kiến trúc CPU
 ```
 
-## Docs
-- [ARCHITECTURE.md](ARCHITECTURE.md) – layers, folder structure, coding rules
-- [DESIGN.md](DESIGN.md) – UI guide per screen
-- [PLAN.md](PLAN.md) – scope and timeline
+## Cấu trúc thư mục
+
+```
+lib/
+  main.dart, app.dart      khởi tạo service, MultiProvider, MaterialApp, AuthGate
+  core/                    config, l10n (AppStrings), network (ApiClient), router, storage, theme, utils, widgets
+  features/<feature>/      data/ (models, repository) + presentation/ (providers, screens, widgets)
+test/
+  unit/                    model, repository, provider
+  widget/                  màn hình với repository giả
+```
+
+## Tài liệu
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) – kiến trúc, cấu trúc thư mục, quy ước code
+- [DESIGN.md](DESIGN.md) – hướng dẫn giao diện từng màn hình
+- [PLAN.md](PLAN.md) – phạm vi, tiến độ và việc còn lại

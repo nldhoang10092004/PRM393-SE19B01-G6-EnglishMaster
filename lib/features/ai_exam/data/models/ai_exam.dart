@@ -80,6 +80,7 @@ class AiExamScore {
   final int? attemptId;
 
   factory AiExamScore.fromJson(Map<String, dynamic> json) {
+    /// Reads a numeric JSON value by key, or null when missing or invalid.
     double? number(String key, [String? storedKey]) {
       final value =
           json.pick(key) ?? (storedKey == null ? null : json.pick(storedKey));

@@ -16,12 +16,15 @@ class VocabularyProvider extends ChangeNotifier {
   String _query = '';
   final Set<int> _pending = {};
   bool _disposed = false;
+  /// Saved vocabulary words that match the current search.
   List<SavedWord> get words => List.unmodifiable(
     _words.where(
       (w) => '${w.front} ${w.back} ${w.example}'.toLowerCase().contains(_query),
     ),
   );
+  /// Whether a save or remove request for the word is still in progress.
   bool isPending(int id) => _pending.contains(id);
+  /// Whether the word is already in the saved list.
   bool isSaved(int id) => _words.any((w) => w.itemId == id);
 
   /// Filters all text locally without another HTTP request.

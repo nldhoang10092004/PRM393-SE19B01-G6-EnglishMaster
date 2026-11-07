@@ -92,13 +92,19 @@ class QuizTakingProvider extends ChangeNotifier {
   final Map<int, int> _choices = {};
   final Map<int, String> _text = {};
   bool _disposed = false;
+  /// All questions of the loaded quiz, or an empty list.
   List<QuizQuestion> get questions => quiz?.questions ?? const [];
+  /// The question currently shown, or null when there are none.
   QuizQuestion? get current => questions.isEmpty ? null : questions[index];
+  /// The group that contains the current question, if any.
   QuizGroup? get currentGroup => quiz?.groups
       .where((g) => g.questions.any((q) => q.id == current?.id))
       .firstOrNull;
+  /// Returns the chosen option for a choice question, or null.
   int? selected(int questionId) => _choices[questionId];
+  /// Returns the typed answer for a text question, or an empty string.
   String textAnswer(int questionId) => _text[questionId] ?? '';
+  /// Number of questions that have an answer.
   int get answeredCount => questions
       .where(
         (q) => q.isChoice
@@ -106,6 +112,7 @@ class QuizTakingProvider extends ChangeNotifier {
             : textAnswer(q.id).trim().isNotEmpty,
       )
       .length;
+  /// Whether the current question is the last one.
   bool get isLast => questions.isNotEmpty && index == questions.length - 1;
 
   /// Loads detail without creating a billable/recorded attempt yet.
@@ -136,6 +143,7 @@ class QuizTakingProvider extends ChangeNotifier {
   /// True after a start attempt was refused because the membership is missing.
   bool needsMembership = false;
 
+  /// Starts the quiz attempt on the server and reports whether it began.
   Future<bool> start() async {
     if (busy || quiz == null || questions.isEmpty) return false;
     if (attemptId != null) return true;

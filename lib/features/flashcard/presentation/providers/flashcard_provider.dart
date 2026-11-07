@@ -71,17 +71,24 @@ class FlashcardStudyProvider extends ChangeNotifier {
   bool complete = false;
   bool _disposed = false;
 
+  /// Number of cards in this set.
   int get total => _cards.length;
+  /// The card currently shown, or null when the set is empty or complete.
   Flashcard? get current => _cards.isEmpty || complete ? null : _cards[index];
+  /// Whether a previous card exists.
   bool get hasPrevious => index > 0;
+  /// Whether a next card exists.
   bool get hasNext => index < _cards.length - 1;
 
+  /// Whether the saved progress marks the card as mastered.
   bool isMastered(int itemId) =>
       progress.any((p) => p.itemId == itemId && p.isMastered);
 
   /// Mastered cards of this set according to the saved progress.
   int get masteredCount => _cards.where((c) => isMastered(c.id)).length;
+  /// Number of cards not yet mastered.
   int get remaining => total - masteredCount;
+  /// Share of the set that is mastered, from 0 to 1.
   double get fraction => total == 0 ? 0 : masteredCount / total;
 
   /// Loads detail and progress, retaining usable cards if progress fails.

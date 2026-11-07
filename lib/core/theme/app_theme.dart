@@ -6,8 +6,10 @@ class AppTheme {
 
   static const Color seed = Color(0xFF3D5AFE);
 
+  /// Builds the light theme used by the app.
   static ThemeData light() => _build(Brightness.light);
 
+  /// Builds the dark theme used by the app.
   static ThemeData dark() => _build(Brightness.dark);
 
   static ThemeData _build(Brightness brightness) {

@@ -18,6 +18,7 @@ class AuthSession {
   /// Access token lifetime in seconds.
   final int? expiresIn;
 
+  /// Whether the session belongs to a student account.
   bool get isStudent => (role ?? 'STUDENT').toUpperCase() == 'STUDENT';
 
   factory AuthSession.fromJson(Map<String, dynamic> json) => AuthSession(

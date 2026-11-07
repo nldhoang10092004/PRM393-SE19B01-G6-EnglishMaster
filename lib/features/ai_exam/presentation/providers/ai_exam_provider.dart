@@ -68,6 +68,7 @@ abstract class AiExamProvider<T> extends ChangeNotifier {
   bool busy = false;
   bool generating = false, grading = false;
   bool disposed = false;
+  /// Whether a new AI prompt can be requested right now.
   bool get canGenerate => !busy;
 
   /// Serializes actions and turns failures into Vietnamese UI state.
@@ -130,11 +131,14 @@ class AiWritingProvider extends AiExamProvider<AiExamScore> {
   AiWritingProvider(AiExamRepository repository)
     : super(repository, AiExamSkill.writing);
   String answer = '';
+  /// Number of words in the current written answer.
   int get wordCount =>
       answer.trim().isEmpty ? 0 : answer.trim().split(RegExp(r'\s+')).length;
+  /// Whether the written answer is long enough to submit.
   bool get canSubmit =>
       !busy && prompt != null && result == null && wordCount >= 150;
 
+  /// Stores the written answer while the exam can still be edited.
   void setAnswer(String value) {
     if (busy || result != null) return;
     answer = value;
@@ -166,13 +170,16 @@ class AiListeningProvider extends AiExamProvider<AiListeningResult> {
     super.audioPlayerFactory,
   }) : super(repository, AiExamSkill.listening);
   final Map<int, String> _answers = {};
+  /// Returns the saved answer for a question, or an empty string.
   String answerFor(int id) => _answers[id] ?? '';
+  /// Whether every listening question has an answer and can be submitted.
   bool get canSubmit =>
       !busy &&
       result == null &&
       prompt != null &&
       prompt!.questions.every((q) => answerFor(q.id).trim().isNotEmpty);
 
+  /// Stores the answer for one listening question.
   void setAnswer(int questionId, String value) {
     if (busy || result != null || prompt == null) return;
     final question = prompt!.questions
@@ -190,6 +197,7 @@ class AiListeningProvider extends AiExamProvider<AiListeningResult> {
   @override
   void clearAnswer() => _answers.clear();
 
+  /// Checks that all listening answers are filled in, then submits them for grading.
   Future<bool> submit() async {
     if (busy || prompt == null || result != null) return false;
     if (!canSubmit) {
@@ -221,6 +229,7 @@ class AiSpeakingProvider extends AiExamProvider<AiExamScore> {
   double level = 0;
   @override
   bool get canGenerate => !busy && !recording;
+  /// Whether a speaking recording exists and can be submitted.
   bool get canSubmit =>
       !busy &&
       !recording &&
@@ -291,6 +300,7 @@ class AiSpeakingProvider extends AiExamProvider<AiExamScore> {
     });
   }
 
+  /// Submits the recorded speaking audio for AI grading.
   Future<bool> submit() async {
     if (!canSubmit) return false;
     return perform(() async {

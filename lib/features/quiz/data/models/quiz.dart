@@ -16,6 +16,7 @@ class Quiz {
   final int type;
   final bool isActive;
   final List<QuizGroup> groups;
+  /// All questions in the quiz, across its groups.
   List<QuizQuestion> get questions =>
       List.unmodifiable(groups.expand((g) => g.questions));
 
@@ -66,6 +67,7 @@ class QuizQuestion {
   final int type;
   final List<QuizOption> options;
   final List<QuizAsset> assets;
+  /// Whether the question is a multiple-choice question.
   bool get isChoice => type == 1 || options.isNotEmpty;
 
   factory QuizQuestion.fromJson(Map<String, dynamic> json) => QuizQuestion(
@@ -104,6 +106,7 @@ class QuizAsset {
   final String text;
   final String caption;
   final String mimeType;
+  /// Whether the asset is an image.
   bool get isImage =>
       type == 2 ||
       mimeType.toLowerCase().startsWith('image/') ||
@@ -111,6 +114,7 @@ class QuizAsset {
         r'\.(png|jpe?g|webp|gif)(\?|$)',
         caseSensitive: false,
       ).hasMatch(url);
+  /// Whether the asset is an audio clip.
   bool get isAudio =>
       type == 1 ||
       mimeType.toLowerCase().startsWith('audio/') ||

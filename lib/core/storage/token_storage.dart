@@ -5,14 +5,19 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// Declared as an abstract class so tests can swap in [InMemoryTokenStorage]
 /// instead of the platform keystore.
 abstract class TokenStorage {
+  /// Reads the stored access token, or null when none is saved.
   Future<String?> readAccessToken();
+  /// Reads the stored account id, or null when none is saved.
   Future<int?> readAccountId();
+  /// Reads the stored account role, or null when none is saved.
   Future<String?> readRole();
+  /// Persists the session credentials and the optional role.
   Future<void> save({
     required String accessToken,
     required int accountId,
     String? role,
   });
+  /// Removes all stored session credentials.
   Future<void> clear();
 }
 

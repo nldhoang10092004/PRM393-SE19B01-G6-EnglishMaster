@@ -96,18 +96,22 @@ class ApiClient {
     }
   }
 
+  /// Sends a GET request and returns the decoded response body.
   Future<dynamic> get(String path, {Map<String, dynamic>? query}) =>
       _send(() => _dio.get(path, queryParameters: query));
 
+  /// Sends a POST request with an optional body and query parameters.
   Future<dynamic> post(
     String path, {
     Object? body,
     Map<String, dynamic>? query,
   }) => _send(() => _dio.post(path, data: body, queryParameters: query));
 
+  /// Sends a PUT request with an optional body.
   Future<dynamic> put(String path, {Object? body}) =>
       _send(() => _dio.put(path, data: body));
 
+  /// Sends a DELETE request to the given API path.
   Future<dynamic> delete(String path) => _send(() => _dio.delete(path));
 
   /// Uploads a file (e.g. a recorded answer) as `multipart/form-data`.

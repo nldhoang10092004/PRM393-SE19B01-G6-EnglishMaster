@@ -28,8 +28,11 @@ class AiExamAudioController extends ChangeNotifier {
   bool playing = false, busy = false;
   String? error;
 
+  /// Whether an audio source has been loaded.
   bool get hasSource => _audio != null;
+  /// Number of audio parts in the current exam.
   int get partCount => _parts.length;
+  /// The underlying audio player, or null before it is created.
   AudioPlayer? get player => _player;
 
   List<String> _split(String audio, bool local) =>
@@ -151,6 +154,7 @@ class AiExamAudioController extends ChangeNotifier {
     }
   }
 
+  /// Plays or pauses the current audio part.
   Future<void> toggle() => _operate(() async {
     final player = _ensurePlayer();
     if (playing) {
@@ -163,6 +167,7 @@ class AiExamAudioController extends ChangeNotifier {
     }
   });
 
+  /// Switches to another audio part and loads it.
   Future<void> changePart(int next) => _operate(() async {
     final player = _ensurePlayer();
     await player.stop();
@@ -174,11 +179,13 @@ class AiExamAudioController extends ChangeNotifier {
     _loaded = true;
   });
 
+  /// Updates the shown position while the user drags the seek bar.
   void previewSeek(Duration value) {
     position = value;
     _notify();
   }
 
+  /// Seeks the audio to the given position.
   Future<void> seek(Duration value) => _operate(() async {
     final max = duration;
     final target = value < Duration.zero
@@ -188,6 +195,7 @@ class AiExamAudioController extends ChangeNotifier {
     if (_loaded || playing) await _ensurePlayer().seek(target);
   });
 
+  /// Seeks backward by the given amount, 10 seconds by default.
   Future<void> rewind([Duration by = const Duration(seconds: 10)]) =>
       seek(position - by);
 

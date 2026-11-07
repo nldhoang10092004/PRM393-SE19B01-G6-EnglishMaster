@@ -114,15 +114,23 @@ class AiExamStrings {
     'Ghi lại từ mới trong mỗi bài luyện để ôn tập sau.',
     'Đọc to bài viết của mình để dễ phát hiện lỗi ngữ pháp.',
   ];
+  /// Label showing how long the student has waited for the AI.
   static String elapsedSeconds(int seconds) => 'Đã chờ ${seconds}s';
 
+  /// Label showing the word count of the written answer.
   static String wordCount(int count) => '$count từ';
+  /// Label for a numbered exam question.
   static String question(int number) => 'Câu $number';
+  /// Score label for a listening exam.
   static String listeningScore(int score, int total) =>
       'Đúng $score/$total câu';
+  /// Label showing the student's own answer.
   static String yourAnswer(String value) => 'Bạn trả lời: $value';
+  /// Label showing the correct answer.
   static String correctAnswer(String value) => 'Đáp án đúng: $value';
+  /// Label for the current audio part out of the total.
   static String audioPart(int index, int total) => 'Đoạn $index/$total';
+  /// Label showing the audio input level as a percentage.
   static String level(int percent) => 'Mức âm thanh: $percent%';
 
   /// Uses Vietnamese headings even when AI feedback keys are in English.

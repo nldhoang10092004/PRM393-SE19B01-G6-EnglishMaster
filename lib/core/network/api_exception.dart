@@ -10,6 +10,7 @@ class ApiException implements Exception {
   final String message;
   final int? statusCode;
 
+  /// Whether the failure was caused by an expired or invalid session.
   bool get isUnauthorized => statusCode == 401;
 
   /// Premium content without an active membership (HTTP 403).

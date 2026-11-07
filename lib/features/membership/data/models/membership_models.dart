@@ -24,6 +24,7 @@ class MembershipPlan {
   final double price;
   final int durationDays;
 
+  /// Price per day of the plan, based on its duration.
   double get pricePerDay => durationDays > 0 ? price / durationDays : price;
 }
 
@@ -108,6 +109,7 @@ class PaymentOrder {
   final String description;
 }
 
+/// Payment order states returned by the backend.
 enum PaymentState { pending, paid, canceled }
 
 /// Result of GET /api/payment/status/{orderId}.

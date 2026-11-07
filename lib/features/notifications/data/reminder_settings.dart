@@ -15,6 +15,7 @@ class ReminderSettings {
   final bool enabled;
   final TimeOfDay time;
 
+  /// Returns a copy with the given enabled flag or reminder time.
   ReminderSettings copyWith({bool? enabled, TimeOfDay? time}) =>
       ReminderSettings(
         enabled: enabled ?? this.enabled,
