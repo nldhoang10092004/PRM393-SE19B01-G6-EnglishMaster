@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../ai_exam_strings.dart';
+import '../../data/ai_exam_audio_controller.dart';
 import '../../data/ai_exam_recorder.dart';
 import '../../data/ai_exam_repository.dart';
 import '../../data/models/ai_exam.dart';
@@ -50,22 +51,35 @@ String aiExamError(Object failure) {
 
 /// Common route-scoped state; failed submissions retain the exercise and answers.
 abstract class AiExamProvider<T> extends ChangeNotifier {
-  AiExamProvider(this.repository, this.skill);
+  AiExamProvider(
+    this.repository,
+    this.skill, {
+    AiAudioPlayerFactory? audioPlayerFactory,
+  }) : audio = AiExamAudioController(playerFactory: audioPlayerFactory);
   final AiExamRepository repository;
+
+  /// One player for the whole exercise; disposed only with this provider.
+  final AiExamAudioController audio;
   final AiExamSkill skill;
   ViewStatus status = ViewStatus.idle;
   AiExamPrompt? prompt;
   T? result;
   String? error;
   bool busy = false;
-  bool sendToTeacher = false;
+  bool generating = false, grading = false;
   bool disposed = false;
   bool get canGenerate => !busy;
 
   /// Serializes actions and turns failures into Vietnamese UI state.
-  Future<bool> perform(Future<void> Function() action) async {
+  Future<bool> perform(
+    Future<void> Function() action, {
+    bool isGenerating = false,
+    bool isGrading = false,
+  }) async {
     if (busy || disposed) return false;
     busy = true;
+    generating = isGenerating;
+    grading = isGrading;
     error = null;
     if (prompt == null) status = ViewStatus.loading;
     notifyListeners();
@@ -79,6 +93,7 @@ abstract class AiExamProvider<T> extends ChangeNotifier {
       return false;
     } finally {
       busy = false;
+      generating = grading = false;
       notifyListeners();
     }
   }
@@ -91,18 +106,11 @@ abstract class AiExamProvider<T> extends ChangeNotifier {
       prompt = generated;
       result = null;
       clearAnswer();
-    });
+    }, isGenerating: true);
   }
 
   /// Resets skill-specific input after successful generation.
   void clearAnswer();
-
-  /// Saving also shares the submission with a teacher; the default is private.
-  void setSendToTeacher(bool value) {
-    if (busy || result != null) return;
-    sendToTeacher = value;
-    notifyListeners();
-  }
 
   @override
   void notifyListeners() {
@@ -112,6 +120,7 @@ abstract class AiExamProvider<T> extends ChangeNotifier {
   @override
   void dispose() {
     disposed = true;
+    audio.dispose();
     super.dispose();
   }
 }
@@ -145,19 +154,17 @@ class AiWritingProvider extends AiExamProvider<AiExamScore> {
       return false;
     }
     return perform(() async {
-      result = await repository.submitWriting(
-        prompt!.id,
-        answer.trim(),
-        sendToTeacher: sendToTeacher,
-      );
-    });
+      result = await repository.submitWriting(prompt!.id, answer.trim());
+    }, isGrading: true);
   }
 }
 
 /// Listening answers retain exact option content and are graded on the server.
 class AiListeningProvider extends AiExamProvider<AiListeningResult> {
-  AiListeningProvider(AiExamRepository repository)
-    : super(repository, AiExamSkill.listening);
+  AiListeningProvider(
+    AiExamRepository repository, {
+    super.audioPlayerFactory,
+  }) : super(repository, AiExamSkill.listening);
   final Map<int, String> _answers = {};
   String answerFor(int id) => _answers[id] ?? '';
   bool get canSubmit =>
@@ -192,15 +199,18 @@ class AiListeningProvider extends AiExamProvider<AiListeningResult> {
     }
     return perform(() async {
       result = await repository.submitListening(prompt!.id, Map.of(_answers));
-    });
+    }, isGrading: true);
   }
 }
 
 /// Captures a timed answer, retains playback on failed uploads, and grades audio.
 class AiSpeakingProvider extends AiExamProvider<AiExamScore> {
-  AiSpeakingProvider(AiExamRepository repository, {AiExamRecorder? recorder})
-    : _recorder = recorder ?? AiExamRecorder(),
-      super(repository, AiExamSkill.speaking);
+  AiSpeakingProvider(
+    AiExamRepository repository, {
+    AiExamRecorder? recorder,
+    super.audioPlayerFactory,
+  }) : _recorder = recorder ?? AiExamRecorder(),
+       super(repository, AiExamSkill.speaking);
   final AiExamRecorder _recorder;
   Timer? _timer;
   StreamSubscription<double>? _levels;
@@ -220,6 +230,7 @@ class AiSpeakingProvider extends AiExamProvider<AiExamScore> {
 
   @override
   void clearAnswer() {
+    unawaited(audio.clear());
     audioPath = null;
     elapsed = Duration.zero;
     level = 0;
@@ -252,6 +263,7 @@ class AiSpeakingProvider extends AiExamProvider<AiExamScore> {
         try {
           await _recorder.start();
           if (disposed) return;
+          unawaited(audio.clear());
           audioPath = null;
           elapsed = Duration.zero;
           recording = true;
@@ -282,12 +294,8 @@ class AiSpeakingProvider extends AiExamProvider<AiExamScore> {
   Future<bool> submit() async {
     if (!canSubmit) return false;
     return perform(() async {
-      result = await repository.submitSpeaking(
-        prompt!.id,
-        audioPath!,
-        sendToTeacher: sendToTeacher,
-      );
-    });
+      result = await repository.submitSpeaking(prompt!.id, audioPath!);
+    }, isGrading: true);
   }
 
   /// Stops microphone work even if the route closes during permission or setup.

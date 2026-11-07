@@ -8,7 +8,7 @@ import '../providers/ai_review_provider.dart';
 import '../widgets/ai_prompt_card.dart';
 import '../widgets/ai_score_card.dart';
 
-/// Original prompt and answer, AI review and an optional teacher review.
+/// Original prompt and answer, and AI review.
 class AiReviewDetailScreen extends StatelessWidget {
   const AiReviewDetailScreen({super.key, required this.submissionId});
   final int submissionId;
@@ -51,14 +51,6 @@ class AiReviewDetailScreen extends StatelessWidget {
                         score: detail.ai,
                         title: AiExamStrings.aiReview,
                       ),
-                      const SizedBox(height: 16),
-                      if (detail.teacher case final teacher?)
-                        AiScoreCard(
-                          score: teacher,
-                          title: AiExamStrings.teacherReview,
-                        )
-                      else
-                        const Text(AiExamStrings.teacherPending),
                     ],
                   );
                 },

@@ -36,50 +36,39 @@ void main() {
     }
   });
 
-  test(
-    'speaking uses file, promptId and sendToTeacher multipart fields',
-    () async {
-      when(
-        () => api.postMultipart(
-          '/api/user/ai-speaking/submit',
-          fileField: 'file',
-          filePath: '/tmp/answer.m4a',
-          fileName: 'answer.m4a',
-          fields: {'promptId': 10, 'sendToTeacher': true},
-        ),
-      ).thenAnswer((_) async => {'score': 7.5});
-      final result = await repository.submitSpeaking(
-        10,
-        '/tmp/answer.m4a',
-        sendToTeacher: true,
-      );
-      expect(result.overall, 7.5);
-      verify(
-        () => api.postMultipart(
-          '/api/user/ai-speaking/submit',
-          fileField: 'file',
-          filePath: '/tmp/answer.m4a',
-          fileName: 'answer.m4a',
-          fields: {'promptId': 10, 'sendToTeacher': true},
-        ),
-      ).called(1);
-    },
-  );
+  test('speaking uses file and promptId multipart fields', () async {
+    when(
+      () => api.postMultipart(
+        '/api/user/ai-speaking/submit',
+        fileField: 'file',
+        filePath: '/tmp/answer.m4a',
+        fileName: 'answer.m4a',
+        fields: {'promptId': 10},
+      ),
+    ).thenAnswer((_) async => {'score': 7.5});
+    final result = await repository.submitSpeaking(10, '/tmp/answer.m4a');
+    expect(result.overall, 7.5);
+    verify(
+      () => api.postMultipart(
+        '/api/user/ai-speaking/submit',
+        fileField: 'file',
+        filePath: '/tmp/answer.m4a',
+        fileName: 'answer.m4a',
+        fields: {'promptId': 10},
+      ),
+    ).called(1);
+  });
 
   test('writing sends camelCase JSON using the slow endpoint', () async {
     when(
       () => api.postSlow(
         '/api/user/ai-writing/submit',
-        body: {'promptId': 10, 'answerText': 'Essay', 'sendToTeacher': false},
+        body: {'promptId': 10, 'answerText': 'Essay'},
       ),
     ).thenAnswer(
       (_) async => {'score': 8, 'taskResponse': 8.5, 'attemptId': 0},
     );
-    final result = await repository.submitWriting(
-      10,
-      'Essay',
-      sendToTeacher: false,
-    );
+    final result = await repository.submitWriting(10, 'Essay');
     expect(result.taskResponse, 8.5);
     expect(result.attemptId, 0);
   });
@@ -135,11 +124,11 @@ void main() {
       when(
         () => api.postSlow(
           '/api/user/ai-writing/submit',
-          body: {'promptId': 10, 'answerText': 'Essay', 'sendToTeacher': false},
+          body: {'promptId': 10, 'answerText': 'Essay'},
         ),
       ).thenAnswer((_) async => {'error': 'missing score'});
       await expectLater(
-        repository.submitWriting(10, 'Essay', sendToTeacher: false),
+        repository.submitWriting(10, 'Essay'),
         throwsA(isA<ApiException>()),
       );
       when(() => api.get('/api/user/review/list'))

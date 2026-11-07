@@ -48,13 +48,7 @@ void main() {
       expect(state.canSubmit, isFalse);
       expect(await state.submit(), isFalse);
       expect(state.error, AiExamStrings.minimumWords);
-      verifyNever(
-        () => repository.submitWriting(
-          any(),
-          any(),
-          sendToTeacher: any(named: 'sendToTeacher'),
-        ),
-      );
+      verifyNever(() => repository.submitWriting(any(), any()));
     },
   );
 
@@ -62,13 +56,12 @@ void main() {
     when(() => repository.generate(AiExamSkill.writing))
         .thenAnswer((_) async => _prompt);
     final pending = Completer<AiExamScore>();
-    when(() => repository.submitWriting(5, _essay, sendToTeacher: true))
+    when(() => repository.submitWriting(5, _essay))
         .thenAnswer((_) => pending.future);
     final state = AiWritingProvider(repository);
     addTearDown(state.dispose);
     await state.generate();
     state.setAnswer(_essay);
-    state.setSendToTeacher(true);
     expect(state.canSubmit, isTrue);
     final submit = state.submit();
     expect(state.busy, isTrue);
@@ -79,14 +72,13 @@ void main() {
     expect(await submit, isTrue);
     expect(state.result, _score);
     expect(state.canSubmit, isFalse);
-    verify(() => repository.submitWriting(5, _essay, sendToTeacher: true))
-        .called(1);
+    verify(() => repository.submitWriting(5, _essay)).called(1);
   });
 
   test('failed submit retains draft and can retry', () async {
     when(() => repository.generate(AiExamSkill.writing))
         .thenAnswer((_) async => _prompt);
-    when(() => repository.submitWriting(5, _essay, sendToTeacher: false))
+    when(() => repository.submitWriting(5, _essay))
         .thenThrow(ApiException('Gemini API key missing'));
     final state = AiWritingProvider(repository);
     addTearDown(state.dispose);
@@ -98,7 +90,7 @@ void main() {
     expect(state.prompt, _prompt);
     expect(state.status, ViewStatus.success);
     expect(state.canSubmit, isTrue);
-    when(() => repository.submitWriting(5, _essay, sendToTeacher: false))
+    when(() => repository.submitWriting(5, _essay))
         .thenAnswer((_) async => _score);
     expect(await state.submit(), isTrue);
     expect(state.error, isNull);
@@ -221,13 +213,8 @@ void main() {
       when(recorder.dispose).thenAnswer((_) async {});
       when(() => repository.generate(AiExamSkill.speaking))
           .thenAnswer((_) async => _prompt);
-      when(
-        () => repository.submitSpeaking(
-          5,
-          '/temp/answer.m4a',
-          sendToTeacher: false,
-        ),
-      ).thenThrow(ApiException('Deepgram API key missing'));
+      when(() => repository.submitSpeaking(5, '/temp/answer.m4a'))
+          .thenThrow(ApiException('Deepgram API key missing'));
       final state = AiSpeakingProvider(repository, recorder: recorder);
       await state.generate();
       expect(await state.submit(), isFalse);
@@ -243,13 +230,8 @@ void main() {
       expect(await state.submit(), isFalse);
       expect(state.error, AiExamStrings.configurationError);
       expect(state.audioPath, '/temp/answer.m4a');
-      when(
-        () => repository.submitSpeaking(
-          5,
-          '/temp/answer.m4a',
-          sendToTeacher: false,
-        ),
-      ).thenAnswer((_) async => _score);
+      when(() => repository.submitSpeaking(5, '/temp/answer.m4a'))
+          .thenAnswer((_) async => _score);
       expect(await state.submit(), isTrue);
       state.dispose();
       await Future<void>.delayed(Duration.zero);

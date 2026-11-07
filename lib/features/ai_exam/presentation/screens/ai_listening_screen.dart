@@ -6,6 +6,7 @@ import '../../data/ai_exam_repository.dart';
 import '../providers/ai_exam_provider.dart';
 import '../widgets/ai_exam_audio_player.dart';
 import '../widgets/ai_exam_body.dart';
+import '../widgets/ai_generating_view.dart';
 import '../widgets/ai_prompt_card.dart';
 
 /// Generated listening audio, mixed choice/text answers and server answer review.
@@ -26,11 +27,18 @@ class AiListeningScreen extends StatelessWidget {
           busy: state.busy,
           canGenerate: state.canGenerate,
           onGenerate: state.generate,
-          submitting: state.prompt != null,
+          kind: AiGeneratingKind.listening,
+          generating: state.generating,
+          grading: state.grading,
+          pinned: state.prompt == null
+              ? null
+              : AiExamAudioPlayer(
+                  controller: state.audio,
+                  audio: state.prompt!.audioUrl,
+                ),
           children: [
             if (state.prompt case final prompt?) ...[
               AiPromptCard(title: prompt.title, content: ''),
-              AiExamAudioPlayer(key: ObjectKey(prompt), audio: prompt.audioUrl),
               const SizedBox(height: 16),
               if (state.result == null) ...[
                 for (final question in prompt.questions)

@@ -99,13 +99,22 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         Text(
-                          AppStrings.studySummary(
+                          AppStrings.studySummaryTotal(
                             state.masteredCount,
+                            state.total,
                             state.reviews,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
-                        FilledButton(
+                        if (state.remaining > 0) ...[
+                          FilledButton(
+                            onPressed: state.restart,
+                            child: const Text(AppStrings.studyUnmastered),
+                          ),
+                          const SizedBox(height: 12),
+                        ],
+                        OutlinedButton(
                           onPressed: () => Navigator.of(context).pop(),
                           child: const Text(AppStrings.backToSet),
                         ),
@@ -128,11 +137,23 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                       children: [
                         LinearProgressIndicator(value: state.fraction),
                         const SizedBox(height: 8),
-                        Text(
-                          AppStrings.studyProgress(
-                            state.masteredCount,
-                            state.remaining,
-                          ),
+                        Row(
+                          children: [
+                            Text(
+                              AppStrings.cardPosition(
+                                state.index + 1,
+                                state.total,
+                              ),
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            const Spacer(),
+                            Text(
+                              AppStrings.studyProgress(
+                                state.masteredCount,
+                                state.remaining,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -140,11 +161,19 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: state.flip,
+                      // Swipe left/right to move between cards.
+                      onHorizontalDragEnd: (details) {
+                        final v = details.primaryVelocity ?? 0;
+                        if (v < -200) state.next();
+                        if (v > 200) state.previous();
+                      },
                       child: Semantics(
                         button: true,
                         label: AppStrings.flipCard,
                         child: TweenAnimationBuilder<double>(
-                          key: ValueKey('${card.id}:${state.reviews}'),
+                          key: ValueKey(
+                            '${card.id}:${state.index}:${state.reviews}',
+                          ),
                           tween: Tween(
                             begin: 0,
                             end: state.flipped ? math.pi : 0,
@@ -171,6 +200,23 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
+                                            if (state.isMastered(card.id))
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 12,
+                                                ),
+                                                child: Chip(
+                                                  avatar: const Icon(
+                                                    Icons.check_circle,
+                                                    size: 18,
+                                                  ),
+                                                  label: const Text(
+                                                    AppStrings.masteredBadge,
+                                                  ),
+                                                  visualDensity:
+                                                      VisualDensity.compact,
+                                                ),
+                                              ),
                                             if (!back && card.imageUrl != null)
                                               Padding(
                                                 padding: const EdgeInsets.only(
@@ -259,6 +305,14 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
+                          IconButton.outlined(
+                            tooltip: AppStrings.previousCard,
+                            onPressed: state.busy || !state.hasPrevious
+                                ? null
+                                : state.previous,
+                            icon: const Icon(Icons.chevron_left),
+                          ),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: OutlinedButton(
                               onPressed: state.busy
@@ -267,7 +321,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                               child: const Text(AppStrings.again),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: FilledButton(
                               onPressed: state.busy
@@ -279,6 +333,14 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                                     : AppStrings.gotIt,
                               ),
                             ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton.outlined(
+                            tooltip: AppStrings.nextCard,
+                            onPressed: state.busy || !state.hasNext
+                                ? null
+                                : state.next,
+                            icon: const Icon(Icons.chevron_right),
                           ),
                         ],
                       ),

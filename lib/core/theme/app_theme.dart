@@ -32,12 +32,22 @@ class AppTheme {
         filled: true,
         fillColor: scheme.surfaceContainerHighest.withValues(alpha: 0.4),
       ),
+      // Filled and outlined buttons share size and shape so button pairs match.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size.fromHeight(48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(64, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          side: BorderSide(color: scheme.outline),
         ),
       ),
     );

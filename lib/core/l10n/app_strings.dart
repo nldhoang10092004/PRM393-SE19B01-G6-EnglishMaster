@@ -110,6 +110,13 @@ class AppStrings {
   static const tapToFlip = 'Chạm để lật thẻ';
   static const again = 'Học lại';
   static const gotIt = 'Đã thuộc';
+  static const previousCard = 'Thẻ trước';
+  static const nextCard = 'Thẻ sau';
+  static const studyUnmastered = 'Học tiếp thẻ chưa thuộc';
+  static const masteredBadge = 'Đã thuộc';
+  static String cardPosition(int current, int total) => 'Thẻ $current/$total';
+  static String studySummaryTotal(int mastered, int total, int reviews) =>
+      'Đã thuộc $mastered/$total thẻ · $reviews lượt ôn trong phiên này.';
   static const openToStudy = 'Mở để học';
   static const detailsUnavailable = 'Không thể tải thông tin';
   static const progressUnavailable = 'Không thể tải tiến độ';

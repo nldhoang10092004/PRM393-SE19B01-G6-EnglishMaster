@@ -46,7 +46,11 @@ class FlashcardProvider extends ChangeNotifier {
   }
 }
 
-/// Route-scoped study state; failed writes never advance the card queue.
+/// Route-scoped study state.
+///
+/// The learner browses every card of the set with previous/next; the
+/// mastered count comes from the progress saved on the server, so it matches
+/// the set detail screen. Failed writes never move to another card.
 class FlashcardStudyProvider extends ChangeNotifier {
   FlashcardStudyProvider(this.repository);
   final FlashcardRepository repository;
@@ -55,19 +59,33 @@ class FlashcardStudyProvider extends ChangeNotifier {
   String? progressError;
   FlashcardSet? set;
   List<FlashcardProgress> progress = [];
-  final List<Flashcard> _queue = [];
+  List<Flashcard> _cards = const [];
+  int index = 0;
   bool flipped = false;
   bool busy = false;
-  int masteredCount = 0;
+
+  /// Number of answers given in this session (for the summary).
   int reviews = 0;
+
+  /// True after the learner answered the last card of the set.
+  bool complete = false;
   bool _disposed = false;
-  Flashcard? get current => _queue.isEmpty ? null : _queue.first;
-  bool get complete => set != null && _queue.isEmpty;
-  int get remaining => _queue.length;
-  double get fraction =>
-      set == null || set!.items.isEmpty ? 0 : masteredCount / set!.items.length;
+
+  int get total => _cards.length;
+  Flashcard? get current => _cards.isEmpty || complete ? null : _cards[index];
+  bool get hasPrevious => index > 0;
+  bool get hasNext => index < _cards.length - 1;
+
+  bool isMastered(int itemId) =>
+      progress.any((p) => p.itemId == itemId && p.isMastered);
+
+  /// Mastered cards of this set according to the saved progress.
+  int get masteredCount => _cards.where((c) => isMastered(c.id)).length;
+  int get remaining => total - masteredCount;
+  double get fraction => total == 0 ? 0 : masteredCount / total;
 
   /// Loads detail and progress, retaining usable cards if progress fails.
+  /// Starts at the first card that is not mastered yet.
   Future<void> load(int id) async {
     if (status == ViewStatus.loading || busy) return;
     status = ViewStatus.loading;
@@ -76,11 +94,9 @@ class FlashcardStudyProvider extends ChangeNotifier {
     notifyListeners();
     try {
       set = await repository.detail(id);
-      _queue
-        ..clear()
-        ..addAll(set!.items);
-      masteredCount = 0;
+      _cards = List.unmodifiable(set!.items);
       reviews = 0;
+      complete = false;
       flipped = false;
       try {
         progress = await repository.progress(id);
@@ -89,6 +105,8 @@ class FlashcardStudyProvider extends ChangeNotifier {
       } catch (_) {
         progressError = AppStrings.progressError;
       }
+      final firstUnmastered = _cards.indexWhere((c) => !isMastered(c.id));
+      index = firstUnmastered < 0 ? 0 : firstUnmastered;
       status = ViewStatus.success;
     } on ApiException catch (e) {
       error = e.message;
@@ -108,7 +126,41 @@ class FlashcardStudyProvider extends ChangeNotifier {
     }
   }
 
-  /// Again puts the card at the end; Got it removes it after persistence.
+  /// Moves to the previous card (front side up).
+  void previous() {
+    if (busy || !hasPrevious) return;
+    index--;
+    flipped = false;
+    notifyListeners();
+  }
+
+  /// Moves to the next card (front side up).
+  void next() {
+    if (busy || !hasNext) return;
+    index++;
+    flipped = false;
+    notifyListeners();
+  }
+
+  /// Jumps to a card, e.g. from a swipe gesture.
+  void goTo(int value) {
+    if (busy || value < 0 || value >= _cards.length || value == index) return;
+    index = value;
+    flipped = false;
+    notifyListeners();
+  }
+
+  /// Restarts the session from the first card that is still not mastered.
+  void restart() {
+    final firstUnmastered = _cards.indexWhere((c) => !isMastered(c.id));
+    index = firstUnmastered < 0 ? 0 : firstUnmastered;
+    complete = false;
+    flipped = false;
+    notifyListeners();
+  }
+
+  /// Saves "Again" / "Got it" for the current card, then moves to the next
+  /// card; answering the last card finishes the session.
   Future<void> answer({required bool mastered}) async {
     if (busy || current == null) return;
     final card = current!;
@@ -117,14 +169,13 @@ class FlashcardStudyProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await repository.learn(card.id, mastered: mastered);
-      _queue.removeAt(0);
-      if (mastered) {
-        masteredCount++;
-      } else {
-        _queue.add(card);
-      }
       reviews++;
       flipped = false;
+      if (hasNext) {
+        index++;
+      } else {
+        complete = true;
+      }
       final previous = progress.where((p) => p.itemId == card.id).firstOrNull;
       progress = [
         ...progress.where((p) => p.itemId != card.id),

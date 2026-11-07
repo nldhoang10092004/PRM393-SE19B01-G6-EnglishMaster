@@ -5,9 +5,9 @@ import '../../ai_exam_strings.dart';
 import '../../data/ai_exam_repository.dart';
 import '../providers/ai_exam_provider.dart';
 import '../widgets/ai_exam_body.dart';
+import '../widgets/ai_generating_view.dart';
 import '../widgets/ai_prompt_card.dart';
 import '../widgets/ai_score_card.dart';
-import '../widgets/ai_teacher_switch.dart';
 
 /// A fresh writing session per route, with a retained draft during submission.
 class AiWritingScreen extends StatelessWidget {
@@ -27,7 +27,9 @@ class AiWritingScreen extends StatelessWidget {
           busy: state.busy,
           canGenerate: state.canGenerate,
           onGenerate: state.generate,
-          submitting: state.answer.isNotEmpty,
+          kind: AiGeneratingKind.writing,
+          generating: state.generating,
+          grading: state.grading,
           children: [
             if (state.prompt case final prompt?) ...[
               AiPromptCard(title: prompt.title, content: prompt.content),
@@ -54,11 +56,6 @@ class AiWritingScreen extends StatelessWidget {
               const Text(AiExamStrings.minimumWords),
               const SizedBox(height: 16),
               if (state.result == null) ...[
-                AiTeacherSwitch(
-                  value: state.sendToTeacher,
-                  onChanged: state.busy ? null : state.setSendToTeacher,
-                ),
-                const SizedBox(height: 8),
                 FilledButton.icon(
                   onPressed: state.canSubmit ? state.submit : null,
                   icon: const Icon(Icons.auto_awesome_outlined),

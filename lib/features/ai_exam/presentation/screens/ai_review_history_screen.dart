@@ -60,10 +60,7 @@ class AiReviewHistoryScreen extends StatelessWidget {
                                 ? AiExamStrings.prompt
                                 : submission.title,
                           ),
-                          subtitle: Text(
-                            '$dateText\n${submission.isTeacherReviewed ? AiExamStrings.teacherReviewed : AiExamStrings.teacherPending}',
-                          ),
-                          isThreeLine: true,
+                          subtitle: Text(dateText),
                           trailing: Text(
                             '${submission.score.toStringAsFixed(1)}/9',
                           ),

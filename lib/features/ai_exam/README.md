@@ -36,7 +36,7 @@ manifest, shell or app registration files were changed by this feature.
 - `presentation/providers/ai_exam_provider.dart`: independent skill sessions, validation and friendly errors.
 - `presentation/providers/ai_review_provider.dart`: history/detail loading states.
 - `presentation/screens/`: hub, speaking, listening, writing, history and detail.
-- `presentation/widgets/`: exercise state, prompt, teacher sharing, structured feedback and audio controls.
+- `presentation/widgets/`: exercise state, prompt, AI generating view, structured feedback and audio controls.
 - `test/unit/ai_exam/`: model, repository contract and provider state tests.
 - `test/widget/ai_exam/`: writing input, word count, submission and feedback test.
 
@@ -53,7 +53,7 @@ Vietnamese and never renders raw server error payloads or credentials.
 - `POST /api/user/ai-speaking/generate`, no body.
 - Response: `{promptId, title, content}`.
 - `POST /api/user/ai-speaking/submit`, multipart form:
-  `file` (recorded M4A), `promptId` (integer), `sendToTeacher` (boolean).
+  `file` (recorded M4A), `promptId` (integer).
 - Backend upload limit: 25,000,000 bytes. The UI caps recording at five minutes
   using 64 kbps mono AAC, comfortably below that limit.
 - Response: `{transcript, score, fluency, lexicalResource, grammar,
@@ -82,7 +82,7 @@ Vietnamese and never renders raw server error payloads or credentials.
 - `POST /api/user/ai-writing/generate`, no body.
 - Response: `{promptId, title, content}`.
 - `POST /api/user/ai-writing/submit` JSON:
-  `{promptId, answerText, sendToTeacher}`.
+  `{promptId, answerText}`.
 - Backend requires **at least 150 words**. The editor displays a live word count
   and disables submission until the minimum is reached.
 - Response: `{score, taskResponse, coherence, lexicalResource, grammar,
@@ -97,8 +97,8 @@ Speaking/writing feedback is usually an object with `overall`, skill criteria,
 plain text is also supported. Interface headings are Vietnamese; generated
 English exam content and server-authored feedback are displayed verbatim.
 
-Speaking/writing persist **only when `sendToTeacher:true`**, which also shares
-the submission with a teacher. The UI defaults this explicit switch to false
+Speaking/writing submissions are always saved to the student's own history
+(standalone app, no teacher sharing).
 and explains its effect. There is no separate save-only endpoint.
 
 - `GET /api/user/review/list` returns a bare array of

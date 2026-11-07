@@ -29,7 +29,7 @@ void main() {
         content: 'Discuss the value of education.',
       ),
     );
-    when(() => repository.submitWriting(9, essay, sendToTeacher: false))
+    when(() => repository.submitWriting(9, essay))
         .thenAnswer((_) => pending.future);
     await tester.pumpWidget(
       Provider<AiExamRepository>.value(
@@ -53,7 +53,7 @@ void main() {
     await tester.tap(submit);
     await tester.pump();
     expect(tester.widget<FilledButton>(submit).onPressed, isNull);
-    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    expect(find.text(AiExamStrings.grading), findsOneWidget);
     pending.complete(
       const AiExamScore(
         overall: 7.5,
@@ -68,8 +68,7 @@ void main() {
     expect(find.text('Điểm tổng: 7.5/9'), findsOneWidget);
     expect(find.text('Bài viết có luận điểm rõ ràng.'), findsOneWidget);
     expect(find.text('Nhận xét chung'), findsOneWidget);
-    verify(() => repository.submitWriting(9, essay, sendToTeacher: false))
-        .called(1);
+    verify(() => repository.submitWriting(9, essay)).called(1);
     expect(tester.takeException(), isNull);
   });
 }

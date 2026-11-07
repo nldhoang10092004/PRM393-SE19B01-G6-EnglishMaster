@@ -11,10 +11,9 @@ class AiExamStrings {
   static const listeningDescription = 'Nghe hội thoại và trả lời câu hỏi.';
   static const writingDescription = 'Viết bài luận và nhận góp ý chi tiết.';
   static const history = 'Lịch sử chấm bài';
-  static const historyDescription =
-      'Xem lại bài đã gửi và nhận xét của giáo viên.';
+  static const historyDescription = 'Xem lại bài đã nộp và nhận xét của AI';
   static const historyNote =
-      'Lịch sử chỉ lưu bài nói và bài viết đã chọn gửi cho giáo viên. Bài nghe không được lưu.';
+      'Lịch sử lưu các bài nói và bài viết đã nộp. Bài nghe không được lưu.';
   static const review = 'Chi tiết chấm bài';
   static const generate = 'Tạo đề mới';
   static const generating = 'Đang tạo đề…';
@@ -25,15 +24,9 @@ class AiExamStrings {
   static const answer = 'Bài làm của bạn';
   static const writingHint = 'Nhập bài viết bằng tiếng Anh…';
   static const minimumWords = 'Bài viết cần ít nhất 150 từ để chấm điểm.';
-  static const sendToTeacher = 'Gửi cho giáo viên và lưu vào lịch sử';
-  static const teacherNote =
-      'Khi bật, bài làm và nhận xét AI sẽ được lưu để giáo viên xem.';
   static const result = 'Kết quả chấm bài';
   static const feedback = 'Nhận xét';
   static const aiReview = 'Nhận xét của AI';
-  static const teacherReview = 'Nhận xét của giáo viên';
-  static const teacherPending = 'Đang chờ giáo viên nhận xét';
-  static const teacherReviewed = 'Giáo viên đã nhận xét';
   static const noFeedback = 'Chưa có nhận xét chi tiết.';
   static const noHistory = 'Bạn chưa có bài chấm nào trong lịch sử.';
   static const noAnswer = 'Chưa trả lời';
@@ -95,6 +88,33 @@ class AiExamStrings {
   static const explanation = 'Giải thích';
   static const errors = 'Lỗi cần sửa';
   static const weakPhrases = 'Cụm từ cần cải thiện';
+
+  static const cancel = 'Huỷ';
+  static const rewind10 = 'Lùi 10 giây';
+  static const audioLoading = 'Đang tải âm thanh…';
+  static const generatingSpeaking = 'AI đang soạn đề nói…';
+  static const generatingListening = 'AI đang soạn bài nghe và tạo audio…';
+  static const generatingWriting = 'AI đang soạn đề viết…';
+  static const grading = 'AI đang chấm bài…';
+  static const estimateNote = 'Có thể mất 10–40 giây.';
+  static const tipLabel = 'Mẹo học tập';
+  static const stepSpeaking = ['Chọn chủ đề', 'Soạn câu hỏi', 'Hoàn tất'];
+  static const stepWriting = ['Chọn chủ đề', 'Soạn đề bài', 'Hoàn tất'];
+  static const stepListening = [
+    'Soạn hội thoại',
+    'Tạo câu hỏi',
+    'Tạo giọng đọc',
+    'Hoàn tất',
+  ];
+  static const stepGrading = ['Gửi bài làm', 'Phân tích bài làm', 'Hoàn tất'];
+  static const tips = [
+    'Nghe lại nhiều lần giúp bạn bắt được từ nối và phát âm tự nhiên hơn.',
+    'Khi viết, hãy lập dàn ý ngắn 2–3 phút trước khi bắt đầu.',
+    'Nói chậm và rõ ràng quan trọng hơn nói nhanh nhưng sai.',
+    'Ghi lại từ mới trong mỗi bài luyện để ôn tập sau.',
+    'Đọc to bài viết của mình để dễ phát hiện lỗi ngữ pháp.',
+  ];
+  static String elapsedSeconds(int seconds) => 'Đã chờ ${seconds}s';
 
   static String wordCount(int count) => '$count từ';
   static String question(int number) => 'Câu $number';

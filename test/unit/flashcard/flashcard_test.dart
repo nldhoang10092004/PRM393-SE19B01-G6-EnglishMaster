@@ -102,23 +102,54 @@ void main() {
     });
     tearDown(() => state.dispose());
 
-    test('Again requeues, Got it advances, flip resets, completion counts unique cards', () async {
+    test(
+      'answers advance through the set, flip resets, last answer completes',
+      () async {
+        await state.load(4);
+        state.flip();
+        expect(state.flipped, isTrue);
+        await state.answer(mastered: false);
+        expect(state.current!.id, 20);
+        expect(state.flipped, isFalse);
+        expect(state.remaining, 2);
+        await state.answer(mastered: true);
+        expect(state.complete, isTrue);
+        expect(state.masteredCount, 1);
+        expect(state.fraction, .5);
+        expect(state.reviews, 2);
+        state.restart();
+        expect(state.complete, isFalse);
+        expect(state.current!.id, 10);
+      },
+    );
+
+    test('previous / next navigate without saving', () async {
       await state.load(4);
-      state.flip();
-      expect(state.flipped, isTrue);
-      await state.answer(mastered: false);
+      expect(state.hasPrevious, isFalse);
+      state.next();
       expect(state.current!.id, 20);
-      expect(state.flipped, isFalse);
-      expect(state.remaining, 2);
-      await state.answer(mastered: true);
+      expect(state.hasNext, isFalse);
+      state.next();
+      expect(state.current!.id, 20);
+      state.previous();
       expect(state.current!.id, 10);
-      expect(state.fraction, .5);
-      await state.answer(mastered: true);
-      expect(state.complete, isTrue);
-      expect(state.masteredCount, 2);
-      expect(state.reviews, 3);
-      expect(state.progress.firstWhere((p) => p.itemId == 10).reviewCount, 2);
+      verifyNever(
+        () => repository.learn(any(), mastered: any(named: 'mastered')),
+      );
     });
+
+    test(
+      'saved progress drives the mastered count and the starting card',
+      () async {
+        when(() => repository.progress(4)).thenAnswer(
+          (_) async => const [FlashcardProgress(itemId: 10, isMastered: true)],
+        );
+        await state.load(4);
+        expect(state.masteredCount, 1);
+        expect(state.remaining, 1);
+        expect(state.current!.id, 20);
+      },
+    );
 
     test('failed record does not advance and allows retry', () async {
       await state.load(4);
@@ -131,6 +162,7 @@ void main() {
       when(() => repository.learn(10, mastered: true)).thenAnswer((_) async {});
       await state.answer(mastered: true);
       expect(state.current!.id, 20);
+      expect(state.masteredCount, 1);
     });
 
     test('rapid double tap persists only once', () async {

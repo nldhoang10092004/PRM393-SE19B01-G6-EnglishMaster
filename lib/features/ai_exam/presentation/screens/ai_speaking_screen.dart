@@ -8,9 +8,9 @@ import '../../data/ai_exam_repository.dart';
 import '../providers/ai_exam_provider.dart';
 import '../widgets/ai_exam_audio_player.dart';
 import '../widgets/ai_exam_body.dart';
+import '../widgets/ai_generating_view.dart';
 import '../widgets/ai_prompt_card.dart';
 import '../widgets/ai_score_card.dart';
-import '../widgets/ai_teacher_switch.dart';
 
 /// Speaking exercise with native recording, live levels, playback and AI grading.
 class AiSpeakingScreen extends StatelessWidget {
@@ -61,7 +61,9 @@ class _SpeakingViewState extends State<_SpeakingView>
         busy: state.busy,
         canGenerate: state.canGenerate,
         onGenerate: state.generate,
-        submitting: state.audioPath != null,
+        kind: AiGeneratingKind.speaking,
+        generating: state.generating,
+        grading: state.grading,
         children: [
           if (state.prompt case final prompt?) ...[
             AiPromptCard(title: prompt.title, content: prompt.content),
@@ -114,17 +116,11 @@ class _SpeakingViewState extends State<_SpeakingView>
             if (state.audioPath case final path?)
               if (!state.recording && !state.busy)
                 AiExamAudioPlayer(
-                  key: ValueKey(path),
+                  controller: state.audio,
                   audio: path,
                   localFile: true,
                 ),
             if (state.result == null) ...[
-              AiTeacherSwitch(
-                value: state.sendToTeacher,
-                onChanged: state.busy || state.recording
-                    ? null
-                    : state.setSendToTeacher,
-              ),
               FilledButton.icon(
                 onPressed: state.canSubmit ? state.submit : null,
                 icon: const Icon(Icons.upload_rounded),

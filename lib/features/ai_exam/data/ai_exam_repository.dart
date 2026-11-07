@@ -40,36 +40,26 @@ class AiExamRepository {
     return AiExamScore.fromJson(json);
   }
 
-  /// Sends essay text; saving history also forwards the work to a teacher.
-  Future<AiExamScore> submitWriting(
-    int promptId,
-    String answerText, {
-    required bool sendToTeacher,
-  }) async => _score(
-    await api.postSlow(
-      '/api/user/ai-writing/submit',
-      body: {
-        'promptId': promptId,
-        'answerText': answerText,
-        'sendToTeacher': sendToTeacher,
-      },
-    ),
-  );
+  /// Sends essay text; the server saves every submission to the history.
+  Future<AiExamScore> submitWriting(int promptId, String answerText) async =>
+      _score(
+        await api.postSlow(
+          '/api/user/ai-writing/submit',
+          body: {'promptId': promptId, 'answerText': answerText},
+        ),
+      );
 
   /// Sends an AAC/M4A recording with the exact form fields expected by ASP.NET.
-  Future<AiExamScore> submitSpeaking(
-    int promptId,
-    String filePath, {
-    required bool sendToTeacher,
-  }) async => _score(
-    await api.postMultipart(
-      '/api/user/ai-speaking/submit',
-      fileField: 'file',
-      filePath: filePath,
-      fileName: 'answer.m4a',
-      fields: {'promptId': promptId, 'sendToTeacher': sendToTeacher},
-    ),
-  );
+  Future<AiExamScore> submitSpeaking(int promptId, String filePath) async =>
+      _score(
+        await api.postMultipart(
+          '/api/user/ai-speaking/submit',
+          fileField: 'file',
+          filePath: filePath,
+          fileName: 'answer.m4a',
+          fields: {'promptId': promptId},
+        ),
+      );
 
   /// Multiple-choice answers contain option text, never a letter or option ID.
   Future<AiListeningResult> submitListening(
