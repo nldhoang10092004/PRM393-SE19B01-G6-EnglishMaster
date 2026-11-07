@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/app_network_image.dart';
 import '../../data/models/quiz.dart';
 
 /// Renders passages and images, with guarded audio playback and URL fallback.
@@ -99,10 +101,11 @@ class _QuizAssetViewState extends State<QuizAssetView> {
             Positioned.fill(
               child: InteractiveViewer(
                 maxScale: 5,
-                child: Image.network(
-                  uri.toString(),
+                // Full-screen zoom: reuses the disk-cached file.
+                child: CachedNetworkImage(
+                  imageUrl: uri.toString(),
                   fit: BoxFit.contain,
-                  errorBuilder: (_, _, _) =>
+                  errorWidget: (_, _, _) =>
                       const Center(child: Text(AppStrings.imageUnavailable)),
                 ),
               ),
@@ -178,18 +181,16 @@ class _QuizAssetViewState extends State<QuizAssetView> {
             if (asset.isImage && uri != null)
               GestureDetector(
                 onTap: () => _zoomImage(context, uri),
-                child: Image.network(
-                  uri.toString(),
+                // Decoded at 200 px height + disk cache.
+                child: AppNetworkImage(
+                  url: uri.toString(),
                   height: 200,
                   fit: BoxFit.contain,
-                  loadingBuilder: (_, child, progress) => progress == null
-                      ? child
-                      : const SizedBox(
-                          height: 80,
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                  errorBuilder: (_, _, _) =>
-                      const Text(AppStrings.imageUnavailable),
+                  placeholder: const SizedBox(
+                    height: 80,
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: const Text(AppStrings.imageUnavailable),
                 ),
               ),
             if (asset.isAudio && uri != null)

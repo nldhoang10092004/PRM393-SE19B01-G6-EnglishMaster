@@ -24,10 +24,13 @@ class AuthProvider extends ChangeNotifier {
 
   /// Current authentication status.
   AuthStatus get status => _status;
+
   /// The signed-in session, or null when signed out.
   AuthSession? get session => _session;
+
   /// Whether an auth request is in progress.
   bool get isBusy => _busy;
+
   /// Last auth error message, or null.
   String? get error => _error;
 

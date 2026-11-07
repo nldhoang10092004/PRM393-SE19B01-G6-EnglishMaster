@@ -16,6 +16,7 @@ class ReminderProvider extends ChangeNotifier {
 
   /// Current reminder settings.
   ReminderSettings get settings => _settings;
+
   /// Whether saved reminder settings have been loaded.
   bool get isLoaded => _loaded;
 

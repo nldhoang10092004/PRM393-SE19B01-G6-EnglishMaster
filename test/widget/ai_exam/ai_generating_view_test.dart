@@ -14,7 +14,7 @@ void main() {
         ),
       ),
     );
-    final steps = AiExamStrings.stepListening;
+    const steps = AiExamStrings.stepListening;
     expect(find.text(AiExamStrings.generatingListening), findsOneWidget);
     expect(find.byKey(ValueKey('step-active-${steps[0]}')), findsOneWidget);
     expect(find.byKey(ValueKey('step-pending-${steps[3]}')), findsOneWidget);

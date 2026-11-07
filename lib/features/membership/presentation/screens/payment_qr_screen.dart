@@ -92,7 +92,10 @@ class _PaymentView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Text(MembershipStrings.scanInstruction, textAlign: TextAlign.center),
+        const Text(
+          MembershipStrings.scanInstruction,
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: 8),
         Text(
           '${MembershipStrings.orderDescription}: ${order.description}',

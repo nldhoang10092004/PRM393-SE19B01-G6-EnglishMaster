@@ -24,14 +24,17 @@ class VideoLessonProvider extends ChangeNotifier {
 
   /// Loading status of the lesson video.
   ViewStatus get status => _status;
+
   /// The loaded lesson video, or null before loading.
   LessonVideo? get video => _video;
+
   /// Last error message, or null.
   String? get error => _error;
 
   /// True when the lesson needs an active membership (show the upgrade banner).
   bool get needsMembership => _needsMembership;
   bool _needsMembership = false;
+
   /// Whether the lesson has been marked as completed.
   bool get isCompleted => _completed;
 

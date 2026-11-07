@@ -30,8 +30,10 @@ class AiExamAudioController extends ChangeNotifier {
 
   /// Whether an audio source has been loaded.
   bool get hasSource => _audio != null;
+
   /// Number of audio parts in the current exam.
   int get partCount => _parts.length;
+
   /// The underlying audio player, or null before it is created.
   AudioPlayer? get player => _player;
 

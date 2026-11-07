@@ -5,12 +5,15 @@ class MembershipStrings {
   static const title = 'Hội viên';
   static const currentMembership = 'Gói hiện tại';
   static const noMembership = 'Chưa có gói';
+
   /// Label saying the membership is active until the given date.
   static String activeUntil(String date) => 'Còn hiệu lực đến $date';
   static const choosePlan = 'Chọn gói hội viên';
   static const noPlans = 'Hiện chưa có gói hội viên nào.';
+
   /// Label for a plan duration in days.
   static String duration(int days) => '$days ngày';
+
   /// Approximate per-day price label for a plan.
   static String perDay(String price) => '≈ $price/ngày';
   static const bestValue = 'Tiết kiệm nhất';
@@ -19,8 +22,10 @@ class MembershipStrings {
   static const apply = 'Áp dụng';
   static const removeVoucher = 'Bỏ mã';
   static const selectPlanFirst = 'Hãy chọn một gói trước khi áp dụng mã.';
+
   /// Label showing the voucher discount amount.
   static String discount(String amount) => 'Giảm $amount';
+
   /// Label showing the total to pay after the discount.
   static String finalPrice(String amount) => 'Thành tiền: $amount';
   static const pay = 'Thanh toán';
@@ -35,6 +40,7 @@ class MembershipStrings {
   static const amount = 'Số tiền';
   static const scanInstruction = 'Mở app ngân hàng, quét mã để thanh toán';
   static const orderDescription = 'Nội dung chuyển khoản';
+
   /// Label showing the time left before the payment code expires.
   static String countdown(String mmss) => 'Mã hết hạn sau $mmss';
   static const openPaymentPage = 'Mở trang thanh toán';
@@ -44,6 +50,7 @@ class MembershipStrings {
       'Chưa nhận được thanh toán. Vui lòng thử lại sau ít giây.';
   static const waiting = 'Đang chờ thanh toán…';
   static const paidTitle = 'Thanh toán thành công';
+
   /// Label showing the membership expiry date after purchase.
   static String newExpiry(String date) =>
       'Hội viên của bạn có hiệu lực đến $date';

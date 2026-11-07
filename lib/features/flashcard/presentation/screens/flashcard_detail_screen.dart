@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/flashcard_repository.dart';
 import '../providers/flashcard_provider.dart';
@@ -85,18 +86,11 @@ class FlashcardDetailScreen extends StatelessWidget {
                           ? null
                           : ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                card.imageUrl!,
+                              // Decoded at 56 px (x pixel ratio) + disk cache.
+                              child: AppNetworkImage(
+                                url: card.imageUrl!,
                                 width: 56,
                                 height: 56,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, _, _) => const SizedBox(
-                                  width: 56,
-                                  height: 56,
-                                  child: Icon(
-                                    Icons.image_not_supported_outlined,
-                                  ),
-                                ),
                               ),
                             ),
                       title: Text(card.front),

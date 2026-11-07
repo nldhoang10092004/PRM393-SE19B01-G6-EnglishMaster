@@ -18,8 +18,10 @@ class CourseListProvider extends ChangeNotifier {
 
   /// Loading status of the course list.
   ViewStatus get status => _status;
+
   /// Courses loaded for the list screen.
   List<CourseSummary> get courses => _courses;
+
   /// Last error message, or null.
   String? get error => _error;
 

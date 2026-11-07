@@ -68,6 +68,7 @@ abstract class AiExamProvider<T> extends ChangeNotifier {
   bool busy = false;
   bool generating = false, grading = false;
   bool disposed = false;
+
   /// Whether a new AI prompt can be requested right now.
   bool get canGenerate => !busy;
 
@@ -131,9 +132,11 @@ class AiWritingProvider extends AiExamProvider<AiExamScore> {
   AiWritingProvider(AiExamRepository repository)
     : super(repository, AiExamSkill.writing);
   String answer = '';
+
   /// Number of words in the current written answer.
   int get wordCount =>
       answer.trim().isEmpty ? 0 : answer.trim().split(RegExp(r'\s+')).length;
+
   /// Whether the written answer is long enough to submit.
   bool get canSubmit =>
       !busy && prompt != null && result == null && wordCount >= 150;
@@ -165,13 +168,13 @@ class AiWritingProvider extends AiExamProvider<AiExamScore> {
 
 /// Listening answers retain exact option content and are graded on the server.
 class AiListeningProvider extends AiExamProvider<AiListeningResult> {
-  AiListeningProvider(
-    AiExamRepository repository, {
-    super.audioPlayerFactory,
-  }) : super(repository, AiExamSkill.listening);
+  AiListeningProvider(AiExamRepository repository, {super.audioPlayerFactory})
+    : super(repository, AiExamSkill.listening);
   final Map<int, String> _answers = {};
+
   /// Returns the saved answer for a question, or an empty string.
   String answerFor(int id) => _answers[id] ?? '';
+
   /// Whether every listening question has an answer and can be submitted.
   bool get canSubmit =>
       !busy &&
@@ -229,6 +232,7 @@ class AiSpeakingProvider extends AiExamProvider<AiExamScore> {
   double level = 0;
   @override
   bool get canGenerate => !busy && !recording;
+
   /// Whether a speaking recording exists and can be submitted.
   bool get canSubmit =>
       !busy &&

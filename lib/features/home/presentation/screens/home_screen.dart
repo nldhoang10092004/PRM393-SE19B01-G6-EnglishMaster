@@ -6,6 +6,7 @@ import '../../../../core/widgets/async_view.dart';
 import '../../../course/presentation/providers/course_list_provider.dart';
 import '../../../course/presentation/screens/course_detail_screen.dart';
 import '../../../course/presentation/widgets/course_card.dart';
+import '../../../streak/data/models/streak_status.dart';
 import '../../../streak/presentation/providers/streak_provider.dart';
 import '../../../streak/presentation/widgets/streak_card.dart';
 import '../../../ai_exam/presentation/screens/ai_exam_hub_screen.dart';
@@ -40,7 +41,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final courses = context.watch<CourseListProvider>();
-    final streak = context.watch<StreakProvider>();
+    // Only the two streak fields the card shows: other StreakProvider changes
+    // do not rebuild the whole home screen.
+    final streakStatus = context.select<StreakProvider, ViewStatus>(
+      (p) => p.status,
+    );
+    final streakValue = context.select<StreakProvider, StreakStatus>(
+      (p) => p.streak,
+    );
     final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
@@ -54,8 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: StreakCard(
-                    status: streak.status,
-                    streak: streak.streak,
+                    status: streakStatus,
+                    streak: streakValue,
                     onRetry: () => context.read<StreakProvider>().load(),
                   ),
                 ),

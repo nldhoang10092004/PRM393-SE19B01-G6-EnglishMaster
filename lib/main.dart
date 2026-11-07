@@ -11,11 +11,14 @@ import 'features/auth/data/auth_repository.dart';
 /// Entry point: builds the long-lived services, then starts the widget tree.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('vi');
-
   final tokenStorage = SecureTokenStorage();
-  // Cookies (refresh token) survive app restarts.
-  final docsDir = await getApplicationDocumentsDirectory();
+  // Date symbols and the documents directory are independent: load in parallel.
+  // (Notification plugin init is lazy, it never runs before the first frame.)
+  final (_, docsDir) = await (
+    initializeDateFormatting('vi'),
+    // Cookies (refresh token) survive app restarts.
+    getApplicationDocumentsDirectory(),
+  ).wait;
   final cookieJar = PersistCookieJar(
     storage: FileStorage('${docsDir.path}/.cookies/'),
   );

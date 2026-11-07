@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../vocabulary/data/models/saved_word.dart';
 import '../../../vocabulary/presentation/providers/vocabulary_provider.dart';
@@ -20,6 +21,28 @@ class FlashcardStudyScreen extends StatefulWidget {
 }
 
 class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
+  String? _precachedUrl;
+
+  /// Warms the image cache for the next card so swiping shows it instantly.
+  void _precacheNext(String? url) {
+    if (url == null || url == _precachedUrl) return;
+    _precachedUrl = url;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final media = MediaQuery.of(context);
+      // Same size the card renders at: screen width minus card margin/padding.
+      precacheImage(
+        AppNetworkImage.providerFor(
+          url,
+          logicalWidth: media.size.width - 80,
+          pixelRatio: media.devicePixelRatio,
+        ),
+        context,
+        onError: (_, _) {},
+      );
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +59,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
     child: Consumer<FlashcardStudyProvider>(
       builder: (context, state, _) {
         final card = state.current;
+        _precacheNext(state.upcoming?.imageUrl);
         final vocabulary = context.watch<VocabularyProvider>();
         final saved =
             card != null &&
@@ -201,16 +225,16 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             if (state.isMastered(card.id))
-                                              Padding(
-                                                padding: const EdgeInsets.only(
+                                              const Padding(
+                                                padding: EdgeInsets.only(
                                                   bottom: 12,
                                                 ),
                                                 child: Chip(
-                                                  avatar: const Icon(
+                                                  avatar: Icon(
                                                     Icons.check_circle,
                                                     size: 18,
                                                   ),
-                                                  label: const Text(
+                                                  label: Text(
                                                     AppStrings.masteredBadge,
                                                   ),
                                                   visualDensity:
@@ -225,35 +249,27 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                                                 child: ClipRRect(
                                                   borderRadius:
                                                       BorderRadius.circular(16),
-                                                  child: Image.network(
-                                                    card.imageUrl!,
+                                                  // Decoded at the card width, cached on disk.
+                                                  child: AppNetworkImage(
+                                                    url: card.imageUrl!,
                                                     height: 180,
                                                     width: double.infinity,
-                                                    fit: BoxFit.cover,
-                                                    loadingBuilder:
-                                                        (
-                                                          _,
-                                                          child,
-                                                          progress,
-                                                        ) => progress == null
-                                                        ? child
-                                                        : const SizedBox(
-                                                            height: 180,
-                                                            child: Center(
-                                                              child:
-                                                                  CircularProgressIndicator(),
-                                                            ),
-                                                          ),
-                                                    errorBuilder: (_, _, _) =>
-                                                        const SizedBox(
-                                                          height: 60,
-                                                          child: Center(
-                                                            child: Icon(
-                                                              Icons
-                                                                  .image_not_supported_outlined,
-                                                            ),
-                                                          ),
+                                                    error: const SizedBox(
+                                                      height: 60,
+                                                      child: Center(
+                                                        child: Icon(
+                                                          Icons
+                                                              .image_not_supported_outlined,
                                                         ),
+                                                      ),
+                                                    ),
+                                                    placeholder: const SizedBox(
+                                                      height: 180,
+                                                      child: Center(
+                                                        child:
+                                                            CircularProgressIndicator(),
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ),

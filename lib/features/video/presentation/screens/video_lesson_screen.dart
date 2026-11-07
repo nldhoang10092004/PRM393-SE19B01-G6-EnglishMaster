@@ -94,7 +94,7 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
         aspectRatio: controller.value.aspectRatio == 0
             ? 16 / 9
             : controller.value.aspectRatio,
-        errorBuilder: (_, message) => MessageView(
+        errorBuilder: (_, message) => const MessageView(
           icon: Icons.error_outline,
           message: AppStrings.videoPlaybackError,
         ),

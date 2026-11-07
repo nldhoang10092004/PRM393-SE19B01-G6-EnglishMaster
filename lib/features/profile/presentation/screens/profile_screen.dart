@@ -6,6 +6,7 @@ import '../../../membership/presentation/screens/membership_screen.dart';
 
 import '../../../../core/config/app_config.dart';
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../quiz/presentation/screens/quiz_history_screen.dart';
@@ -78,12 +79,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     name.characters.first.toUpperCase(),
                                     style: theme.textTheme.headlineMedium,
                                   )
-                                : Image.network(
-                                    avatar,
+                                : AppNetworkImage(
+                                    url: avatar,
                                     width: 80,
                                     height: 80,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, _, _) => Text(
+                                    error: Text(
                                       name.characters.first.toUpperCase(),
                                       style: theme.textTheme.headlineMedium,
                                     ),
