@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/utils/validators.dart';
 import '../../data/models/user_profile.dart';
 import '../providers/profile_provider.dart';
@@ -58,8 +60,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
     if (ok && mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Profile updated')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.profileUpdated)));
       Navigator.of(context).pop();
     }
   }
@@ -68,7 +71,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     final state = context.watch<ProfileProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit profile')),
+      appBar: AppBar(title: const Text(AppStrings.editProfile)),
       body: Form(
         key: _form,
         child: ListView(
@@ -78,35 +81,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               controller: _name,
               enabled: !state.busy,
               maxLength: 100,
-              decoration: const InputDecoration(labelText: 'Full name'),
+              decoration: const InputDecoration(labelText: AppStrings.fullName),
               validator: (value) =>
-                  Validators.required(value, field: 'Full name'),
+                  Validators.required(value, field: AppStrings.fullName),
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _phone,
               enabled: !state.busy,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(labelText: 'Phone'),
+              decoration: const InputDecoration(labelText: AppStrings.phone),
               validator: (value) =>
                   value == null ||
                       value.trim().isEmpty ||
                       RegExp(r'^[0-9]{9,11}$').hasMatch(value.trim())
                   ? null
-                  : 'Use 9–11 digits',
+                  : AppStrings.phoneDigits,
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _address,
               enabled: !state.busy,
               maxLength: 255,
-              decoration: const InputDecoration(labelText: 'Address'),
+              decoration: const InputDecoration(labelText: AppStrings.address),
             ),
             const SizedBox(height: 16),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Date of birth'),
-              subtitle: Text(_dob?.toString().split(' ').first ?? 'Not set'),
+              title: const Text(AppStrings.dateOfBirth),
+              subtitle: Text(
+                _dob == null
+                    ? AppStrings.notSet
+                    : DateFormat.yMd('vi').format(_dob!),
+              ),
               trailing: const Icon(Icons.calendar_today_outlined),
               onTap: state.busy
                   ? null
@@ -133,9 +140,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     },
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Existing phone, address and birthday cannot be cleared by this API.',
-            ),
+            const Text(AppStrings.cannotClearProfile),
             if (state.error != null)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -147,7 +152,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 24),
             FilledButton(
               onPressed: state.busy ? null : _save,
-              child: Text(state.busy ? 'Saving…' : 'Save changes'),
+              child: Text(
+                state.busy ? AppStrings.saving : AppStrings.saveChanges,
+              ),
             ),
           ],
         ),

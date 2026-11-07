@@ -19,10 +19,10 @@ class LessonVideo {
   final bool canWatch;
 
   factory LessonVideo.fromJson(Map<String, dynamic> json) => LessonVideo(
-        id: json.asInt('videoId'),
-        name: json.asString('videoName'),
-        url: json.asString('videoURL'),
-        isPreview: json.asBool('isPreview'),
-        canWatch: json.asBool('canWatch', fallback: true),
-      );
+    id: json.asInt('videoId'),
+    name: json.asString('videoName'),
+    url: json.asString('videoURL'),
+    isPreview: json.asBool('isPreview'),
+    canWatch: json.asBool('canWatch', fallback: true),
+  );
 }

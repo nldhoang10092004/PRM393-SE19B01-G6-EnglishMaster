@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:provider/provider.dart';
+import 'package:english_master/core/l10n/app_strings.dart';
 import 'package:english_master/features/vocabulary/data/models/saved_word.dart';
 import 'package:english_master/features/vocabulary/data/vocabulary_repository.dart';
 import 'package:english_master/features/vocabulary/presentation/providers/vocabulary_provider.dart';
 import 'package:english_master/features/vocabulary/presentation/screens/vocabulary_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:provider/provider.dart';
 
 class _Repository extends Mock implements VocabularyRepository {}
 
@@ -30,8 +31,8 @@ void main() {
     await tester.drag(find.byType(Dismissible), const Offset(-700, 0));
     await tester.pumpAndSettle();
     expect(find.text('journey'), findsNothing);
-    expect(find.text('Undo'), findsOneWidget);
-    await tester.tap(find.text('Undo'));
+    expect(find.text(AppStrings.undo), findsOneWidget);
+    await tester.tap(find.text(AppStrings.undo));
     await tester.pumpAndSettle();
     expect(find.text('journey'), findsOneWidget);
     verify(() => repository.save(10)).called(1);

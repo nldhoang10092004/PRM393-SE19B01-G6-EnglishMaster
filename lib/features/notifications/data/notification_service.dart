@@ -3,6 +3,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../../core/l10n/app_strings.dart';
+
 /// Thin wrapper around `flutter_local_notifications` for the study reminder.
 ///
 /// * [scheduleDailyReminder] repeats every day at a chosen local time;
@@ -11,7 +13,7 @@ import 'package:timezone/timezone.dart' as tz;
 /// All methods lazily call [init], so callers never need to initialize first.
 class NotificationService {
   NotificationService({FlutterLocalNotificationsPlugin? plugin})
-      : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+    : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   static const int _dailyReminderId = 1001;
   static const int _instantId = 1002;
@@ -19,8 +21,8 @@ class NotificationService {
   static const NotificationDetails _details = NotificationDetails(
     android: AndroidNotificationDetails(
       _channelId,
-      'Study reminders',
-      channelDescription: 'Daily reminder to practice English',
+      AppStrings.reminderChannel,
+      channelDescription: AppStrings.reminderDescription,
       importance: Importance.high,
       priority: Priority.high,
     ),
@@ -35,7 +37,9 @@ class NotificationService {
     tzdata.initializeTimeZones();
     tz.setLocalLocation(_deviceLocation());
     await _plugin.initialize(
-      settings: const InitializationSettings(android: AndroidInitializationSettings('@mipmap/ic_launcher')),
+      settings: const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      ),
     );
     _ready = true;
   }
@@ -47,7 +51,8 @@ class NotificationService {
     final now = DateTime.now();
     final offset = now.timeZoneOffset;
     for (final location in tz.timeZoneDatabase.locations.values) {
-      if (location.name.contains('/') && location.timeZone(now.millisecondsSinceEpoch).offset == offset) {
+      if (location.name.contains('/') &&
+          location.timeZone(now.millisecondsSinceEpoch).offset == offset) {
         return location;
       }
     }
@@ -57,7 +62,10 @@ class NotificationService {
   /// Asks for the Android 13+ notification permission. Returns true if granted.
   Future<bool> requestPermission() async {
     await init();
-    final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     return await android?.requestNotificationsPermission() ?? true;
   }
 
@@ -66,12 +74,19 @@ class NotificationService {
   Future<void> scheduleDailyReminder(TimeOfDay time) async {
     await init();
     final now = tz.TZDateTime.now(tz.local);
-    var first = tz.TZDateTime(tz.local, now.year, now.month, now.day, time.hour, time.minute);
+    var first = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
     if (!first.isAfter(now)) first = first.add(const Duration(days: 1));
     await _plugin.zonedSchedule(
       id: _dailyReminderId,
-      title: 'Time to practice English',
-      body: 'A few minutes today keeps your streak alive.',
+      title: AppStrings.practiceTime,
+      body: AppStrings.dailyReminderBody,
       scheduledDate: first,
       notificationDetails: _details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -88,12 +103,19 @@ class NotificationService {
   /// Shows a notification immediately.
   Future<void> showNow({required String title, required String body}) async {
     await init();
-    await _plugin.show(id: _instantId, title: title, body: body, notificationDetails: _details);
+    await _plugin.show(
+      id: _instantId,
+      title: title,
+      body: body,
+      notificationDetails: _details,
+    );
   }
 
   /// Immediate nudge used when the streak API reports `needsActivityToday`.
   Future<void> showStreakReminder({int currentStreak = 0}) => showNow(
-        title: currentStreak > 0 ? "Don't lose your $currentStreak day streak!" : 'Start your learning streak',
-        body: 'Study for a few minutes today.',
-      );
+    title: currentStreak > 0
+        ? AppStrings.keepStreak(currentStreak)
+        : AppStrings.startStreak,
+    body: AppStrings.studyMinutes,
+  );
 }

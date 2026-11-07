@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../providers/quiz_provider.dart';
 
@@ -24,7 +26,7 @@ class QuizHistoryList extends StatelessWidget {
                   SizedBox(height: 120),
                   MessageView(
                     icon: Icons.history,
-                    message: 'No quiz attempts yet.',
+                    message: AppStrings.noAttempts,
                   ),
                 ],
               )
@@ -39,26 +41,25 @@ class QuizHistoryList extends StatelessWidget {
                           .where((q) => q.id == attempt.quizId)
                           .firstOrNull
                           ?.title ??
-                      'Quiz #${attempt.quizId}';
-                  final date =
-                      (attempt.submittedAt ?? attempt.startedAt)
-                          ?.toLocal()
-                          .toString()
-                          .split('.')
-                          .first ??
-                      '';
+                      AppStrings.quizNumber(attempt.quizId);
+                  final timestamp = attempt.submittedAt ?? attempt.startedAt;
+                  final date = timestamp == null
+                      ? ''
+                      : DateFormat.yMd('vi')
+                            .add_Hm()
+                            .format(timestamp.toLocal());
                   return Card(
                     child: ListTile(
                       leading: const Icon(Icons.history),
                       title: Text(title),
                       subtitle: Text(
-                        '${attempt.status.replaceAll('_', ' ')}\n$date',
+                        AppStrings.attemptSummary(attempt.status, date),
                       ),
                       isThreeLine: true,
                       trailing: Text(
                         attempt.submittedAt == null || attempt.score == null
-                            ? '—'
-                            : '${attempt.score!.toStringAsFixed(1)}%',
+                            ? AppStrings.unavailableValue
+                            : AppStrings.percentage(attempt.score!),
                       ),
                     ),
                   );

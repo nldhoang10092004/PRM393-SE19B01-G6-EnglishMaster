@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../data/quiz_repository.dart';
 import '../providers/quiz_provider.dart';
 import 'quiz_catalog.dart';
@@ -24,7 +25,7 @@ class QuizListForCourse extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: IconButton(
-              tooltip: 'Refresh quizzes',
+              tooltip: AppStrings.refreshQuizzes,
               icon: const Icon(Icons.refresh),
               onPressed: () =>
                   context.read<QuizProvider>().load(courseId: courseId),

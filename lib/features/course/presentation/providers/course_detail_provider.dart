@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/course_repository.dart';
@@ -52,7 +53,7 @@ class CourseDetailProvider extends ChangeNotifier {
       _status = ViewStatus.error;
       notifyListeners();
     } catch (e) {
-      _error = 'Unexpected error: $e';
+      _error = AppStrings.unexpectedError;
       _status = ViewStatus.error;
       notifyListeners();
     }
@@ -75,17 +76,24 @@ class CourseDetailProvider extends ChangeNotifier {
   /// Fetches completion flags for the videos of one chapter (called when the
   /// chapter is expanded, to avoid one request per video up front).
   /// Pass [force] to re-check videos already looked up (after watching one).
-  Future<void> loadProgressFor(Iterable<LessonSummary> videos, {bool force = false}) async {
-    final pending = videos.where((v) => force || !_checked.contains(v.id)).toList();
+  Future<void> loadProgressFor(
+    Iterable<LessonSummary> videos, {
+    bool force = false,
+  }) async {
+    final pending = videos
+        .where((v) => force || !_checked.contains(v.id))
+        .toList();
     if (pending.isEmpty) return;
     _checked.addAll(pending.map((v) => v.id));
-    await Future.wait(pending.map((v) async {
-      try {
-        if (await _repository.isVideoCompleted(v.id)) _completed.add(v.id);
-      } catch (_) {
-        _checked.remove(v.id); // retry next time the chapter is opened
-      }
-    }));
+    await Future.wait(
+      pending.map((v) async {
+        try {
+          if (await _repository.isVideoCompleted(v.id)) _completed.add(v.id);
+        } catch (_) {
+          _checked.remove(v.id); // retry next time the chapter is opened
+        }
+      }),
+    );
     notifyListeners();
   }
 
@@ -95,14 +103,18 @@ class CourseDetailProvider extends ChangeNotifier {
     _actionError = null;
     notifyListeners();
     try {
-      await _repository.submitFeedback(courseId: courseId, rating: rating, comment: comment);
+      await _repository.submitFeedback(
+        courseId: courseId,
+        rating: rating,
+        comment: comment,
+      );
       await _loadReviews();
       return true;
     } on ApiException catch (e) {
       _actionError = e.message;
       return false;
     } catch (e) {
-      _actionError = 'Unexpected error: $e';
+      _actionError = AppStrings.unexpectedError;
       return false;
     } finally {
       _submitting = false;

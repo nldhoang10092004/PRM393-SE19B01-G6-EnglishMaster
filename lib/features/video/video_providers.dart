@@ -10,6 +10,8 @@ class VideoProviders {
 
   /// Providers to add to the app-level `MultiProvider`.
   static List<SingleChildWidget> providers() => [
-        ProxyProvider<ApiClient, VideoRepository>(update: (_, api, _) => VideoRepository(api)),
-      ];
+    ProxyProvider<ApiClient, VideoRepository>(
+      update: (_, api, _) => VideoRepository(api),
+    ),
+  ];
 }

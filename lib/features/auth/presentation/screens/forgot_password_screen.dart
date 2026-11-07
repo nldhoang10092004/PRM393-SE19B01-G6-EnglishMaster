@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/utils/validators.dart';
 import '../providers/auth_provider.dart';
 
@@ -17,6 +18,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _email = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // AuthProvider is shared by all auth screens: drop errors left by the previous screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<AuthProvider>().clearError();
+    });
+  }
+
+  @override
   void dispose() {
     _email.dispose();
     super.dispose();
@@ -26,9 +36,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (!_formKey.currentState!.validate()) return;
     final ok = await context.read<AuthProvider>().forgotPassword(_email.text);
     if (!mounted || !ok) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('If the email exists, a reset link has been sent.')),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text(AppStrings.resetSent)));
     Navigator.pop(context);
   }
 
@@ -36,7 +45,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Forgot password')),
+      appBar: AppBar(title: const Text(AppStrings.forgotPassword)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -44,21 +53,32 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('Enter your account email and we will send you a reset link.'),
+              const Text(AppStrings.resetHint),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _email,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)),
+                decoration: const InputDecoration(
+                  labelText: AppStrings.email,
+                  prefixIcon: Icon(Icons.email_outlined),
+                ),
                 validator: Validators.email,
               ),
               const SizedBox(height: 16),
               if (auth.error != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(auth.error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                  child: Text(
+                    auth.error!,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
                 ),
-              FilledButton(onPressed: auth.isBusy ? null : _submit, child: const Text('Send reset link')),
+              FilledButton(
+                onPressed: auth.isBusy ? null : _submit,
+                child: const Text(AppStrings.sendReset),
+              ),
             ],
           ),
         ),

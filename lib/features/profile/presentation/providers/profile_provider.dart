@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/models/user_profile.dart';
@@ -36,14 +37,14 @@ class ProfileProvider extends ChangeNotifier {
       } on ApiException catch (e) {
         avatarError = e.message;
       } catch (_) {
-        avatarError = 'Avatar unavailable.';
+        avatarError = AppStrings.avatarError;
       }
       try {
         membership = await repository.membership();
       } on ApiException catch (e) {
         membershipError = e.message;
       } catch (_) {
-        membershipError = 'Membership status unavailable.';
+        membershipError = AppStrings.membershipStatusError;
       }
       statsError = null;
       try {
@@ -51,14 +52,14 @@ class ProfileProvider extends ChangeNotifier {
       } on ApiException catch (e) {
         statsError = e.message;
       } catch (_) {
-        statsError = 'Study statistics unavailable.';
+        statsError = AppStrings.statsError;
       }
       status = ViewStatus.success;
     } on ApiException catch (e) {
       error = e.message;
       status = ViewStatus.error;
     } catch (_) {
-      error = 'Unable to load your profile.';
+      error = AppStrings.profileLoadError;
       status = ViewStatus.error;
     }
     notifyListeners();
@@ -89,7 +90,7 @@ class ProfileProvider extends ChangeNotifier {
       error = e.message;
       return false;
     } catch (_) {
-      error = 'Unable to save changes. Please try again.';
+      error = AppStrings.saveChangesError;
       return false;
     } finally {
       busy = false;

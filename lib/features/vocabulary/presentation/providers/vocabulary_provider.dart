@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/models/saved_word.dart';
@@ -42,7 +43,7 @@ class VocabularyProvider extends ChangeNotifier {
       error = e.message;
       status = ViewStatus.error;
     } catch (_) {
-      error = 'Unable to load saved vocabulary.';
+      error = AppStrings.vocabularyLoadError;
       status = ViewStatus.error;
     }
     notifyListeners();
@@ -71,7 +72,7 @@ class VocabularyProvider extends ChangeNotifier {
       error = e.message;
       return false;
     } catch (_) {
-      error = 'Could not update saved vocabulary.';
+      error = AppStrings.vocabularyUpdateError;
       return false;
     } finally {
       _pending.remove(word.itemId);

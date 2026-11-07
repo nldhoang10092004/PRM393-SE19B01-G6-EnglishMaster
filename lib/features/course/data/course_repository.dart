@@ -1,3 +1,4 @@
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/utils/json_utils.dart';
@@ -14,14 +15,16 @@ class CourseRepository {
   /// Lists every course. The API wraps the list as `{ courses: [...] }`.
   Future<List<CourseSummary>> fetchCourses() async {
     final json = await _api.get('/api/user/course');
-    final list = json is Map ? Map<String, dynamic>.from(json).asList('courses') : asMapList(json);
+    final list = json is Map
+        ? Map<String, dynamic>.from(json).asList('courses')
+        : asMapList(json);
     return list.map(CourseSummary.fromJson).toList();
   }
 
   /// Loads one course with its chapters and videos.
   Future<CourseDetail> fetchCourse(int id) async {
     final json = await _api.get('/api/user/course/$id');
-    if (json is! Map) throw ApiException('Unexpected course response.');
+    if (json is! Map) throw ApiException(AppStrings.invalidCourse);
     return CourseDetail.fromJson(Map<String, dynamic>.from(json));
   }
 
@@ -35,17 +38,26 @@ class CourseRepository {
   /// Visible reviews of a course.
   Future<List<CourseFeedback>> fetchFeedbacks(int courseId) async {
     final json = await _api.get('/api/user/course/$courseId/feedback');
-    final list = json is Map ? Map<String, dynamic>.from(json).asList('feedbacks') : asMapList(json);
+    final list = json is Map
+        ? Map<String, dynamic>.from(json).asList('feedbacks')
+        : asMapList(json);
     return list.map(CourseFeedback.fromJson).toList();
   }
 
   /// Submits a review (students only). [rating] is 1..5.
-  Future<void> submitFeedback({required int courseId, required int rating, String? comment}) =>
-      _api.post('/api/user/course/feedback', body: {
-        'courseID': courseId,
-        'rating': rating,
-        if (comment != null && comment.trim().isNotEmpty) 'comment': comment.trim(),
-      });
+  Future<void> submitFeedback({
+    required int courseId,
+    required int rating,
+    String? comment,
+  }) => _api.post(
+    '/api/user/course/feedback',
+    body: {
+      'courseID': courseId,
+      'rating': rating,
+      if (comment != null && comment.trim().isNotEmpty)
+        'comment': comment.trim(),
+    },
+  );
 
   /// Whether the signed-in student completed [videoId].
   Future<bool> isVideoCompleted(int videoId) async {

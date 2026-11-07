@@ -1,3 +1,4 @@
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
 import 'models/lesson_video.dart';
@@ -13,7 +14,7 @@ class VideoRepository {
   /// the video is missing or needs a membership (HTTP 403/404).
   Future<LessonVideo> fetchVideo(int videoId) async {
     final json = await _api.get('/api/public/video/$videoId');
-    if (json is! Map) throw ApiException('Unexpected video response.');
+    if (json is! Map) throw ApiException(AppStrings.invalidVideoResponse);
     return LessonVideo.fromJson(Map<String, dynamic>.from(json));
   }
 
@@ -31,12 +32,14 @@ class VideoRepository {
     required int lastPositionSec,
     required int totalDurationSec,
     required bool isCompleted,
-  }) =>
-      _api.post('/api/user/video/progress', body: {
-        'videoId': videoId,
-        'watchDurationSec': watchDurationSec,
-        'lastPositionSec': lastPositionSec,
-        'totalDurationSec': totalDurationSec,
-        'isCompleted': isCompleted,
-      });
+  }) => _api.post(
+    '/api/user/video/progress',
+    body: {
+      'videoId': videoId,
+      'watchDurationSec': watchDurationSec,
+      'lastPositionSec': lastPositionSec,
+      'totalDurationSec': totalDurationSec,
+      'isCompleted': isCompleted,
+    },
+  );
 }

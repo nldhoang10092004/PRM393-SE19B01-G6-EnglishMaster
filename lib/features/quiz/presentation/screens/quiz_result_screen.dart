@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../providers/quiz_provider.dart';
 
 /// Server score, correct/total counts and expandable submitted-answer review.
@@ -11,7 +12,7 @@ class QuizResultScreen extends StatelessWidget {
     final state = context.watch<QuizTakingProvider>();
     final result = state.result!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Quiz result')),
+      appBar: AppBar(title: const Text(AppStrings.quizResult)),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
@@ -29,7 +30,7 @@ class QuizResultScreen extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${result.score.toStringAsFixed(1)}%',
+                    AppStrings.percentage(result.score),
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                 ],
@@ -38,24 +39,22 @@ class QuizResultScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            '${result.correct}/${result.total} correct',
+            AppStrings.correctCount(result.correct, result.total),
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           Text(
-            '${result.wrong} incorrect · ${result.pending} pending review',
+            AppStrings.pendingCount(result.wrong, result.pending),
             textAlign: TextAlign.center,
           ),
           if (result.status == 'PENDING_REVIEW')
             const Padding(
               padding: EdgeInsets.only(top: 12),
-              child: Text(
-                'Your final score may change after your written answers are reviewed.',
-              ),
+              child: Text(AppStrings.pendingScoreHint),
             ),
           const SizedBox(height: 24),
           ExpansionTile(
-            title: const Text('Review answers'),
+            title: const Text(AppStrings.reviewAnswers),
             children: List.generate(result.results.length, (index) {
               final answer = result.results[index];
               final question = state.questions
@@ -68,7 +67,7 @@ class QuizResultScreen extends StatelessWidget {
               final correction = [
                 ...answer.correctOptions.map((o) => o.content),
                 if (answer.correctText.isNotEmpty) answer.correctText,
-              ].join(' / ');
+              ].join(AppStrings.answerSeparator);
               return ListTile(
                 leading: Icon(
                   answer.isCorrect == null
@@ -79,7 +78,13 @@ class QuizResultScreen extends StatelessWidget {
                 ),
                 title: Text(answer.content),
                 subtitle: Text(
-                  'Your answer: ${selectedText ?? (answer.submittedText.isEmpty ? 'Unanswered' : answer.submittedText)}${correction.isEmpty ? '' : '\nCorrect answer: $correction'}',
+                  AppStrings.answerReview(
+                    selectedText ??
+                        (answer.submittedText.isEmpty
+                            ? AppStrings.unanswered
+                            : answer.submittedText),
+                    correction,
+                  ),
                 ),
               );
             }),
@@ -87,7 +92,7 @@ class QuizResultScreen extends StatelessWidget {
           const SizedBox(height: 24),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Back to quizzes'),
+            child: const Text(AppStrings.backToQuizzes),
           ),
         ],
       ),

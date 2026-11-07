@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/flashcard_repository.dart';
 import '../../data/models/flashcard.dart';
@@ -50,7 +51,9 @@ class FlashcardSetTile extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    total == null ? 'Open to study' : '$total cards',
+                    total == null
+                        ? AppStrings.openToStudy
+                        : AppStrings.cardCount(total),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 8),
@@ -66,12 +69,12 @@ class FlashcardSetTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     state.status == ViewStatus.error
-                        ? 'Details unavailable'
+                        ? AppStrings.detailsUnavailable
                         : state.progressError != null
-                        ? 'Progress unavailable'
+                        ? AppStrings.progressUnavailable
                         : total == null
-                        ? 'Loading details'
-                        : '$mastered mastered',
+                        ? AppStrings.loadingDetails
+                        : AppStrings.masteredCount(mastered),
                   ),
                 ],
               ),

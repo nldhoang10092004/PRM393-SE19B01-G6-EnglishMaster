@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../providers/vocabulary_provider.dart';
 
@@ -29,7 +30,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     final state = context.watch<VocabularyProvider>();
     final words = state.words;
     return Scaffold(
-      appBar: AppBar(title: const Text('Saved vocabulary')),
+      appBar: AppBar(title: const Text(AppStrings.vocabulary)),
       body: Column(
         children: [
           Padding(
@@ -37,7 +38,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
             child: TextField(
               onChanged: state.search,
               decoration: const InputDecoration(
-                labelText: 'Search words',
+                labelText: AppStrings.searchWords,
                 prefixIcon: Icon(Icons.search),
               ),
             ),
@@ -56,8 +57,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                           SizedBox(height: 96),
                           MessageView(
                             icon: Icons.bookmark_border,
-                            message:
-                                'No matching words. Save cards while studying.',
+                            message: AppStrings.noMatchingWords,
                           ),
                         ],
                       )
@@ -91,13 +91,13 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                 SnackBar(
                                   content: Text(
                                     ok
-                                        ? '${word.front} removed'
+                                        ? AppStrings.wordRemoved(word.front)
                                         : state.error ??
-                                              'Could not delete word.',
+                                              AppStrings.deleteWordError,
                                   ),
                                   action: ok
                                       ? SnackBarAction(
-                                          label: 'Undo',
+                                          label: AppStrings.undo,
                                           onPressed: () async {
                                             final restored = await state.save(
                                               word,
@@ -106,7 +106,9 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                                               messenger.showSnackBar(
                                                 SnackBar(
                                                   content: Text(
-                                                    state.error ?? 'Unable to restore word.',
+                                                    state.error ??
+                                                        AppStrings
+                                                            .restoreWordError,
                                                   ),
                                                 ),
                                               );
@@ -122,7 +124,10 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
                               child: ListTile(
                                 title: Text(word.front),
                                 subtitle: Text(
-                                  '${word.back}${word.example.isEmpty ? '' : '\n${word.example}'}',
+                                  AppStrings.wordDetails(
+                                    word.back,
+                                    word.example,
+                                  ),
                                 ),
                                 isThreeLine: word.example.isNotEmpty,
                                 trailing: word.isMastered

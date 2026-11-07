@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../providers/quiz_provider.dart';
 import '../widgets/quiz_asset_view.dart';
@@ -20,18 +21,18 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Submit quiz?'),
+        title: const Text(AppStrings.confirmSubmit),
         content: Text(
-          '${state.answeredCount} of ${state.questions.length} answered. Unanswered questions will be marked incorrect.',
+          AppStrings.submitSummary(state.answeredCount, state.questions.length),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Keep reviewing'),
+            child: const Text(AppStrings.keepReviewing),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Submit'),
+            child: const Text(AppStrings.submit),
           ),
         ],
       ),
@@ -51,18 +52,16 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
         final leave = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Leave quiz?'),
-            content: const Text(
-              'Your attempt will remain unfinished. You can resume from the quiz detail while it is open.',
-            ),
+            title: const Text(AppStrings.confirmLeave),
+            content: const Text(AppStrings.leaveQuizHint),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Stay'),
+                child: const Text(AppStrings.stay),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('Leave'),
+                child: const Text(AppStrings.leave),
               ),
             ],
           ),
@@ -75,11 +74,11 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(state.quiz?.title ?? 'Quiz')),
+        appBar: AppBar(title: Text(state.quiz?.title ?? AppStrings.quiz)),
         body: question == null
             ? const MessageView(
                 icon: Icons.quiz_outlined,
-                message: 'No questions available.',
+                message: AppStrings.noQuestions,
               )
             : Column(
                 children: [
@@ -92,7 +91,10 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Question ${state.index + 1}/${state.questions.length}',
+                          AppStrings.questionProgress(
+                            state.index + 1,
+                            state.questions.length,
+                          ),
                         ),
                       ],
                     ),
@@ -185,14 +187,12 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                             minLines: 2,
                             maxLines: 6,
                             decoration: const InputDecoration(
-                              labelText: 'Your answer',
+                              labelText: AppStrings.yourAnswer,
                             ),
                             onChanged: state.answerText,
                           ),
                         if (question.isChoice && question.options.isEmpty)
-                          const Text(
-                            'No answer options are available for this question.',
-                          ),
+                          const Text(AppStrings.noOptions),
                       ],
                     ),
                   ),
@@ -215,7 +215,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                           if (state.index > 0) ...[
                             OutlinedButton(
                               onPressed: state.busy ? null : state.previous,
-                              child: const Text('Previous'),
+                              child: const Text(AppStrings.previous),
                             ),
                             const SizedBox(width: 12),
                           ],
@@ -229,10 +229,10 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                                   : state.next,
                               child: Text(
                                 state.busy
-                                    ? 'Submitting…'
+                                    ? AppStrings.submitting
                                     : state.isLast
-                                    ? 'Submit quiz'
-                                    : 'Next',
+                                    ? AppStrings.submitQuiz
+                                    : AppStrings.next,
                               ),
                             ),
                           ),

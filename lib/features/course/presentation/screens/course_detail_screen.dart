@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../quiz/presentation/widgets/quiz_list_for_course.dart';
 import '../../../video/presentation/screens/video_lesson_screen.dart';
@@ -24,7 +25,8 @@ class CourseDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (ctx) => CourseDetailProvider(ctx.read<CourseRepository>(), courseId)..load(),
+      create: (ctx) =>
+          CourseDetailProvider(ctx.read<CourseRepository>(), courseId)..load(),
       child: _CourseDetailView(title: title),
     );
   }
@@ -41,7 +43,7 @@ class _CourseDetailView extends StatelessWidget {
     final course = p.course;
     final ready = p.status == ViewStatus.success && course != null;
     return Scaffold(
-      appBar: ready ? null : AppBar(title: Text(title ?? 'Course')),
+      appBar: ready ? null : AppBar(title: Text(title ?? AppStrings.course)),
       body: AsyncView(
         status: p.status,
         error: p.error,
@@ -56,14 +58,17 @@ class _CourseDetailView extends StatelessWidget {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    child: Text(course.description, style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text(
+                      course.description,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
                 ),
-              _sectionTitle(context, 'Chapters'),
+              _sectionTitle(context, AppStrings.chapters),
               _Chapters(course: course, provider: p),
-              _sectionTitle(context, 'Quizzes'),
+              _sectionTitle(context, AppStrings.quizzes),
               SliverToBoxAdapter(child: QuizListForCourse(courseId: course.id)),
-              _sectionTitle(context, 'Reviews'),
+              _sectionTitle(context, AppStrings.reviews),
               _Reviews(provider: p),
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
@@ -73,7 +78,8 @@ class _CourseDetailView extends StatelessWidget {
     );
   }
 
-  SliverToBoxAdapter _sectionTitle(BuildContext context, String text) => SliverToBoxAdapter(
+  SliverToBoxAdapter _sectionTitle(BuildContext context, String text) =>
+      SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
           child: Text(text, style: Theme.of(context).textTheme.titleLarge),
@@ -117,14 +123,21 @@ class _Header extends StatelessWidget {
             children: [
               Text(
                 course.name,
-                style: theme.textTheme.headlineSmall?.copyWith(color: scheme.onPrimary, fontWeight: FontWeight.bold),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: scheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
               Text(
-                course.teacherName.isEmpty ? 'EnglishMaster' : 'By ${course.teacherName}',
-                style: theme.textTheme.bodyMedium?.copyWith(color: scheme.onPrimary),
+                course.teacherName.isEmpty
+                    ? AppStrings.appName
+                    : AppStrings.teacherBy(course.teacherName),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: scheme.onPrimary,
+                ),
               ),
               const SizedBox(height: 8),
               Row(
@@ -132,8 +145,15 @@ class _Header extends StatelessWidget {
                   RatingStars(rating: rating.average, color: scheme.onPrimary),
                   const SizedBox(width: 8),
                   Text(
-                    rating.total == 0 ? 'No reviews yet' : '${rating.average.toStringAsFixed(1)} (${rating.total})',
-                    style: theme.textTheme.bodySmall?.copyWith(color: scheme.onPrimary),
+                    rating.total == 0
+                        ? AppStrings.noReviews
+                        : AppStrings.ratingSummary(
+                            rating.average,
+                            rating.total,
+                          ),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: scheme.onPrimary,
+                    ),
                   ),
                 ],
               ),
@@ -156,11 +176,15 @@ class _Chapters extends StatelessWidget {
   Widget build(BuildContext context) {
     final groups = [
       for (final c in course.chapters) (c.name, c.videos),
-      if (course.orphanVideos.isNotEmpty) ('Other lessons', course.orphanVideos),
+      if (course.orphanVideos.isNotEmpty)
+        (AppStrings.otherLessons, course.orphanVideos),
     ];
     if (groups.isEmpty) {
       return const SliverToBoxAdapter(
-        child: Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Text('No lessons yet.')),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text(AppStrings.noLessons),
+        ),
       );
     }
     return SliverList.builder(
@@ -179,9 +203,10 @@ class _Chapters extends StatelessWidget {
                 if (open) provider.loadProgressFor(videos);
               },
               title: Text(name, style: Theme.of(context).textTheme.titleMedium),
-              subtitle: Text('${videos.length} lesson${videos.length == 1 ? '' : 's'}'),
+              subtitle: Text(AppStrings.lessonCount(videos.length)),
               children: [
-                for (final v in videos) _VideoTile(video: v, provider: provider),
+                for (final v in videos)
+                  _VideoTile(video: v, provider: provider),
               ],
             ),
           ),
@@ -206,11 +231,19 @@ class _VideoTile extends StatelessWidget {
         color: done ? Colors.green : Theme.of(context).colorScheme.primary,
       ),
       title: Text(video.name),
-      trailing: video.isPreview ? const Chip(label: Text('Free'), visualDensity: VisualDensity.compact) : null,
+      trailing: video.isPreview
+          ? const Chip(
+              label: Text(AppStrings.free),
+              visualDensity: VisualDensity.compact,
+            )
+          : null,
       onTap: () async {
-        await Navigator.of(context).push(MaterialPageRoute<bool>(
-          builder: (_) => VideoLessonScreen(videoId: video.id, title: video.name),
-        ));
+        await Navigator.of(context).push(
+          MaterialPageRoute<bool>(
+            builder: (_) =>
+                VideoLessonScreen(videoId: video.id, title: video.name),
+          ),
+        );
         provider.loadProgressFor([video], force: true);
       },
     );
@@ -227,46 +260,66 @@ class _Reviews extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final feedbacks = provider.feedbacks;
-    return SliverList.list(children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: OutlinedButton.icon(
-            onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              final sent = await showDialog<bool>(
-                context: context,
-                builder: (_) => FeedbackDialog(provider: provider),
-              );
-              if (sent == true) messenger.showSnackBar(const SnackBar(content: Text('Thanks for your review!')));
-            },
-            icon: const Icon(Icons.rate_review_outlined),
-            label: const Text('Write a review'),
+    return SliverList.list(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final sent = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => FeedbackDialog(provider: provider),
+                );
+                if (sent == true) {
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text(AppStrings.reviewThanks)),
+                  );
+                }
+              },
+              icon: const Icon(Icons.rate_review_outlined),
+              label: const Text(AppStrings.writeReview),
+            ),
           ),
         ),
-      ),
-      if (feedbacks.isEmpty)
-        const Padding(padding: EdgeInsets.all(16), child: Text('Be the first to review this course.')),
-      for (final f in feedbacks)
-        ListTile(
-          leading: CircleAvatar(child: Text(f.username.isEmpty ? '?' : f.username.substring(0, 1).toUpperCase())),
-          title: Row(
-            children: [
-              Flexible(child: Text(f.username, overflow: TextOverflow.ellipsis)),
-              const SizedBox(width: 8),
-              RatingStars(rating: f.rating.toDouble(), size: 14),
-            ],
+        if (feedbacks.isEmpty)
+          const Padding(
+            padding: EdgeInsets.all(16),
+            child: Text(AppStrings.firstReview),
           ),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if ((f.comment ?? '').trim().isNotEmpty) Text(f.comment!),
-              if (f.createdAt != null)
-                Text(DateFormat.yMMMd().format(f.createdAt!.toLocal()), style: theme.textTheme.bodySmall),
-            ],
+        for (final f in feedbacks)
+          ListTile(
+            leading: CircleAvatar(
+              child: Text(
+                f.username.isEmpty
+                    ? AppStrings.unknownInitial
+                    : f.username.substring(0, 1).toUpperCase(),
+              ),
+            ),
+            title: Row(
+              children: [
+                Flexible(
+                  child: Text(f.username, overflow: TextOverflow.ellipsis),
+                ),
+                const SizedBox(width: 8),
+                RatingStars(rating: f.rating.toDouble(), size: 14),
+              ],
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if ((f.comment ?? '').trim().isNotEmpty) Text(f.comment!),
+                if (f.createdAt != null)
+                  Text(
+                    DateFormat.yMMMd('vi').format(f.createdAt!.toLocal()),
+                    style: theme.textTheme.bodySmall,
+                  ),
+              ],
+            ),
           ),
-        ),
-    ]);
+      ],
+    );
   }
 }

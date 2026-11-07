@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/flashcard_repository.dart';
@@ -27,7 +28,7 @@ class FlashcardHistoryProvider extends ChangeNotifier {
       error = e.message;
       status = ViewStatus.error;
     } catch (_) {
-      error = 'Unable to load history.';
+      error = AppStrings.historyLoadError;
       status = ViewStatus.error;
     }
     notifyListeners();

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/models/quiz.dart';
@@ -30,7 +31,7 @@ class QuizProvider extends ChangeNotifier {
       error = e.message;
       status = ViewStatus.error;
     } catch (_) {
-      error = 'Unable to load quizzes.';
+      error = AppStrings.quizzesLoadError;
       status = ViewStatus.error;
     }
     notifyListeners();
@@ -49,7 +50,7 @@ class QuizProvider extends ChangeNotifier {
       historyError = e.message;
       historyStatus = ViewStatus.error;
     } catch (_) {
-      historyError = 'Unable to load quiz history.';
+      historyError = AppStrings.quizHistoryLoadError;
       historyStatus = ViewStatus.error;
     }
     notifyListeners();
@@ -125,13 +126,16 @@ class QuizTakingProvider extends ChangeNotifier {
       error = e.message;
       status = ViewStatus.error;
     } catch (_) {
-      error = 'Unable to load this quiz.';
+      error = AppStrings.quizLoadError;
       status = ViewStatus.error;
     }
     notifyListeners();
   }
 
   /// Starts once; retrying a failed submit keeps this same attempt ID.
+  /// True after a start attempt was refused because the membership is missing.
+  bool needsMembership = false;
+
   Future<bool> start() async {
     if (busy || quiz == null || questions.isEmpty) return false;
     if (attemptId != null) return true;
@@ -143,9 +147,10 @@ class QuizTakingProvider extends ChangeNotifier {
       return true;
     } on ApiException catch (e) {
       error = e.message;
+      needsMembership = e.isForbidden;
       return false;
     } catch (_) {
-      error = 'Unable to start this quiz.';
+      error = AppStrings.quizStartError;
       return false;
     } finally {
       busy = false;
@@ -223,7 +228,7 @@ class QuizTakingProvider extends ChangeNotifier {
       error = e.message;
       return false;
     } catch (_) {
-      error = 'Unable to submit. Your answers are still here.';
+      error = AppStrings.quizSubmitError;
       return false;
     } finally {
       busy = false;

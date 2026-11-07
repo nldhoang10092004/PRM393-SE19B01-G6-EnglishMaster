@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../membership/presentation/widgets/upgrade_membership_banner.dart';
+
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/quiz_repository.dart';
 import '../providers/quiz_provider.dart';
@@ -17,7 +20,7 @@ class QuizDetailScreen extends StatelessWidget {
         QuizTakingProvider(context.read<QuizRepository>())..load(quizId),
     child: Consumer<QuizTakingProvider>(
       builder: (context, state, _) => Scaffold(
-        appBar: AppBar(title: Text(state.quiz?.title ?? 'Quiz detail')),
+        appBar: AppBar(title: Text(state.quiz?.title ?? AppStrings.quizDetail)),
         body: AsyncView(
           status: state.status,
           error: state.error,
@@ -32,13 +35,13 @@ class QuizDetailScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text(state.quiz!.description),
               const SizedBox(height: 16),
-              Text('${state.questions.length} questions'),
+              Text(AppStrings.questionCount(state.questions.length)),
               const SizedBox(height: 8),
-              const Text('You can review earlier answers before submitting.'),
+              const Text(AppStrings.reviewBeforeSubmit),
               if (state.questions.isEmpty)
                 const MessageView(
                   icon: Icons.quiz_outlined,
-                  message: 'This quiz has no questions yet.',
+                  message: AppStrings.quizNoQuestions,
                 ),
               if (state.error != null)
                 Padding(
@@ -49,6 +52,11 @@ class QuizDetailScreen extends StatelessWidget {
                       color: Theme.of(context).colorScheme.error,
                     ),
                   ),
+                ),
+              if (state.needsMembership)
+                const Padding(
+                  padding: EdgeInsets.only(top: 12),
+                  child: UpgradeMembershipBanner(),
                 ),
               const SizedBox(height: 24),
               FilledButton(
@@ -70,10 +78,10 @@ class QuizDetailScreen extends StatelessWidget {
                       },
                 child: Text(
                   state.busy
-                      ? 'Starting…'
+                      ? AppStrings.starting
                       : state.attemptId == null
-                      ? 'Start quiz'
-                      : 'Resume quiz',
+                      ? AppStrings.startQuiz
+                      : AppStrings.resumeQuiz,
                 ),
               ),
             ],

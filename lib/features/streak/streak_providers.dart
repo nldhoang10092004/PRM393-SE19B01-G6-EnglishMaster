@@ -11,7 +11,11 @@ class StreakProviders {
 
   /// Providers to add to the app-level `MultiProvider`.
   static List<SingleChildWidget> providers() => [
-        ProxyProvider<ApiClient, StreakRepository>(update: (_, api, _) => StreakRepository(api)),
-        ChangeNotifierProvider<StreakProvider>(create: (ctx) => StreakProvider(ctx.read<StreakRepository>())),
-      ];
+    ProxyProvider<ApiClient, StreakRepository>(
+      update: (_, api, _) => StreakRepository(api),
+    ),
+    ChangeNotifierProvider<StreakProvider>(
+      create: (ctx) => StreakProvider(ctx.read<StreakRepository>()),
+    ),
+  ];
 }

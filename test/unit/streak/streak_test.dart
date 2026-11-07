@@ -23,8 +23,13 @@ void main() {
 
   test('StreakProvider: success and error transitions', () async {
     final repo = _FakeRepo();
-    when(() => repo.fetchStreak())
-        .thenAnswer((_) async => const StreakStatus(currentStreak: 2, needsActivityToday: false, message: ''));
+    when(() => repo.fetchStreak()).thenAnswer(
+      (_) async => const StreakStatus(
+        currentStreak: 2,
+        needsActivityToday: false,
+        message: '',
+      ),
+    );
     final p = StreakProvider(repo);
     expect(p.status, ViewStatus.idle);
     await p.load();

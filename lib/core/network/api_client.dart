@@ -19,19 +19,21 @@ class ApiClient {
     CookieJar? cookieJar,
     Dio? dio,
     String? baseUrl,
-  })  : _tokens = tokenStorage,
-        _dio = dio ??
-            Dio(BaseOptions(
-              baseUrl: baseUrl ?? AppConfig.apiBaseUrl,
-              connectTimeout: AppConfig.requestTimeout,
-              receiveTimeout: AppConfig.requestTimeout,
-              contentType: Headers.jsonContentType,
-            )) {
+  }) : _tokens = tokenStorage,
+       _dio =
+           dio ??
+           Dio(
+             BaseOptions(
+               baseUrl: baseUrl ?? AppConfig.apiBaseUrl,
+               connectTimeout: AppConfig.requestTimeout,
+               receiveTimeout: AppConfig.requestTimeout,
+               contentType: Headers.jsonContentType,
+             ),
+           ) {
     _dio.interceptors.add(CookieManager(cookieJar ?? CookieJar()));
-    _dio.interceptors.add(InterceptorsWrapper(
-      onRequest: _attachToken,
-      onError: _refreshOn401,
-    ));
+    _dio.interceptors.add(
+      InterceptorsWrapper(onRequest: _attachToken, onError: _refreshOn401),
+    );
   }
 
   final Dio _dio;
@@ -40,7 +42,10 @@ class ApiClient {
   /// Called when the session cannot be refreshed (e.g. to navigate to login).
   void Function()? onSessionExpired;
 
-  Future<void> _attachToken(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> _attachToken(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final token = await _tokens.readAccessToken();
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -48,7 +53,10 @@ class ApiClient {
     handler.next(options);
   }
 
-  Future<void> _refreshOn401(DioException error, ErrorInterceptorHandler handler) async {
+  Future<void> _refreshOn401(
+    DioException error,
+    ErrorInterceptorHandler handler,
+  ) async {
     final request = error.requestOptions;
     final isAuthCall = request.path.startsWith('/api/auth/');
     final alreadyRetried = request.extra['retried'] == true;
@@ -91,12 +99,56 @@ class ApiClient {
   Future<dynamic> get(String path, {Map<String, dynamic>? query}) =>
       _send(() => _dio.get(path, queryParameters: query));
 
-  Future<dynamic> post(String path, {Object? body, Map<String, dynamic>? query}) =>
-      _send(() => _dio.post(path, data: body, queryParameters: query));
+  Future<dynamic> post(
+    String path, {
+    Object? body,
+    Map<String, dynamic>? query,
+  }) => _send(() => _dio.post(path, data: body, queryParameters: query));
 
-  Future<dynamic> put(String path, {Object? body}) => _send(() => _dio.put(path, data: body));
+  Future<dynamic> put(String path, {Object? body}) =>
+      _send(() => _dio.put(path, data: body));
 
   Future<dynamic> delete(String path) => _send(() => _dio.delete(path));
+
+  /// Uploads a file (e.g. a recorded answer) as `multipart/form-data`.
+  /// [fields] are extra form fields sent next to the file.
+  Future<dynamic> postMultipart(
+    String path, {
+    required String fileField,
+    required String filePath,
+    String? fileName,
+    Map<String, dynamic>? fields,
+    Duration? timeout,
+  }) async {
+    final form = FormData.fromMap({
+      ...?fields,
+      fileField: await MultipartFile.fromFile(filePath, filename: fileName),
+    });
+    return _send(
+      () => _dio.post(
+        path,
+        data: form,
+        options: Options(
+          contentType: 'multipart/form-data',
+          receiveTimeout: timeout ?? const Duration(seconds: 90),
+          sendTimeout: timeout ?? const Duration(seconds: 90),
+        ),
+      ),
+    );
+  }
+
+  /// POST with a longer timeout for slow AI endpoints (generation / grading).
+  Future<dynamic> postSlow(
+    String path, {
+    Object? body,
+    Duration timeout = const Duration(seconds: 90),
+  }) => _send(
+    () => _dio.post(
+      path,
+      data: body,
+      options: Options(receiveTimeout: timeout, sendTimeout: timeout),
+    ),
+  );
 
   Future<dynamic> _send(Future<Response<dynamic>> Function() call) async {
     try {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/utils/validators.dart';
 import '../providers/profile_provider.dart';
 
@@ -34,8 +35,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       _confirm.text,
     );
     if (ok && mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Password changed')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text(AppStrings.passwordChanged)));
       Navigator.of(context).pop();
     }
   }
@@ -44,7 +46,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     final state = context.watch<ProfileProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Change password')),
+      appBar: AppBar(title: const Text(AppStrings.changePassword)),
       body: Form(
         key: _form,
         child: ListView(
@@ -54,16 +56,20 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               controller: _current,
               enabled: !state.busy,
               obscureText: _obscure,
-              decoration: const InputDecoration(labelText: 'Current password'),
+              decoration: const InputDecoration(
+                labelText: AppStrings.currentPassword,
+              ),
               validator: (v) =>
-                  Validators.required(v, field: 'Current password'),
+                  Validators.required(v, field: AppStrings.currentPassword),
             ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _password,
               enabled: !state.busy,
               obscureText: _obscure,
-              decoration: const InputDecoration(labelText: 'New password'),
+              decoration: const InputDecoration(
+                labelText: AppStrings.newPassword,
+              ),
               validator: Validators.password,
             ),
             const SizedBox(height: 16),
@@ -72,7 +78,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               enabled: !state.busy,
               obscureText: _obscure,
               decoration: const InputDecoration(
-                labelText: 'Confirm new password',
+                labelText: AppStrings.confirmNewPassword,
               ),
               validator: (v) => Validators.confirmPassword(v, _password.text),
             ),
@@ -83,7 +89,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   onChanged: (value) =>
                       setState(() => _obscure = !(value ?? false)),
                 ),
-                const Text('Show passwords'),
+                const Text(AppStrings.showPasswords),
               ],
             ),
             if (state.error != null)
@@ -97,7 +103,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             const SizedBox(height: 24),
             FilledButton(
               onPressed: state.busy ? null : _save,
-              child: Text(state.busy ? 'Saving…' : 'Change password'),
+              child: Text(
+                state.busy ? AppStrings.saving : AppStrings.changePassword,
+              ),
             ),
           ],
         ),

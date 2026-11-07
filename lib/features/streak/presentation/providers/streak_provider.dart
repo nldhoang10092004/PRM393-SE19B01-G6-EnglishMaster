@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/models/streak_status.dart';
@@ -33,7 +34,7 @@ class StreakProvider extends ChangeNotifier {
       _error = e.message;
       _status = ViewStatus.error;
     } catch (e) {
-      _error = 'Unexpected error: $e';
+      _error = AppStrings.unexpectedError;
       _status = ViewStatus.error;
     }
     notifyListeners();

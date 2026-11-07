@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../providers/flashcard_provider.dart';
 import '../widgets/flashcard_set_tile.dart';
@@ -33,10 +34,10 @@ class _FlashcardSetsScreenState extends State<FlashcardSetsScreen> {
     final state = context.watch<FlashcardProvider>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flashcards'),
+        title: const Text(AppStrings.flashcards),
         actions: [
           IconButton(
-            tooltip: 'Study history',
+            tooltip: AppStrings.studyHistory,
             icon: const Icon(Icons.history),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
@@ -59,7 +60,7 @@ class _FlashcardSetsScreenState extends State<FlashcardSetsScreen> {
                     SizedBox(height: 120),
                     MessageView(
                       icon: Icons.style_outlined,
-                      message: 'No flashcard sets yet.',
+                      message: AppStrings.noSets,
                     ),
                   ],
                 )

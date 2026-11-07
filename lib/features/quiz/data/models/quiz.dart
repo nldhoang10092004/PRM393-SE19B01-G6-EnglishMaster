@@ -94,19 +94,25 @@ class QuizAsset {
     this.text = '',
     this.caption = '',
     this.mimeType = '',
+    this.type = 0,
   });
   final int id;
+
+  /// API AssetType: 1 = audio, 2 = image, 3 = text passage, 4 = file, 5 = video.
+  final int type;
   final String url;
   final String text;
   final String caption;
   final String mimeType;
   bool get isImage =>
+      type == 2 ||
       mimeType.toLowerCase().startsWith('image/') ||
       RegExp(
         r'\.(png|jpe?g|webp|gif)(\?|$)',
         caseSensitive: false,
       ).hasMatch(url);
   bool get isAudio =>
+      type == 1 ||
       mimeType.toLowerCase().startsWith('audio/') ||
       RegExp(
         r'\.(mp3|wav|m4a|ogg|aac)(\?|$)',
@@ -118,6 +124,7 @@ class QuizAsset {
     text: json.asString('contentText'),
     caption: json.asString('caption'),
     mimeType: json.asString('mimeType'),
+    type: json.asInt('assetType'),
   );
 }
 

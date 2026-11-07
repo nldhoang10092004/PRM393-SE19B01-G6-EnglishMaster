@@ -16,8 +16,9 @@ void main() {
   setUp(() => repo = _FakeRepo());
 
   test('CourseListProvider: idle -> success', () async {
-    when(() => repo.fetchCourses())
-        .thenAnswer((_) async => [const CourseSummary(id: 1, name: 'A', teacherName: 'T')]);
+    when(() => repo.fetchCourses()).thenAnswer(
+      (_) async => [const CourseSummary(id: 1, name: 'A', teacherName: 'T')],
+    );
     final p = CourseListProvider(repo);
     expect(p.status, ViewStatus.idle);
     await p.load();
@@ -31,7 +32,9 @@ void main() {
     await p.load();
     expect(p.status, ViewStatus.error);
     expect(p.error, 'boom');
-    when(() => repo.fetchCourses()).thenAnswer((_) async => [const CourseSummary(id: 1, name: 'A', teacherName: 'T')]);
+    when(() => repo.fetchCourses()).thenAnswer(
+      (_) async => [const CourseSummary(id: 1, name: 'A', teacherName: 'T')],
+    );
     await p.load();
     when(() => repo.fetchCourses()).thenThrow(ApiException('again'));
     await p.load();
@@ -39,30 +42,42 @@ void main() {
     expect(p.courses, hasLength(1));
   });
 
-  test('CourseDetailProvider: loads course, reviews and lazy progress', () async {
-    const video = LessonSummary(id: 7, name: 'V', isPreview: false);
-    when(() => repo.fetchCourse(1)).thenAnswer((_) async => const CourseDetail(
+  test(
+    'CourseDetailProvider: loads course, reviews and lazy progress',
+    () async {
+      const video = LessonSummary(id: 7, name: 'V', isPreview: false);
+      when(() => repo.fetchCourse(1)).thenAnswer(
+        (_) async => const CourseDetail(
           id: 1,
           name: 'A',
           description: '',
           teacherName: 'T',
-          chapters: [CourseChapter(id: 1, name: 'C', videos: [video])],
-        ));
-    when(() => repo.fetchRating(1)).thenAnswer((_) async => const CourseRating(average: 4, total: 1));
-    when(() => repo.fetchFeedbacks(1)).thenAnswer((_) async => const []);
-    when(() => repo.isVideoCompleted(7)).thenAnswer((_) async => true);
-    final p = CourseDetailProvider(repo, 1);
-    await p.load();
-    expect(p.status, ViewStatus.success);
-    expect(p.rating.total, 1);
-    await p.loadProgressFor([video]);
-    expect(p.isCompleted(7), true);
-  });
+          chapters: [
+            CourseChapter(id: 1, name: 'C', videos: [video]),
+          ],
+        ),
+      );
+      when(() => repo.fetchRating(1))
+          .thenAnswer((_) async => const CourseRating(average: 4, total: 1));
+      when(() => repo.fetchFeedbacks(1)).thenAnswer((_) async => const []);
+      when(() => repo.isVideoCompleted(7)).thenAnswer((_) async => true);
+      final p = CourseDetailProvider(repo, 1);
+      await p.load();
+      expect(p.status, ViewStatus.success);
+      expect(p.rating.total, 1);
+      await p.loadProgressFor([video]);
+      expect(p.isCompleted(7), true);
+    },
+  );
 
-  test('CourseDetailProvider: submitFeedback failure exposes actionError', () async {
-    when(() => repo.submitFeedback(courseId: 1, rating: 5, comment: null)).thenThrow(ApiException('nope'));
-    final p = CourseDetailProvider(repo, 1);
-    expect(await p.submitFeedback(5, null), false);
-    expect(p.actionError, 'nope');
-  });
+  test(
+    'CourseDetailProvider: submitFeedback failure exposes actionError',
+    () async {
+      when(() => repo.submitFeedback(courseId: 1, rating: 5, comment: null))
+          .thenThrow(ApiException('nope'));
+      final p = CourseDetailProvider(repo, 1);
+      expect(await p.submitFeedback(5, null), false);
+      expect(p.actionError, 'nope');
+    },
+  );
 }

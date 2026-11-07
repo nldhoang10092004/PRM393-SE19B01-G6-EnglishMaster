@@ -69,6 +69,24 @@ void main() {
     );
   });
 
+  test('asset type codes map to audio, image and text', () {
+    expect(
+      QuizAsset.fromJson({'assetID': 1, 'assetType': 1, 'url': 'x'}).isAudio,
+      isTrue,
+    );
+    expect(
+      QuizAsset.fromJson({'assetID': 2, 'assetType': 2, 'url': 'x'}).isImage,
+      isTrue,
+    );
+    final text = QuizAsset.fromJson({
+      'assetID': 3,
+      'assetType': 3,
+      'contentText': 'Passage',
+    });
+    expect(text.isAudio || text.isImage, isFalse);
+    expect(text.text, 'Passage');
+  });
+
   group('answer state', () {
     late _Repository repository;
     late QuizTakingProvider state;

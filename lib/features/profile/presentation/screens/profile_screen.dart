@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../membership/presentation/screens/membership_screen.dart';
+
 import '../../../../core/config/app_config.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../quiz/presentation/screens/quiz_history_screen.dart';
 import '../../../vocabulary/presentation/screens/vocabulary_screen.dart';
 import '../providers/profile_provider.dart';
-import 'edit_profile_screen.dart';
 import 'change_password_screen.dart';
+import 'edit_profile_screen.dart';
 
 /// Student identity, membership and account actions.
 class ProfileScreen extends StatefulWidget {
@@ -43,14 +47,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final state = context.watch<ProfileProvider>();
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(title: const Text(AppStrings.profile)),
       body: AsyncView(
         status: state.status,
         error: state.error,
         onRetry: state.load,
         builder: (_) {
           final profile = state.profile!;
-          final name = profile.fullName.isEmpty ? 'Student' : profile.fullName;
+          final name = profile.fullName.isEmpty
+              ? AppStrings.student
+              : profile.fullName;
           final avatar = _avatar(state.avatarUrl);
           final membership = state.membership;
           return RefreshIndicator(
@@ -91,9 +97,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _stat(context, state.stats?.streak, 'Day streak'),
-                            _stat(context, state.stats?.attempts, 'Attempts'),
-                            _stat(context, state.stats?.words, 'Words'),
+                            _stat(
+                              context,
+                              state.stats?.streak,
+                              AppStrings.dayStreak,
+                            ),
+                            _stat(
+                              context,
+                              state.stats?.attempts,
+                              AppStrings.attempts,
+                            ),
+                            _stat(
+                              context,
+                              state.stats?.words,
+                              AppStrings.words,
+                            ),
                           ],
                         ),
                         if (state.statsError != null)
@@ -104,25 +122,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 Card(
                   child: ListTile(
+                    // Opens plan selection / renewal with PayOS QR payment.
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const MembershipScreen(),
+                        ),
+                      );
+                      if (context.mounted) {
+                        context.read<ProfileProvider>().load();
+                      }
+                    },
+                    trailing: const Icon(Icons.chevron_right),
                     leading: const Icon(Icons.workspace_premium_outlined),
                     title: Text(
                       membership == null
-                          ? 'Membership unavailable'
+                          ? AppStrings.membershipUnavailable
                           : membership.hasMembership
-                          ? 'Active membership'
-                          : 'No active membership',
+                          ? AppStrings.activeMembership
+                          : AppStrings.noMembership,
                     ),
                     subtitle: Text(
                       state.membershipError ??
                           (membership?.endsAt == null
-                              ? 'Membership is required for course quizzes.'
-                              : 'Expires ${membership!.endsAt!.toLocal().toString().split(' ').first}'),
+                              ? AppStrings.quizMembershipRequired
+                              : AppStrings.membershipExpires(
+                                  DateFormat.yMd('vi')
+                                      .format(membership!.endsAt!.toLocal()),
+                                )),
                     ),
                   ),
                 ),
                 ListTile(
                   leading: const Icon(Icons.edit_outlined),
-                  title: const Text('Edit profile'),
+                  title: const Text(AppStrings.editProfile),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     state.clearError();
@@ -135,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.lock_outline),
-                  title: const Text('Change password'),
+                  title: const Text(AppStrings.changePassword),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     state.clearError();
@@ -148,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.bookmark_border),
-                  title: const Text('Saved vocabulary'),
+                  title: const Text(AppStrings.vocabulary),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
                     await Navigator.of(context).push(
@@ -161,17 +194,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.notifications_outlined),
-                  title: const Text('Study reminder'),
-                  subtitle: const Text(
-                    'Manage reminder time and notifications',
-                  ),
+                  title: const Text(AppStrings.studyReminder),
+                  subtitle: const Text(AppStrings.manageReminders),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () =>
                       Navigator.of(context).pushNamed('/settings/reminder'),
                 ),
                 ListTile(
                   leading: const Icon(Icons.history),
-                  title: const Text('Quiz history'),
+                  title: const Text(AppStrings.quizHistory),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
@@ -181,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 ListTile(
                   leading: Icon(Icons.logout, color: theme.colorScheme.error),
-                  title: const Text('Log out'),
+                  title: const Text(AppStrings.logout),
                   onTap: () async {
                     await context.read<AuthProvider>().logout();
                     if (context.mounted) {
@@ -200,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _stat(BuildContext context, int? count, String label) => Column(
     children: [
       Text(
-        count?.toString() ?? '—',
+        count?.toString() ?? AppStrings.unavailableValue,
         style: Theme.of(context).textTheme.titleLarge,
       ),
       Text(label),

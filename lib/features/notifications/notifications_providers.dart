@@ -10,9 +10,10 @@ class NotificationsProviders {
 
   /// Providers to add to the app-level `MultiProvider`.
   static List<SingleChildWidget> providers() => [
-        Provider<NotificationService>(create: (_) => NotificationService()),
-        ChangeNotifierProvider<ReminderProvider>(
-          create: (ctx) => ReminderProvider(ctx.read<NotificationService>())..load(),
-        ),
-      ];
+    Provider<NotificationService>(create: (_) => NotificationService()),
+    ChangeNotifierProvider<ReminderProvider>(
+      create: (ctx) =>
+          ReminderProvider(ctx.read<NotificationService>())..load(),
+    ),
+  ];
 }

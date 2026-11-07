@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../vocabulary/data/models/saved_word.dart';
 import '../../../vocabulary/presentation/providers/vocabulary_provider.dart';
@@ -42,11 +43,11 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                 state.progress.any((p) => p.itemId == card.id && p.isSaved));
         return Scaffold(
           appBar: AppBar(
-            title: Text(state.set?.title ?? 'Study'),
+            title: Text(state.set?.title ?? AppStrings.study),
             actions: [
               if (card != null)
                 IconButton(
-                  tooltip: 'Save to vocabulary',
+                  tooltip: AppStrings.saveVocabulary,
                   onPressed: vocabulary.isPending(card.id) || saved
                       ? null
                       : () async {
@@ -63,9 +64,9 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                               SnackBar(
                                 content: Text(
                                   ok
-                                      ? 'Saved to vocabulary'
+                                      ? AppStrings.savedVocabulary
                                       : vocabulary.error ??
-                                            'Unable to save word.',
+                                            AppStrings.saveWordError,
                                 ),
                               ),
                             );
@@ -94,16 +95,19 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Set complete!',
+                          AppStrings.setComplete,
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         Text(
-                          '${state.masteredCount} cards mastered in ${state.reviews} reviews.',
+                          AppStrings.studySummary(
+                            state.masteredCount,
+                            state.reviews,
+                          ),
                         ),
                         const SizedBox(height: 24),
                         FilledButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Back to set'),
+                          child: const Text(AppStrings.backToSet),
                         ),
                       ],
                     ),
@@ -113,7 +117,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
               if (card == null) {
                 return const MessageView(
                   icon: Icons.style_outlined,
-                  message: 'No cards in this set.',
+                  message: AppStrings.emptySet,
                 );
               }
               return Column(
@@ -125,7 +129,10 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                         LinearProgressIndicator(value: state.fraction),
                         const SizedBox(height: 8),
                         Text(
-                          '${state.masteredCount} mastered · ${state.remaining} remaining',
+                          AppStrings.studyProgress(
+                            state.masteredCount,
+                            state.remaining,
+                          ),
                         ),
                       ],
                     ),
@@ -135,7 +142,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                       onTap: state.flip,
                       child: Semantics(
                         button: true,
-                        label: 'Flip flashcard',
+                        label: AppStrings.flipCard,
                         child: TweenAnimationBuilder<double>(
                           key: ValueKey('${card.id}:${state.reviews}'),
                           tween: Tween(
@@ -164,6 +171,46 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
+                                            if (!back && card.imageUrl != null)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 16,
+                                                ),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                  child: Image.network(
+                                                    card.imageUrl!,
+                                                    height: 180,
+                                                    width: double.infinity,
+                                                    fit: BoxFit.cover,
+                                                    loadingBuilder:
+                                                        (
+                                                          _,
+                                                          child,
+                                                          progress,
+                                                        ) => progress == null
+                                                        ? child
+                                                        : const SizedBox(
+                                                            height: 180,
+                                                            child: Center(
+                                                              child:
+                                                                  CircularProgressIndicator(),
+                                                            ),
+                                                          ),
+                                                    errorBuilder: (_, _, _) =>
+                                                        const SizedBox(
+                                                          height: 60,
+                                                          child: Center(
+                                                            child: Icon(
+                                                              Icons
+                                                                  .image_not_supported_outlined,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
                                             Text(
                                               back ? card.back : card.front,
                                               textAlign: TextAlign.center,
@@ -182,7 +229,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                                               ),
                                             ],
                                             const SizedBox(height: 24),
-                                            const Text('Tap to flip'),
+                                            const Text(AppStrings.tapToFlip),
                                           ],
                                         ),
                                       ),
@@ -217,7 +264,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                               onPressed: state.busy
                                   ? null
                                   : () => state.answer(mastered: false),
-                              child: const Text('Again'),
+                              child: const Text(AppStrings.again),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -226,7 +273,11 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                               onPressed: state.busy
                                   ? null
                                   : () => state.answer(mastered: true),
-                              child: Text(state.busy ? 'Saving…' : 'Got it'),
+                              child: Text(
+                                state.busy
+                                    ? AppStrings.saving
+                                    : AppStrings.gotIt,
+                              ),
                             ),
                           ),
                         ],

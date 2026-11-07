@@ -8,12 +8,14 @@ class Flashcard {
     required this.back,
     this.ipa = '',
     this.example = '',
+    this.imageUrl,
   });
   final int id;
   final String front;
   final String back;
   final String ipa;
   final String example;
+  final String? imageUrl;
 
   factory Flashcard.fromJson(Map<String, dynamic> json) => Flashcard(
     id: json.asInt('itemID'),
@@ -21,6 +23,7 @@ class Flashcard {
     back: json.asString('backText'),
     ipa: json.asString('ipa'),
     example: json.asString('example'),
+    imageUrl: _cleanUrl(json['imageUrl']),
   );
 }
 
@@ -93,4 +96,9 @@ class FlashcardHistory {
         actionType: json.asInt('actionType'),
         createdAt: json.asDate('createdAt'),
       );
+}
+
+String? _cleanUrl(Object? raw) {
+  final value = raw is String ? raw.trim() : '';
+  return value.isEmpty ? null : value;
 }

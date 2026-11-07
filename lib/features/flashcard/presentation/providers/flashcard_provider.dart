@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/flashcard_repository.dart';
@@ -27,7 +28,7 @@ class FlashcardProvider extends ChangeNotifier {
       error = e.message;
       status = ViewStatus.error;
     } catch (_) {
-      error = 'Unable to load flashcards.';
+      error = AppStrings.flashcardsLoadError;
       status = ViewStatus.error;
     }
     notifyListeners();
@@ -86,14 +87,14 @@ class FlashcardStudyProvider extends ChangeNotifier {
       } on ApiException catch (e) {
         progressError = e.message;
       } catch (_) {
-        progressError = 'Progress is unavailable.';
+        progressError = AppStrings.progressError;
       }
       status = ViewStatus.success;
     } on ApiException catch (e) {
       error = e.message;
       status = ViewStatus.error;
     } catch (_) {
-      error = 'Unable to load this set.';
+      error = AppStrings.setLoadError;
       status = ViewStatus.error;
     }
     notifyListeners();
@@ -137,7 +138,7 @@ class FlashcardStudyProvider extends ChangeNotifier {
     } on ApiException catch (e) {
       error = e.message;
     } catch (_) {
-      error = 'Could not record learning. Please try again.';
+      error = AppStrings.recordLearningError;
     }
     busy = false;
     notifyListeners();

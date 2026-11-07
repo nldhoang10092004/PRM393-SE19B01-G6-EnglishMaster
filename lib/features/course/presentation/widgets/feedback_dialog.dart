@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../providers/course_detail_provider.dart';
 
 /// Dialog to write a review: star selector, optional comment, submit.
@@ -46,7 +47,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return AlertDialog(
-      title: const Text('Rate this course'),
+      title: const Text(AppStrings.rateCourse),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -55,10 +56,12 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             children: [
               for (var i = 1; i <= 5; i++)
                 IconButton(
-                  tooltip: '$i star${i == 1 ? '' : 's'}',
+                  tooltip: AppStrings.starCount(i),
                   onPressed: _busy ? null : () => setState(() => _rating = i),
                   icon: Icon(
-                    i <= _rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                    i <= _rating
+                        ? Icons.star_rounded
+                        : Icons.star_outline_rounded,
                     color: scheme.tertiary,
                     size: 32,
                   ),
@@ -70,7 +73,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
             enabled: !_busy,
             maxLines: 3,
             maxLength: 500,
-            decoration: const InputDecoration(hintText: 'Share your experience (optional)'),
+            decoration: const InputDecoration(hintText: AppStrings.reviewHint),
           ),
           if (_error != null)
             Padding(
@@ -80,12 +83,19 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
         ],
       ),
       actions: [
-        TextButton(onPressed: _busy ? null : () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+        TextButton(
+          onPressed: _busy ? null : () => Navigator.of(context).pop(false),
+          child: const Text(AppStrings.cancel),
+        ),
         FilledButton(
           onPressed: _busy ? null : _submit,
           child: _busy
-              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Text('Submit'),
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text(AppStrings.submit),
         ),
       ],
     );

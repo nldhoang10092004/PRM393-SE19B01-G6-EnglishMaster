@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/models/lesson_video.dart';
@@ -24,10 +25,15 @@ class VideoLessonProvider extends ChangeNotifier {
   ViewStatus get status => _status;
   LessonVideo? get video => _video;
   String? get error => _error;
+
+  /// True when the lesson needs an active membership (show the upgrade banner).
+  bool get needsMembership => _needsMembership;
+  bool _needsMembership = false;
   bool get isCompleted => _completed;
 
   /// Position (seconds) to resume from, 0 when starting over.
-  int get resumePositionSec => _completed ? 0 : (_progress.lastPositionSec ?? 0);
+  int get resumePositionSec =>
+      _completed ? 0 : (_progress.lastPositionSec ?? 0);
 
   /// Loads the video and the saved progress. Progress failures are ignored.
   Future<void> load() async {
@@ -36,8 +42,12 @@ class VideoLessonProvider extends ChangeNotifier {
     notifyListeners();
     try {
       final video = await _repository.fetchVideo(videoId);
-      if (!video.canWatch) throw ApiException('A membership is required to watch this video.');
-      if (video.url.trim().isEmpty) throw ApiException('This video has no playable source yet.');
+      if (!video.canWatch) {
+        throw ApiException(AppStrings.videoMembershipRequired);
+      }
+      if (video.url.trim().isEmpty) {
+        throw ApiException(AppStrings.noVideoSource);
+      }
       _video = video;
       try {
         _progress = await _repository.fetchProgress(videoId);
@@ -48,9 +58,10 @@ class VideoLessonProvider extends ChangeNotifier {
       _status = ViewStatus.success;
     } on ApiException catch (e) {
       _error = e.message;
+      _needsMembership = e.isForbidden;
       _status = ViewStatus.error;
     } catch (e) {
-      _error = 'Unexpected error: $e';
+      _error = AppStrings.unexpectedError;
       _status = ViewStatus.error;
     }
     notifyListeners();
@@ -72,7 +83,9 @@ class VideoLessonProvider extends ChangeNotifier {
   }) async {
     if (_video == null || totalSec <= 0) return false;
     final completed = _completed || markCompleted;
-    final watched = positionSec > _progress.watchDurationSec ? positionSec : _progress.watchDurationSec;
+    final watched = positionSec > _progress.watchDurationSec
+        ? positionSec
+        : _progress.watchDurationSec;
     try {
       await _repository.saveProgress(
         videoId: videoId,

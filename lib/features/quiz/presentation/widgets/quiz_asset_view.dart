@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/config/app_config.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../data/models/quiz.dart';
 
 /// Renders passages and images, with guarded audio playback and URL fallback.
@@ -65,7 +66,7 @@ class _QuizAssetViewState extends State<QuizAssetView> {
       }
     } catch (_) {
       if (mounted) {
-        setState(() => _error = 'Audio is unavailable on this device.');
+        setState(() => _error = AppStrings.audioUnavailable);
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -76,7 +77,7 @@ class _QuizAssetViewState extends State<QuizAssetView> {
     if (mounted) {
       setState(() {
         if (_audio?.value.hasError ?? false) {
-          _error = 'Audio could not be played.';
+          _error = AppStrings.audioPlaybackError;
         }
       });
     }
@@ -87,6 +88,63 @@ class _QuizAssetViewState extends State<QuizAssetView> {
     _audio?.removeListener(_audioChanged);
     _audio?.dispose();
     super.dispose();
+  }
+
+  void _zoomImage(BuildContext context, Uri uri) {
+    showDialog<void>(
+      context: context,
+      builder: (_) => Dialog.fullscreen(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: InteractiveViewer(
+                maxScale: 5,
+                child: Image.network(
+                  uri.toString(),
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, _, _) =>
+                      const Center(child: Text(AppStrings.imageUnavailable)),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                tooltip: AppStrings.close,
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.close),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _seekBar(VideoPlayerController c) {
+    final total = c.value.duration.inMilliseconds;
+    final pos = c.value.position.inMilliseconds.clamp(0, total > 0 ? total : 0);
+    String fmt(int ms) {
+      final d = Duration(milliseconds: ms);
+      return '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
+    }
+
+    return Row(
+      children: [
+        Text(fmt(pos)),
+        Expanded(
+          child: Slider(
+            value: pos.toDouble(),
+            max: total > 0 ? total.toDouble() : 1,
+            onChanged: total > 0
+                ? (v) => c.seekTo(Duration(milliseconds: v.round()))
+                : null,
+          ),
+        ),
+        Text(fmt(total)),
+      ],
+    );
   }
 
   @override
@@ -104,19 +162,35 @@ class _QuizAssetViewState extends State<QuizAssetView> {
                 asset.caption,
                 style: Theme.of(context).textTheme.titleSmall,
               ),
-            if (asset.text.isNotEmpty) SelectableText(asset.text),
+            if (asset.text.isNotEmpty)
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 280),
+                child: Scrollbar(
+                  child: SingleChildScrollView(
+                    child: SelectableText(
+                      asset.text,
+                      style: Theme.of(context).textTheme.bodyLarge
+                          ?.copyWith(height: 1.5),
+                    ),
+                  ),
+                ),
+              ),
             if (asset.isImage && uri != null)
-              Image.network(
-                uri.toString(),
-                height: 200,
-                fit: BoxFit.contain,
-                loadingBuilder: (_, child, progress) => progress == null
-                    ? child
-                    : const SizedBox(
-                        height: 80,
-                        child: Center(child: CircularProgressIndicator()),
-                      ),
-                errorBuilder: (_, _, _) => const Text('Image unavailable.'),
+              GestureDetector(
+                onTap: () => _zoomImage(context, uri),
+                child: Image.network(
+                  uri.toString(),
+                  height: 200,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (_, child, progress) => progress == null
+                      ? child
+                      : const SizedBox(
+                          height: 80,
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                  errorBuilder: (_, _, _) =>
+                      const Text(AppStrings.imageUnavailable),
+                ),
               ),
             if (asset.isAudio && uri != null)
               OutlinedButton.icon(
@@ -128,12 +202,14 @@ class _QuizAssetViewState extends State<QuizAssetView> {
                 ),
                 label: Text(
                   _loading
-                      ? 'Loading audio…'
+                      ? AppStrings.loadingAudio
                       : _audio?.value.isPlaying == true
-                      ? 'Pause audio'
-                      : 'Play audio',
+                      ? AppStrings.pauseAudio
+                      : AppStrings.playAudio,
                 ),
               ),
+            if (asset.isAudio && uri != null && _audio != null)
+              _seekBar(_audio!),
             if (_error != null)
               Text(
                 _error!,
@@ -144,7 +220,7 @@ class _QuizAssetViewState extends State<QuizAssetView> {
                     (!asset.isImage && !asset.isAudio) ||
                     _error != null))
               SelectableText(
-                uri?.toString() ?? 'Attachment URL is unavailable.',
+                uri?.toString() ?? AppStrings.attachmentUnavailable,
               ),
           ],
         ),

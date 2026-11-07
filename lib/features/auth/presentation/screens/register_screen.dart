@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/utils/validators.dart';
 import '../providers/auth_provider.dart';
 
@@ -22,6 +23,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _otpSent = false;
 
   @override
+  void initState() {
+    super.initState();
+    // AuthProvider is shared by all auth screens: drop errors left by the previous screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<AuthProvider>().clearError();
+    });
+  }
+
+  @override
   void dispose() {
     for (final c in [_email, _username, _password, _confirm, _otp]) {
       c.dispose();
@@ -32,25 +42,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _sendOtp() async {
     final emailError = Validators.email(_email.text);
     if (emailError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(emailError)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(emailError)));
       return;
     }
     final ok = await context.read<AuthProvider>().sendOtp(_email.text);
     if (!mounted) return;
     if (ok) {
       setState(() => _otpSent = true);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('OTP sent. Check your inbox.')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text(AppStrings.otpSent)));
     }
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     final ok = await context.read<AuthProvider>().register(
-          email: _email.text,
-          username: _username.text,
-          password: _password.text,
-          otp: _otp.text,
-        );
+      email: _email.text,
+      username: _username.text,
+      password: _password.text,
+      otp: _otp.text,
+    );
     // On success the root gate shows the main app; close this route.
     if (ok && mounted) Navigator.of(context).popUntil((r) => r.isFirst);
   }
@@ -61,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Create account')),
+      appBar: AppBar(title: const Text(AppStrings.createAccount)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -73,28 +85,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextFormField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.email,
+                    prefixIcon: Icon(Icons.email_outlined),
+                  ),
                   validator: Validators.email,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _username,
-                  decoration: const InputDecoration(labelText: 'Username', prefixIcon: Icon(Icons.person_outline)),
-                  validator: (v) => Validators.required(v, field: 'Username'),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.username,
+                    prefixIcon: Icon(Icons.person_outline),
+                  ),
+                  validator: (v) =>
+                      Validators.required(v, field: AppStrings.username),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _password,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Password', prefixIcon: Icon(Icons.lock_outline)),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.password,
+                    prefixIcon: Icon(Icons.lock_outline),
+                  ),
                   validator: Validators.password,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _confirm,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Confirm password', prefixIcon: Icon(Icons.lock_outline)),
-                  validator: (v) => Validators.confirmPassword(v, _password.text),
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.confirmPassword,
+                    prefixIcon: Icon(Icons.lock_outline),
+                  ),
+                  validator: (v) =>
+                      Validators.confirmPassword(v, _password.text),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -103,27 +129,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: TextFormField(
                         controller: _otp,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'OTP code', prefixIcon: Icon(Icons.pin_outlined)),
+                        decoration: const InputDecoration(
+                          labelText: AppStrings.otpCode,
+                          prefixIcon: Icon(Icons.pin_outlined),
+                        ),
                         validator: Validators.otp,
                       ),
                     ),
                     const SizedBox(width: 12),
                     OutlinedButton(
                       onPressed: auth.isBusy ? null : _sendOtp,
-                      child: Text(_otpSent ? 'Resend' : 'Send OTP'),
+                      child: Text(
+                        _otpSent ? AppStrings.resend : AppStrings.sendOtp,
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 if (auth.error != null) ...[
-                  Text(auth.error!, style: TextStyle(color: theme.colorScheme.error)),
+                  Text(
+                    auth.error!,
+                    style: TextStyle(color: theme.colorScheme.error),
+                  ),
                   const SizedBox(height: 12),
                 ],
                 FilledButton(
                   onPressed: auth.isBusy ? null : _submit,
                   child: auth.isBusy
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Sign up'),
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text(AppStrings.register),
                 ),
               ],
             ),

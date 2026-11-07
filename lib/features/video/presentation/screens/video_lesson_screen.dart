@@ -3,8 +3,12 @@ import 'dart:async';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../membership/presentation/widgets/upgrade_membership_banner.dart';
+
 import 'package:video_player/video_player.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/video_repository.dart';
 import '../providers/video_lesson_provider.dart';
@@ -25,7 +29,8 @@ class VideoLessonScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (ctx) => VideoLessonProvider(ctx.read<VideoRepository>(), videoId),
+      create: (ctx) =>
+          VideoLessonProvider(ctx.read<VideoRepository>(), videoId),
       child: _VideoLessonBody(title: title),
     );
   }
@@ -60,25 +65,39 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
   Future<void> _start() async {
     await _provider.load();
     final video = _provider.video;
-    if (!mounted || _provider.status != ViewStatus.success || video == null) return;
+    if (!mounted || _provider.status != ViewStatus.success || video == null) {
+      return;
+    }
     try {
       final uri = Uri.parse(video.url.trim());
       if (!uri.hasScheme || !(uri.scheme == 'http' || uri.scheme == 'https')) {
-        throw const FormatException('Invalid video address');
+        throw const FormatException(AppStrings.invalidVideoAddress);
       }
       final controller = VideoPlayerController.networkUrl(uri);
       _controller = controller;
       await controller.initialize();
       if (!mounted) return;
       final resume = Duration(seconds: _provider.resumePositionSec);
-      if (resume > Duration.zero && resume < controller.value.duration - const Duration(seconds: 2)) {
+      if (resume > Duration.zero &&
+          resume < controller.value.duration - const Duration(seconds: 2)) {
         await controller.seekTo(resume);
       }
       _chewie = ChewieController(
         videoPlayerController: controller,
         autoPlay: true,
-        aspectRatio: controller.value.aspectRatio == 0 ? 16 / 9 : controller.value.aspectRatio,
-        errorBuilder: (_, message) => MessageView(icon: Icons.error_outline, message: message),
+        optionsTranslation: OptionsTranslation(
+          playbackSpeedButtonText: AppStrings.playbackSpeed,
+          subtitlesButtonText: AppStrings.subtitles,
+          cancelButtonText: AppStrings.cancel,
+          qualityButtonText: AppStrings.videoQuality,
+        ),
+        aspectRatio: controller.value.aspectRatio == 0
+            ? 16 / 9
+            : controller.value.aspectRatio,
+        errorBuilder: (_, message) => MessageView(
+          icon: Icons.error_outline,
+          message: AppStrings.videoPlaybackError,
+        ),
       );
       _timer = Timer.periodic(saveInterval, (_) {
         if (controller.value.isPlaying) _save();
@@ -86,7 +105,7 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
       setState(() {});
     } catch (_) {
       if (mounted) {
-        _provider.reportPlaybackError('This video cannot be played. The link may be invalid or unreachable.');
+        _provider.reportPlaybackError(AppStrings.videoPlaybackError);
       }
     }
   }
@@ -98,15 +117,24 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
     final total = controller.value.duration.inSeconds;
     var position = controller.value.position.inSeconds;
     if (markCompleted) position = total;
-    await _provider.saveProgress(positionSec: position, totalSec: total, markCompleted: markCompleted);
+    await _provider.saveProgress(
+      positionSec: position,
+      totalSec: total,
+      markCompleted: markCompleted,
+    );
   }
 
   Future<void> _markCompleted() async {
     final messenger = ScaffoldMessenger.of(context);
-    final ok = await _save(markCompleted: true).then((_) => _provider.isCompleted);
-    messenger.showSnackBar(SnackBar(
-      content: Text(ok ? 'Lesson marked as completed' : 'Could not save progress. Try again.'),
-    ));
+    final ok = await _save(markCompleted: true)
+        .then((_) => _provider.isCompleted);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          ok ? AppStrings.lessonCompleted : AppStrings.progressSaveError,
+        ),
+      ),
+    );
   }
 
   @override
@@ -139,49 +167,64 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
         navigator.pop(true);
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(video?.name ?? widget.title ?? 'Lesson')),
-        body: AsyncView(
-          status: provider.status,
-          error: provider.error,
-          onRetry: () {
-            _disposePlayer();
-            _start();
-          },
-          builder: (context) => ListView(
-            children: [
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: _chewie == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : Chewie(controller: _chewie!),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        appBar: AppBar(
+          title: Text(video?.name ?? widget.title ?? AppStrings.lesson),
+        ),
+        body: provider.needsMembership
+            ? _LockedLesson(message: provider.error)
+            : AsyncView(
+                status: provider.status,
+                error: provider.error,
+                onRetry: () {
+                  _disposePlayer();
+                  _start();
+                },
+                builder: (context) => ListView(
                   children: [
-                    Text(video?.name ?? '', style: theme.textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    if (video?.isPreview ?? false)
-                      const Chip(label: Text('Free preview'), visualDensity: VisualDensity.compact),
-                    const SizedBox(height: 16),
-                    provider.isCompleted
-                        ? FilledButton.tonalIcon(
-                            onPressed: null,
-                            icon: const Icon(Icons.check_circle, color: Colors.green),
-                            label: const Text('Completed'),
-                          )
-                        : FilledButton.icon(
-                            onPressed: _chewie == null ? null : _markCompleted,
-                            icon: const Icon(Icons.check_circle_outline),
-                            label: const Text('Mark as completed'),
+                    AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: _chewie == null
+                          ? const Center(child: CircularProgressIndicator())
+                          : Chewie(controller: _chewie!),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            video?.name ?? '',
+                            style: theme.textTheme.titleMedium,
                           ),
+                          const SizedBox(height: 8),
+                          if (video?.isPreview ?? false)
+                            const Chip(
+                              label: Text(AppStrings.freePreview),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          const SizedBox(height: 16),
+                          provider.isCompleted
+                              ? FilledButton.tonalIcon(
+                                  onPressed: null,
+                                  icon: const Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                  ),
+                                  label: const Text(AppStrings.completed),
+                                )
+                              : FilledButton.icon(
+                                  onPressed: _chewie == null
+                                      ? null
+                                      : _markCompleted,
+                                  icon: const Icon(Icons.check_circle_outline),
+                                  label: const Text(AppStrings.markCompleted),
+                                ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -192,5 +235,35 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
     _controller?.dispose();
     _chewie = null;
     _controller = null;
+  }
+}
+
+/// Shown instead of the player when the lesson is premium and the user has no membership.
+class _LockedLesson extends StatelessWidget {
+  const _LockedLesson({this.message});
+
+  final String? message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.lock_outline,
+              size: 56,
+              color: Theme.of(context).colorScheme.outline,
+            ),
+            const SizedBox(height: 12),
+            if (message != null) Text(message!, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            const UpgradeMembershipBanner(),
+          ],
+        ),
+      ),
+    );
   }
 }

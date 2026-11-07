@@ -8,14 +8,18 @@ abstract class TokenStorage {
   Future<String?> readAccessToken();
   Future<int?> readAccountId();
   Future<String?> readRole();
-  Future<void> save({required String accessToken, required int accountId, String? role});
+  Future<void> save({
+    required String accessToken,
+    required int accountId,
+    String? role,
+  });
   Future<void> clear();
 }
 
 /// Production implementation backed by Android Keystore (encrypted storage).
 class SecureTokenStorage implements TokenStorage {
   SecureTokenStorage([FlutterSecureStorage? storage])
-      : _storage = storage ?? const FlutterSecureStorage();
+    : _storage = storage ?? const FlutterSecureStorage();
 
   final FlutterSecureStorage _storage;
 
@@ -34,7 +38,11 @@ class SecureTokenStorage implements TokenStorage {
   Future<String?> readRole() => _storage.read(key: _kRole);
 
   @override
-  Future<void> save({required String accessToken, required int accountId, String? role}) async {
+  Future<void> save({
+    required String accessToken,
+    required int accountId,
+    String? role,
+  }) async {
     await _storage.write(key: _kToken, value: accessToken);
     await _storage.write(key: _kAccountId, value: accountId.toString());
     if (role != null) await _storage.write(key: _kRole, value: role);
@@ -64,7 +72,11 @@ class InMemoryTokenStorage implements TokenStorage {
   Future<String?> readRole() async => _role;
 
   @override
-  Future<void> save({required String accessToken, required int accountId, String? role}) async {
+  Future<void> save({
+    required String accessToken,
+    required int accountId,
+    String? role,
+  }) async {
     _token = accessToken;
     _accountId = accountId;
     _role = role;

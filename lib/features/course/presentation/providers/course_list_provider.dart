@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/course_repository.dart';
@@ -34,7 +35,7 @@ class CourseListProvider extends ChangeNotifier {
       _error = e.message;
       if (_courses.isEmpty) _status = ViewStatus.error;
     } catch (e) {
-      _error = 'Unexpected error: $e';
+      _error = AppStrings.unexpectedError;
       if (_courses.isEmpty) _status = ViewStatus.error;
     }
     notifyListeners();

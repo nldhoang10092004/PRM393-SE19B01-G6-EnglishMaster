@@ -10,7 +10,11 @@ class StreakStatus {
   });
 
   /// Streak shown before data is available.
-  static const empty = StreakStatus(currentStreak: 0, needsActivityToday: true, message: '');
+  static const empty = StreakStatus(
+    currentStreak: 0,
+    needsActivityToday: true,
+    message: '',
+  );
 
   final int currentStreak;
   final DateTime? lastActivityDate;
@@ -22,9 +26,9 @@ class StreakStatus {
   final String message;
 
   factory StreakStatus.fromJson(Map<String, dynamic> json) => StreakStatus(
-        currentStreak: json.asInt('currentStreak'),
-        lastActivityDate: json.asDate('lastActivityDate'),
-        needsActivityToday: json.asBool('needsActivityToday', fallback: true),
-        message: json.asString('message'),
-      );
+    currentStreak: json.asInt('currentStreak'),
+    lastActivityDate: json.asDate('lastActivityDate'),
+    needsActivityToday: json.asBool('needsActivityToday', fallback: true),
+    message: json.asString('message'),
+  );
 }

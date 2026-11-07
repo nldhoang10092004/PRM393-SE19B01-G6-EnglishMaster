@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../providers/quiz_provider.dart';
 import '../widgets/quiz_catalog.dart';
 import '../widgets/quiz_history_list.dart';
@@ -31,11 +32,11 @@ class _QuizListScreenState extends State<QuizListScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Quizzes'),
+          title: const Text(AppStrings.quizzes),
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'System quizzes'),
-              Tab(text: 'Attempt history'),
+              Tab(text: AppStrings.systemQuizzes),
+              Tab(text: AppStrings.attemptHistory),
             ],
           ),
         ),

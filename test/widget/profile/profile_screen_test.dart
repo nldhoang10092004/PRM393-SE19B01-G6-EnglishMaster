@@ -1,16 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:provider/provider.dart';
+import 'package:english_master/core/l10n/app_strings.dart';
 import 'package:english_master/core/network/api_exception.dart';
 import 'package:english_master/features/profile/data/models/user_profile.dart';
 import 'package:english_master/features/profile/data/profile_repository.dart';
 import 'package:english_master/features/profile/presentation/providers/profile_provider.dart';
 import 'package:english_master/features/profile/presentation/screens/profile_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:provider/provider.dart';
 
 class _Repository extends Mock implements ProfileRepository {}
 
 void main() {
+  setUpAll(() => initializeDateFormatting('vi'));
   testWidgets(
     'renders fake profile, membership, stats and named reminder route',
     (tester) async {
@@ -40,7 +43,7 @@ void main() {
             home: const ProfileScreen(),
             routes: {
               '/settings/reminder': (_) =>
-                  const Scaffold(body: Text('Reminder settings')),
+                  const Scaffold(body: Text(AppStrings.studyReminder)),
             },
           ),
         ),
@@ -48,15 +51,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Anna Nguyen'), findsOneWidget);
       expect(find.text('anna@example.test'), findsOneWidget);
-      expect(find.text('Active membership'), findsOneWidget);
+      expect(find.text(AppStrings.activeMembership), findsOneWidget);
       expect(find.text('3'), findsOneWidget);
       expect(find.text('8'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Study reminder'), 160);
-      await tester.ensureVisible(find.text('Study reminder'));
+      await tester.scrollUntilVisible(find.text(AppStrings.studyReminder), 160);
+      await tester.ensureVisible(find.text(AppStrings.studyReminder));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Study reminder'));
+      await tester.tap(find.text(AppStrings.studyReminder));
       await tester.pumpAndSettle();
-      expect(find.text('Reminder settings'), findsOneWidget);
+      expect(find.text(AppStrings.studyReminder), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );
@@ -74,7 +77,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Offline'), findsOneWidget);
-    expect(find.text('Retry'), findsOneWidget);
+    expect(find.text(AppStrings.retry), findsOneWidget);
     when(() => repository.detail()).thenAnswer(
       (_) async => const UserProfile(accountId: 4, fullName: 'Anna'),
     );
@@ -83,7 +86,7 @@ void main() {
         .thenAnswer((_) async => const MembershipStatus(hasMembership: false));
     when(() => repository.stats())
         .thenAnswer((_) async => (streak: 0, attempts: 0, words: 0));
-    await tester.tap(find.text('Retry'));
+    await tester.tap(find.text(AppStrings.retry));
     await tester.pumpAndSettle();
     expect(find.text('Anna'), findsOneWidget);
   });

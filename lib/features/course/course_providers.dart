@@ -13,7 +13,11 @@ class CourseProviders {
 
   /// Providers to add to the app-level `MultiProvider`.
   static List<SingleChildWidget> providers() => [
-        ProxyProvider<ApiClient, CourseRepository>(update: (_, api, _) => CourseRepository(api)),
-        ChangeNotifierProvider<CourseListProvider>(create: (ctx) => CourseListProvider(ctx.read<CourseRepository>())),
-      ];
+    ProxyProvider<ApiClient, CourseRepository>(
+      update: (_, api, _) => CourseRepository(api),
+    ),
+    ChangeNotifierProvider<CourseListProvider>(
+      create: (ctx) => CourseListProvider(ctx.read<CourseRepository>()),
+    ),
+  ];
 }

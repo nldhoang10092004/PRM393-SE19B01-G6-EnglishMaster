@@ -1,3 +1,4 @@
+import '../../../core/l10n/app_strings.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/network/api_exception.dart';
 import '../../../core/utils/json_utils.dart';
@@ -27,7 +28,7 @@ class QuizRepository {
     final value = await _api.post('/api/user/quiz/start/$id');
     final attemptId = value is num ? value.toInt() : int.tryParse('$value');
     if (attemptId == null || attemptId <= 0) {
-      throw ApiException('The server did not return a valid attempt ID.');
+      throw ApiException(AppStrings.invalidAttempt);
     }
     return attemptId;
   }

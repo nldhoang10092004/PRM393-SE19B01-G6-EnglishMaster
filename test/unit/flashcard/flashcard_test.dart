@@ -13,6 +13,32 @@ class _Repository extends Mock implements FlashcardRepository {}
 class _Api extends Mock implements ApiClient {}
 
 void main() {
+  test('flashcard imageUrl is parsed and blank values become null', () {
+    expect(
+      Flashcard.fromJson({
+        'itemID': 1,
+        'frontText': 'passport',
+        'backText': 'hộ chiếu',
+        'imageUrl': ' https://example.test/p.jpg ',
+      }).imageUrl,
+      'https://example.test/p.jpg',
+    );
+    expect(
+      Flashcard.fromJson({'itemID': 2, 'frontText': 'a', 'backText': 'b'})
+          .imageUrl,
+      isNull,
+    );
+    expect(
+      Flashcard.fromJson({
+        'itemID': 3,
+        'frontText': 'a',
+        'backText': 'b',
+        'imageUrl': '  ',
+      }).imageUrl,
+      isNull,
+    );
+  });
+
   test('models parse actual flashcard, progress and history DTOs', () {
     final set = FlashcardSet.fromJson({
       'setID': 4,

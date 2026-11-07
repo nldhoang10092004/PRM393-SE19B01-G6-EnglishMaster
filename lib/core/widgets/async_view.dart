@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
+
 /// Loading state of a screen backed by a provider.
 enum ViewStatus { idle, loading, success, error }
 
@@ -13,7 +15,7 @@ class AsyncView extends StatelessWidget {
     this.error,
     this.onRetry,
     this.isEmpty = false,
-    this.emptyMessage = 'Nothing here yet.',
+    this.emptyMessage = AppStrings.empty,
   });
 
   final ViewStatus status;
@@ -32,12 +34,14 @@ class AsyncView extends StatelessWidget {
       case ViewStatus.error:
         return MessageView(
           icon: Icons.cloud_off_outlined,
-          message: error ?? 'Something went wrong.',
-          actionLabel: onRetry == null ? null : 'Retry',
+          message: error ?? AppStrings.genericError,
+          actionLabel: onRetry == null ? null : AppStrings.retry,
           onAction: onRetry,
         );
       case ViewStatus.success:
-        if (isEmpty) return MessageView(icon: Icons.inbox_outlined, message: emptyMessage);
+        if (isEmpty) {
+          return MessageView(icon: Icons.inbox_outlined, message: emptyMessage);
+        }
         return builder(context);
     }
   }
@@ -45,7 +49,13 @@ class AsyncView extends StatelessWidget {
 
 /// Centered icon + message with an optional action button.
 class MessageView extends StatelessWidget {
-  const MessageView({super.key, required this.icon, required this.message, this.actionLabel, this.onAction});
+  const MessageView({
+    super.key,
+    required this.icon,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
 
   final IconData icon;
   final String message;
@@ -63,7 +73,11 @@ class MessageView extends StatelessWidget {
           children: [
             Icon(icon, size: 56, color: theme.colorScheme.outline),
             const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center, style: theme.textTheme.bodyLarge),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyLarge,
+            ),
             if (actionLabel != null) ...[
               const SizedBox(height: 16),
               OutlinedButton(onPressed: onAction, child: Text(actionLabel!)),

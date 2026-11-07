@@ -18,9 +18,9 @@ class VideoProgress {
   final bool isCompleted;
 
   factory VideoProgress.fromJson(Map<String, dynamic> json) => VideoProgress(
-        watchDurationSec: json.asInt('watchDurationSec'),
-        lastPositionSec: json.asIntOrNull('lastPositionSec'),
-        totalDurationSec: json.asIntOrNull('totalDurationSec'),
-        isCompleted: json.asBool('isCompleted'),
-      );
+    watchDurationSec: json.asInt('watchDurationSec'),
+    lastPositionSec: json.asIntOrNull('lastPositionSec'),
+    totalDurationSec: json.asIntOrNull('totalDurationSec'),
+    isCompleted: json.asBool('isCompleted'),
+  );
 }

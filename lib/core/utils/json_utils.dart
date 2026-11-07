@@ -32,7 +32,8 @@ extension JsonMapX on Map<String, dynamic> {
     return double.tryParse('$v') ?? fallback;
   }
 
-  String asString(String key, {String fallback = ''}) => pick(key)?.toString() ?? fallback;
+  String asString(String key, {String fallback = ''}) =>
+      pick(key)?.toString() ?? fallback;
 
   String? asStringOrNull(String key) => pick(key)?.toString();
 
@@ -44,7 +45,8 @@ extension JsonMapX on Map<String, dynamic> {
     return fallback;
   }
 
-  DateTime? asDate(String key) => DateTime.tryParse(pick(key)?.toString() ?? '');
+  DateTime? asDate(String key) =>
+      DateTime.tryParse(pick(key)?.toString() ?? '');
 
   List<Map<String, dynamic>> asList(String key) => asMapList(pick(key));
 }
@@ -52,5 +54,8 @@ extension JsonMapX on Map<String, dynamic> {
 /// Converts a dynamic JSON value into a list of maps (empty when not a list).
 List<Map<String, dynamic>> asMapList(dynamic value) {
   if (value is! List) return const [];
-  return value.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
+  return value
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
 }

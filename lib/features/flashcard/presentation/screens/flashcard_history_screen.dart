@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
-import '../providers/flashcard_history_provider.dart';
 import '../../data/flashcard_repository.dart';
+import '../providers/flashcard_history_provider.dart';
 
 /// Refreshable learning history scoped to this route.
 class FlashcardHistoryScreen extends StatelessWidget {
@@ -14,7 +16,7 @@ class FlashcardHistoryScreen extends StatelessWidget {
         FlashcardHistoryProvider(context.read<FlashcardRepository>())..load(),
     child: Consumer<FlashcardHistoryProvider>(
       builder: (_, state, _) => Scaffold(
-        appBar: AppBar(title: const Text('Study history')),
+        appBar: AppBar(title: const Text(AppStrings.studyHistory)),
         body: AsyncView(
           status: state.status,
           error: state.error,
@@ -28,7 +30,7 @@ class FlashcardHistoryScreen extends StatelessWidget {
                       SizedBox(height: 120),
                       MessageView(
                         icon: Icons.history,
-                        message: 'No study history yet.',
+                        message: AppStrings.noStudyHistory,
                       ),
                     ],
                   )
@@ -45,7 +47,16 @@ class FlashcardHistoryScreen extends StatelessWidget {
                         ),
                         title: Text(item.front),
                         subtitle: Text(
-                          '${item.actionType == 2 ? 'Mastered' : 'Reviewed'} · ${item.createdAt?.toLocal().toString().split('.').first ?? ''}',
+                          AppStrings.historyEntry(
+                            item.actionType == 2
+                                ? AppStrings.mastered
+                                : AppStrings.reviewed,
+                            item.createdAt == null
+                                ? ''
+                                : DateFormat.yMd('vi')
+                                      .add_Hm()
+                                      .format(item.createdAt!.toLocal()),
+                          ),
                         ),
                       );
                     },

@@ -11,11 +11,17 @@ class AppTheme {
   static ThemeData dark() => _build(Brightness.dark);
 
   static ThemeData _build(Brightness brightness) {
-    final scheme = ColorScheme.fromSeed(seedColor: seed, brightness: brightness);
+    final scheme = ColorScheme.fromSeed(
+      seedColor: seed,
+      brightness: brightness,
+    );
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      appBarTheme: AppBarTheme(centerTitle: false, backgroundColor: scheme.surface),
+      appBarTheme: AppBarTheme(
+        centerTitle: false,
+        backgroundColor: scheme.surface,
+      ),
       cardTheme: CardThemeData(
         elevation: 0,
         color: scheme.surfaceContainerLow,
@@ -29,7 +35,9 @@ class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size.fromHeight(48),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       ),
     );

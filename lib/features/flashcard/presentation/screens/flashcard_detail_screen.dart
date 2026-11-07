@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/flashcard_repository.dart';
 import '../providers/flashcard_provider.dart';
@@ -18,7 +19,9 @@ class FlashcardDetailScreen extends StatelessWidget {
           ..load(setId),
     child: Consumer<FlashcardStudyProvider>(
       builder: (context, state, _) => Scaffold(
-        appBar: AppBar(title: Text(state.set?.title ?? 'Flashcard set')),
+        appBar: AppBar(
+          title: Text(state.set?.title ?? AppStrings.flashcardSet),
+        ),
         body: AsyncView(
           status: state.status,
           error: state.error,
@@ -39,7 +42,9 @@ class FlashcardDetailScreen extends StatelessWidget {
                       children: [
                         if (set.description.isNotEmpty) Text(set.description),
                         const SizedBox(height: 12),
-                        Text('$mastered / ${set.items.length} mastered'),
+                        Text(
+                          AppStrings.masteredTotal(mastered, set.items.length),
+                        ),
                         const SizedBox(height: 8),
                         LinearProgressIndicator(
                           value: set.items.isEmpty
@@ -51,7 +56,7 @@ class FlashcardDetailScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         FilledButton.icon(
                           icon: const Icon(Icons.play_arrow_rounded),
-                          label: const Text('Study set'),
+                          label: const Text(AppStrings.studySet),
                           onPressed: set.items.isEmpty
                               ? null
                               : () async {
@@ -68,7 +73,7 @@ class FlashcardDetailScreen extends StatelessWidget {
                         if (set.items.isEmpty)
                           const MessageView(
                             icon: Icons.style_outlined,
-                            message: 'This set has no cards yet.',
+                            message: AppStrings.noCards,
                           ),
                       ],
                     );
@@ -76,6 +81,24 @@ class FlashcardDetailScreen extends StatelessWidget {
                   final card = set.items[index - 1];
                   return Card(
                     child: ListTile(
+                      leading: card.imageUrl == null
+                          ? null
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                card.imageUrl!,
+                                width: 56,
+                                height: 56,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => const SizedBox(
+                                  width: 56,
+                                  height: 56,
+                                  child: Icon(
+                                    Icons.image_not_supported_outlined,
+                                  ),
+                                ),
+                              ),
+                            ),
                       title: Text(card.front),
                       subtitle: Text(card.back),
                       trailing:

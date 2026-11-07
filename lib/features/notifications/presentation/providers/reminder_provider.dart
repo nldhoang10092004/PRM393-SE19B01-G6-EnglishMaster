@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../data/notification_service.dart';
 import '../../data/reminder_settings.dart';
 
@@ -40,7 +41,7 @@ class ReminderProvider extends ChangeNotifier {
     try {
       if (value) {
         if (!await _service.requestPermission()) {
-          _error = 'Notification permission was denied. Enable it in system settings.';
+          _error = AppStrings.permissionDenied;
           notifyListeners();
           return;
         }
@@ -51,7 +52,7 @@ class ReminderProvider extends ChangeNotifier {
       _settings = _settings.copyWith(enabled: value);
       await _settings.save();
     } catch (e) {
-      _error = 'Could not update the reminder: $e';
+      _error = AppStrings.reminderUpdateError;
     }
     notifyListeners();
   }
@@ -64,7 +65,7 @@ class ReminderProvider extends ChangeNotifier {
       await _settings.save();
       if (_settings.enabled) await _service.scheduleDailyReminder(time);
     } catch (e) {
-      _error = 'Could not update the reminder: $e';
+      _error = AppStrings.reminderUpdateError;
     }
     notifyListeners();
   }
@@ -74,12 +75,15 @@ class ReminderProvider extends ChangeNotifier {
     _error = null;
     try {
       if (!await _service.requestPermission()) {
-        _error = 'Notification permission was denied. Enable it in system settings.';
+        _error = AppStrings.permissionDenied;
       } else {
-        await _service.showNow(title: 'EnglishMaster', body: 'This is a test reminder.');
+        await _service.showNow(
+          title: AppStrings.appName,
+          body: AppStrings.testReminder,
+        );
       }
     } catch (e) {
-      _error = 'Could not show the notification: $e';
+      _error = AppStrings.notificationShowError;
     }
     notifyListeners();
   }

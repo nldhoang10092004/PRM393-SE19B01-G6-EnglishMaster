@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../flashcard/presentation/screens/flashcard_sets_screen.dart';
 import '../../../profile/presentation/screens/profile_screen.dart';
 import '../../../quiz/presentation/screens/quiz_list_screen.dart';
@@ -33,10 +34,26 @@ class _HomeShellState extends State<HomeShell> {
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.style_outlined), selectedIcon: Icon(Icons.style), label: 'Flashcards'),
-          NavigationDestination(icon: Icon(Icons.quiz_outlined), selectedIcon: Icon(Icons.quiz), label: 'Quiz'),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profile'),
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: AppStrings.home,
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.style_outlined),
+            selectedIcon: Icon(Icons.style),
+            label: AppStrings.flashcards,
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.quiz_outlined),
+            selectedIcon: Icon(Icons.quiz),
+            label: AppStrings.quiz,
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: AppStrings.profile,
+          ),
         ],
       ),
     );

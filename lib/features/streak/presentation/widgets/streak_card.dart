@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../data/models/streak_status.dart';
 
 /// Gradient card with the fire icon, streak length and a "study today" hint.
 class StreakCard extends StatelessWidget {
-  const StreakCard({super.key, required this.status, required this.streak, this.onRetry});
+  const StreakCard({
+    super.key,
+    required this.status,
+    required this.streak,
+    this.onRetry,
+  });
 
   final ViewStatus status;
   final StreakStatus streak;
@@ -42,18 +48,24 @@ class StreakCard extends StatelessWidget {
     switch (status) {
       case ViewStatus.idle:
       case ViewStatus.loading:
-        return Text('Loading your streak...', style: theme.textTheme.titleMedium?.copyWith(color: onColor));
+        return Text(
+          AppStrings.loadingStreak,
+          style: theme.textTheme.titleMedium?.copyWith(color: onColor),
+        );
       case ViewStatus.error:
         return Row(
           children: [
             Expanded(
-              child: Text('Streak unavailable', style: theme.textTheme.titleMedium?.copyWith(color: onColor)),
+              child: Text(
+                AppStrings.streakUnavailable,
+                style: theme.textTheme.titleMedium?.copyWith(color: onColor),
+              ),
             ),
             if (onRetry != null)
               TextButton(
                 onPressed: onRetry,
                 style: TextButton.styleFrom(foregroundColor: onColor),
-                child: const Text('Retry'),
+                child: const Text(AppStrings.retry),
               ),
           ],
         );
@@ -63,12 +75,17 @@ class StreakCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              days == 1 ? '1 day streak' : '$days day streak',
-              style: theme.textTheme.headlineSmall?.copyWith(color: onColor, fontWeight: FontWeight.bold),
+              AppStrings.streakDays(days),
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: onColor,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
-              streak.needsActivityToday ? 'Study today to keep your streak going!' : "You've studied today. Great job!",
+              streak.needsActivityToday
+                  ? AppStrings.studyToday
+                  : AppStrings.studiedToday,
               style: theme.textTheme.bodyMedium?.copyWith(color: onColor),
             ),
           ],

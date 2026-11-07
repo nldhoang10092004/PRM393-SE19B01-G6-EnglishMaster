@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../data/auth_repository.dart';
 import '../../data/models/auth_session.dart';
@@ -29,39 +30,42 @@ class AuthProvider extends ChangeNotifier {
   /// Called once at startup to restore a saved session.
   Future<void> bootstrap() async {
     _session = await _repository.restoreSession();
-    _status = _session == null ? AuthStatus.unauthenticated : AuthStatus.authenticated;
+    _status = _session == null
+        ? AuthStatus.unauthenticated
+        : AuthStatus.authenticated;
     notifyListeners();
   }
 
   Future<bool> login(String emailOrUsername, String password) => _run(() async {
-        final session = await _repository.login(emailOrUsername.trim(), password);
-        if (!session.isStudent) {
-          await _repository.logout();
-          throw ApiException('This app is for students. Please use the web portal for ${session.role} accounts.');
-        }
-        _session = session;
-        _status = AuthStatus.authenticated;
-      });
+    final session = await _repository.login(emailOrUsername.trim(), password);
+    if (!session.isStudent) {
+      await _repository.logout();
+      throw ApiException(AppStrings.studentOnly(session.role));
+    }
+    _session = session;
+    _status = AuthStatus.authenticated;
+  });
 
-  Future<bool> sendOtp(String email) => _run(() => _repository.sendOtp(email.trim()));
+  Future<bool> sendOtp(String email) =>
+      _run(() => _repository.sendOtp(email.trim()));
 
   Future<bool> register({
     required String email,
     required String username,
     required String password,
     required String otp,
-  }) =>
-      _run(() async {
-        _session = await _repository.register(
-          email: email.trim(),
-          username: username.trim(),
-          password: password,
-          otp: otp.trim(),
-        );
-        _status = AuthStatus.authenticated;
-      });
+  }) => _run(() async {
+    _session = await _repository.register(
+      email: email.trim(),
+      username: username.trim(),
+      password: password,
+      otp: otp.trim(),
+    );
+    _status = AuthStatus.authenticated;
+  });
 
-  Future<bool> forgotPassword(String email) => _run(() => _repository.forgotPassword(email.trim()));
+  Future<bool> forgotPassword(String email) =>
+      _run(() => _repository.forgotPassword(email.trim()));
 
   Future<void> logout() async {
     await _repository.logout();
@@ -74,11 +78,12 @@ class AuthProvider extends ChangeNotifier {
   void onSessionExpired() {
     _session = null;
     _status = AuthStatus.unauthenticated;
-    _error = 'Your session has expired. Please log in again.';
+    _error = AppStrings.sessionExpired;
     notifyListeners();
   }
 
   void clearError() {
+    if (_error == null) return;
     _error = null;
     notifyListeners();
   }
@@ -96,7 +101,7 @@ class AuthProvider extends ChangeNotifier {
       _error = e.message;
       return false;
     } catch (e) {
-      _error = 'Unexpected error: $e';
+      _error = AppStrings.unexpectedError;
       return false;
     } finally {
       _busy = false;

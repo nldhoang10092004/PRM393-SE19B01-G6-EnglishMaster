@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 /// Row of five stars filled according to [rating] (0..5, half steps rounded).
 class RatingStars extends StatelessWidget {
-  const RatingStars({super.key, required this.rating, this.size = 16, this.color});
+  const RatingStars({
+    super.key,
+    required this.rating,
+    this.size = 16,
+    this.color,
+  });
 
   final double rating;
   final double size;
@@ -20,8 +25,8 @@ class RatingStars extends StatelessWidget {
         final icon = diff >= 0.75
             ? Icons.star_rounded
             : diff >= 0.25
-                ? Icons.star_half_rounded
-                : Icons.star_outline_rounded;
+            ? Icons.star_half_rounded
+            : Icons.star_outline_rounded;
         return Icon(icon, size: size, color: c);
       }),
     );

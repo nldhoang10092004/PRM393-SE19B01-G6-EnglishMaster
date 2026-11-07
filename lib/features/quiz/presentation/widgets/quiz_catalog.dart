@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../providers/quiz_provider.dart';
 import '../screens/quiz_detail_screen.dart';
@@ -27,7 +28,7 @@ class QuizCatalog extends StatelessWidget {
             ? (embedded
                   ? const MessageView(
                       icon: Icons.quiz_outlined,
-                      message: 'No quizzes yet.',
+                      message: AppStrings.noQuizzes,
                     )
                   : ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
@@ -35,7 +36,7 @@ class QuizCatalog extends StatelessWidget {
                         SizedBox(height: 120),
                         MessageView(
                           icon: Icons.quiz_outlined,
-                          message: 'No quizzes yet.',
+                          message: AppStrings.noQuizzes,
                         ),
                       ],
                     ))
@@ -62,15 +63,13 @@ class QuizCatalog extends StatelessWidget {
                       subtitle: Text(
                         quiz.description.isEmpty
                             ? (quiz.type == 1
-                                  ? 'Listening quiz'
-                                  : 'Practice quiz')
+                                  ? AppStrings.listeningQuiz
+                                  : AppStrings.practiceQuiz)
                             : quiz.description,
                       ),
                       trailing: best == null
                           ? const Icon(Icons.chevron_right)
-                          : Chip(
-                              label: Text('Best ${best.toStringAsFixed(0)}%'),
-                            ),
+                          : Chip(label: Text(AppStrings.bestScore(best))),
                       onTap: quiz.isActive
                           ? () async {
                               await Navigator.of(context).push(
