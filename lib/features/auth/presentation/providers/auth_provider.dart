@@ -35,8 +35,16 @@ class AuthProvider extends ChangeNotifier {
   String? get error => _error;
 
   /// Called once at startup to restore a saved session.
+  ///
+  /// Never throws: if the secure storage cannot be read (corrupted keystore,
+  /// restored backup...) the user simply lands on the login screen instead of
+  /// being stuck on the splash forever.
   Future<void> bootstrap() async {
-    _session = await _repository.restoreSession();
+    try {
+      _session = await _repository.restoreSession();
+    } catch (_) {
+      _session = null;
+    }
     _status = _session == null
         ? AuthStatus.unauthenticated
         : AuthStatus.authenticated;
