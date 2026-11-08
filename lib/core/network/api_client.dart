@@ -63,10 +63,15 @@ class ApiClient {
     if (error.response?.statusCode != 401 || isAuthCall || alreadyRetried) {
       return handler.next(error);
     }
-    final refreshed = await _tryRefresh();
-    if (!refreshed) {
-      await _tokens.clear();
-      onSessionExpired?.call();
+    // Another request may already have refreshed the token while this one was
+    // in flight: then just retry with the new token instead of refreshing again.
+    final sentHeader = request.headers['Authorization'];
+    final current = await _tokens.readAccessToken();
+    final tokenChanged =
+        current != null &&
+        current.isNotEmpty &&
+        sentHeader != 'Bearer $current';
+    if (!tokenChanged && !await _refreshOnce()) {
       return handler.next(error);
     }
     try {
@@ -81,6 +86,27 @@ class ApiClient {
     } on DioException catch (e) {
       handler.next(e);
     }
+  }
+
+  /// The refresh currently in progress, shared by every request that got a 401.
+  Future<bool>? _refreshing;
+
+  /// Runs at most one refresh at a time. Parallel 401s wait for the same call,
+  /// so a rotating refresh token is never spent twice, and the session is
+  /// cleared (and [onSessionExpired] fired) only once when it fails.
+  Future<bool> _refreshOnce() {
+    return _refreshing ??= () async {
+      try {
+        final ok = await _tryRefresh();
+        if (!ok) {
+          await _tokens.clear();
+          onSessionExpired?.call();
+        }
+        return ok;
+      } finally {
+        _refreshing = null;
+      }
+    }();
   }
 
   /// Exchanges the expired access token + refresh cookie for a new token.

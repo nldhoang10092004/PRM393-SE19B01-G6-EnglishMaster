@@ -47,6 +47,30 @@ class EnglishMasterApp extends StatelessWidget {
             return auth..bootstrap();
           },
         ),
+        // Reminder settings belong to the device, not to an account.
+        ...NotificationsProviders.providers(),
+      ],
+      child: const _AccountScope(),
+    );
+  }
+}
+
+/// Holds every provider that caches data of the signed-in account.
+///
+/// The subtree is keyed by the account id, so logging out or switching
+/// accounts throws all of it away (and disposes the providers): the next user
+/// can never see the previous user's profile, streak, vocabulary, etc.
+class _AccountScope extends StatelessWidget {
+  const _AccountScope();
+
+  @override
+  Widget build(BuildContext context) {
+    final accountId = context.select<AuthProvider, int?>(
+      (a) => a.session?.accountId,
+    );
+    return MultiProvider(
+      key: ValueKey<int?>(accountId),
+      providers: [
         // Feature repositories + providers (each feature exposes its own list).
         ...CourseProviders.providers(),
         ...VideoProviders.providers(),
@@ -55,7 +79,6 @@ class EnglishMasterApp extends StatelessWidget {
         ...VocabularyProviders.providers(),
         ...QuizProviders.providers(),
         ...ProfileProviders.providers(),
-        ...NotificationsProviders.providers(),
         ...MembershipProviders.providers(),
         ...AiExamProviders.providers(),
       ],

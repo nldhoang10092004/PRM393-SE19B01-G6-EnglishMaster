@@ -44,4 +44,18 @@ class StreakProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  bool _disposed = false;
+
+  // The provider is disposed on logout, possibly while a request is in flight.
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
 }
