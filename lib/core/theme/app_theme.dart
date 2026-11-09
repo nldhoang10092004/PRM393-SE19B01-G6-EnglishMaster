@@ -3,20 +3,21 @@ import 'package:flutter/material.dart';
 import 'app_palette.dart';
 export 'app_palette.dart';
 
-/// Material 3 mapping of the approved flat, bordered design system.
+/// Material 3 mapping of the “Botanical Study Ledger” flat, bordered design system.
 class AppTheme {
   AppTheme._();
-  static const seed = Color(0xFF3D5AFE);
-  static const rewardSeed = Color(0xFFFF9B26);
+  static const seed = Color(0xFF1B6E66);
+  static const rewardSeed = Color(0xFFF2911B);
   static const qrPaper = Color(0xFFFFFFFF);
   static const qrInk = Color(0xFF171923);
 
-  /// Builds the warm light appearance.
+  /// Builds the warm herbarium-vellum light appearance.
   static ThemeData light() => _build(Brightness.light, AppPalette.light);
 
-  /// Builds the contrast-safe dark appearance.
+  /// Builds the contrast-safe nocturnal-herbarium dark appearance.
   static ThemeData dark() => _build(Brightness.dark, AppPalette.dark);
   static ThemeData _build(Brightness brightness, AppPalette p) {
+    const tabular = [FontFeature.tabularFigures()];
     final scheme = ColorScheme.fromSeed(seedColor: seed, brightness: brightness)
         .copyWith(
           primary: p.primary,
@@ -54,49 +55,68 @@ class AppTheme {
           headlineLarge: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w800,
+            letterSpacing: -.6,
+            fontFeatures: tabular,
             color: p.ink,
           ),
           headlineMedium: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w800,
             letterSpacing: -.5,
+            fontFeatures: tabular,
             color: p.ink,
           ),
           headlineSmall: TextStyle(
-            fontSize: 28,
+            fontSize: 26,
             fontWeight: FontWeight.w800,
             letterSpacing: -.4,
+            fontFeatures: tabular,
             color: p.ink,
           ),
           titleLarge: TextStyle(
-            fontSize: 22,
+            fontSize: 21,
             fontWeight: FontWeight.w800,
+            letterSpacing: -.3,
+            fontFeatures: tabular,
             color: p.ink,
           ),
           titleMedium: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
+            fontFeatures: tabular,
             color: p.ink,
           ),
           titleSmall: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
+            fontFeatures: tabular,
             color: p.ink,
           ),
           bodyLarge: TextStyle(fontSize: 16, height: 1.5, color: p.ink),
           bodyMedium: TextStyle(fontSize: 15, height: 1.5, color: p.ink),
-          bodySmall: TextStyle(fontSize: 13, height: 1.5, color: p.inkMuted),
+          bodySmall: TextStyle(
+            fontSize: 13,
+            height: 1.5,
+            fontFeatures: tabular,
+            color: p.inkMuted,
+          ),
           labelLarge: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
+            fontFeatures: tabular,
             color: p.ink,
           ),
           labelMedium: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
+            fontFeatures: tabular,
             color: p.inkMuted,
           ),
-          labelSmall: TextStyle(fontSize: 12, color: p.inkMuted),
+          labelSmall: TextStyle(
+            fontSize: 12,
+            fontFeatures: tabular,
+            color: p.inkMuted,
+          ),
         )
         .apply(fontFamily: 'Be Vietnam Pro');
     final shape = RoundedRectangleBorder(
@@ -110,6 +130,11 @@ class AppTheme {
       extensions: [p],
       scaffoldBackgroundColor: p.background,
       textTheme: text,
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: p.primary,
+        selectionColor: p.primarySoft,
+        selectionHandleColor: p.primary,
+      ),
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
@@ -125,7 +150,7 @@ class AppTheme {
         surfaceTintColor: p.surface,
         margin: const EdgeInsets.symmetric(vertical: 6),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(22),
           side: BorderSide(color: p.outline, width: 2),
         ),
       ),
@@ -183,14 +208,34 @@ class AppTheme {
             fontWeight: s.contains(WidgetState.selected)
                 ? FontWeight.w800
                 : FontWeight.w600,
-            color: s.contains(WidgetState.selected) ? p.primary : p.inkMuted,
+            color: s.contains(WidgetState.selected)
+                ? p.onPrimarySoft
+                : p.inkMuted,
           ),
         ),
         iconTheme: WidgetStateProperty.resolveWith(
           (s) => IconThemeData(
             size: 22,
-            color: s.contains(WidgetState.selected) ? p.primary : p.inkMuted,
+            color: s.contains(WidgetState.selected)
+                ? p.onPrimarySoft
+                : p.inkMuted,
           ),
+        ),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: p.surface,
+        elevation: 0,
+        indicatorColor: p.primarySoft,
+        indicatorShape: const StadiumBorder(),
+        selectedIconTheme: IconThemeData(color: p.onPrimarySoft, size: 22),
+        unselectedIconTheme: IconThemeData(color: p.inkMuted, size: 22),
+        selectedLabelTextStyle: text.labelSmall!.copyWith(
+          fontWeight: FontWeight.w800,
+          color: p.onPrimarySoft,
+        ),
+        unselectedLabelTextStyle: text.labelSmall!.copyWith(
+          fontWeight: FontWeight.w600,
+          color: p.inkMuted,
         ),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -202,7 +247,7 @@ class AppTheme {
       ),
       chipTheme: base.chipTheme.copyWith(
         shape: const StadiumBorder(),
-        side: BorderSide.none,
+        side: BorderSide(color: p.outline, width: 1.5),
         backgroundColor: p.muted,
         selectedColor: p.primarySoft,
         labelStyle: text.labelMedium,

@@ -136,11 +136,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               VoidCallback onTap,
             ) => ListTile(
               leading: Container(
-                width: 32,
-                height: 32,
+                width: 34,
+                height: 34,
                 decoration: BoxDecoration(
                   color: colors.background,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: colors.edge, width: 1.5),
                 ),
                 child: Icon(icon, size: 18, color: colors.ink),
               ),
@@ -299,6 +300,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   OutlinedCard(
                     padding: EdgeInsets.zero,
+                    edgeColor: p.outline,
                     child: Column(
                       children: [
                         setting(

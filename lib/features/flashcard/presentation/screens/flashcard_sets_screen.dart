@@ -149,6 +149,7 @@ class _FlashcardSetsScreenState extends State<FlashcardSetsScreen> {
                         padding: const EdgeInsets.all(20),
                         sliver: SliverToBoxAdapter(
                           child: OutlinedCard(
+                            edgeColor: p.outline,
                             child: Row(
                               children: [
                                 Container(
@@ -157,6 +158,10 @@ class _FlashcardSetsScreenState extends State<FlashcardSetsScreen> {
                                   decoration: BoxDecoration(
                                     color: p.reward,
                                     borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: p.onReward.withValues(alpha: 0.22),
+                                      width: 2,
+                                    ),
                                   ),
                                   child: Icon(
                                     Icons.local_fire_department_outlined,

@@ -21,25 +21,35 @@ class FlatHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final p = AppPalette.of(context);
     final background =
         colors?.background ??
         (warm ? scheme.secondaryContainer : scheme.primaryContainer);
     final foreground =
         colors?.ink ??
         (warm ? scheme.onSecondaryContainer : scheme.onPrimaryContainer);
+    final edge = colors?.edge ?? p.outline;
     return Container(
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(24),
         color: background,
+        border: Border.all(color: edge, width: 2),
+        boxShadow: [BoxShadow(color: edge, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CircleAvatar(
-            radius: 28,
-            backgroundColor: foreground.withValues(alpha: .08),
-            child: Icon(icon, size: 30, color: foreground),
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: p.surface.withValues(alpha: .72),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: edge, width: 1.5),
+            ),
+            child: Icon(icon, size: 28, color: foreground),
           ),
           const SizedBox(height: 16),
           Text(

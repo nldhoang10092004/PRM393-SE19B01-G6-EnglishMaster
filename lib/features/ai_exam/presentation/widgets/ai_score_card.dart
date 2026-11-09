@@ -66,10 +66,13 @@ class AiScoreCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
+          margin: const EdgeInsets.only(bottom: 4),
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: c.background,
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: c.edge, width: 2),
+            boxShadow: [BoxShadow(color: c.edge, offset: const Offset(0, 4))],
           ),
           child: Row(
             children: [
