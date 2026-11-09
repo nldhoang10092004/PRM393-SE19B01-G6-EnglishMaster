@@ -30,7 +30,13 @@ class PaymentStatusProvider extends ChangeNotifier {
   PaymentPhase phase = PaymentPhase.waiting;
   Duration remaining;
   PaymentStatus? result;
+
+  /// A status request is in flight (background poll or user check).
   bool checking = false;
+
+  /// The user pressed "Tôi đã thanh toán" and is waiting for the answer.
+  /// Background polls never set this, so the button keeps its label.
+  bool confirming = false;
   String? message;
 
   Timer? _poll;
@@ -63,12 +69,16 @@ class PaymentStatusProvider extends ChangeNotifier {
 
   /// Asks the server once; [silent] hides the "not paid yet" hint.
   Future<void> check({bool silent = false}) async {
-    if (checking || !isWaiting) return;
-    checking = true;
+    if (!isWaiting) return;
     if (!silent) {
+      if (confirming) return;
+      confirming = true;
       message = null;
       notifyListeners();
     }
+    // A background poll is already asking: its answer is reported to the user.
+    if (checking) return;
+    checking = true;
     try {
       final status = await repository.status(orderId);
       if (!isWaiting) return;
@@ -81,12 +91,13 @@ class PaymentStatusProvider extends ChangeNotifier {
           result = status;
           _finish(PaymentPhase.canceled);
         case PaymentState.pending:
-          if (!silent) message = MembershipStrings.notPaidYet;
+          if (confirming) message = MembershipStrings.notPaidYet;
       }
     } catch (_) {
-      if (!silent) message = MembershipStrings.notPaidYet;
+      if (confirming) message = MembershipStrings.notPaidYet;
     } finally {
       checking = false;
+      confirming = false;
       notifyListeners();
     }
   }

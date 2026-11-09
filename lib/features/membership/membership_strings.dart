@@ -70,7 +70,9 @@ class MembershipStrings {
   static const iHavePaid = 'Tôi đã thanh toán';
   static const notPaidYet =
       'Chưa nhận được thanh toán. Vui lòng thử lại sau ít giây.';
-  static const waiting = 'Đang chờ thanh toán…';
+
+  /// Shown on the confirm button only while a check the user asked for runs.
+  static const checkingPayment = 'Đang kiểm tra…';
   static const paidTitle = 'Thanh toán thành công';
 
   /// Label showing the membership expiry date after purchase.

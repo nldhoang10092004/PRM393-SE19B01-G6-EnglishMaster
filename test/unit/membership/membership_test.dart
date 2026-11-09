@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show VoidCallback;
 import 'package:english_master/core/network/api_exception.dart';
 import 'package:english_master/core/widgets/async_view.dart';
@@ -229,6 +231,37 @@ void main() {
       await p.check();
       expect(p.message, isNotNull);
       expect(p.phase, PaymentPhase.waiting);
+      p.dispose();
+    });
+
+    test(
+      'background poll never puts the confirm button in busy state',
+      () async {
+        final reply = Completer<PaymentStatus>();
+        when(() => repo.status(9)).thenAnswer((_) => reply.future);
+        final p = make();
+        unawaited(p.check(silent: true));
+        expect(p.checking, isTrue);
+        expect(p.confirming, isFalse); // button still says "Tôi đã thanh toán"
+        reply.complete(st(PaymentState.pending));
+        await Future<void>.delayed(Duration.zero);
+        expect(p.message, isNull);
+        p.dispose();
+      },
+    );
+
+    test('tap during a background poll reports that poll\'s answer', () async {
+      final reply = Completer<PaymentStatus>();
+      when(() => repo.status(9)).thenAnswer((_) => reply.future);
+      final p = make();
+      unawaited(p.check(silent: true));
+      await p.check(); // user taps while the poll is in flight
+      expect(p.confirming, isTrue);
+      reply.complete(st(PaymentState.pending));
+      await Future<void>.delayed(Duration.zero);
+      expect(p.confirming, isFalse);
+      expect(p.message, isNotNull);
+      verify(() => repo.status(9)).called(1);
       p.dispose();
     });
 
