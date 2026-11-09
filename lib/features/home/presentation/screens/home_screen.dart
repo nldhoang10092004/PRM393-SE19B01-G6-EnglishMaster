@@ -9,7 +9,7 @@ import '../../../../core/widgets/skill_tile.dart';
 import '../../../course/presentation/providers/course_list_provider.dart';
 import '../../../course/presentation/screens/course_detail_screen.dart';
 import '../../../course/presentation/screens/course_list_screen.dart';
-import '../../../course/presentation/widgets/course_card.dart';
+import '../../../course/presentation/widgets/course_card_sliver.dart';
 import '../../../streak/presentation/providers/streak_provider.dart';
 import '../../../streak/presentation/widgets/streak_card.dart';
 import '../../../ai_exam/presentation/screens/ai_speaking_screen.dart';
@@ -146,18 +146,11 @@ class _HomeScreenState extends State<HomeScreen> {
               else
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                  sliver: SliverList.separated(
-                    itemCount: courses.courses.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final c = courses.courses[index];
-                      return CourseCard(
-                        course: c,
-                        onTap: () => _open(
-                          CourseDetailScreen(courseId: c.id, title: c.name),
-                        ),
-                      );
-                    },
+                  sliver: CourseCardSliver(
+                    courses: courses.courses,
+                    onTap: (c) => _open(
+                      CourseDetailScreen(courseId: c.id, title: c.name),
+                    ),
                   ),
                 ),
             ],

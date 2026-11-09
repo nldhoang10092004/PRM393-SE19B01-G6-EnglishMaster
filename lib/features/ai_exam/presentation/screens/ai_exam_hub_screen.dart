@@ -66,7 +66,12 @@ class AiExamHubScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             sliver: SliverGrid.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: MediaQuery.sizeOf(context).width < 340 ? 1 : 2,
+                crossAxisCount: switch (MediaQuery.sizeOf(context).width) {
+                  < 340 => 1,
+                  < 600 => 2,
+                  < 900 => 3,
+                  _ => 5,
+                },
                 mainAxisExtent: 250,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,

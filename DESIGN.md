@@ -95,6 +95,15 @@ Android legacy WRITE_EXTERNAL_STORAGE is restricted to API ≤29; modern Android
 uses MediaStore. The existing polling/status and external payment link remain.
 Hủy đơn dismisses the local QR view; the repository has no server cancel endpoint.
 
+## Responsive layout (phones, foldables, tablets)
+
+Material 3 window size classes in `lib/core/layout/responsive.dart`:
+- Compact (< 600dp: phones, folded foldables such as the 344dp Fold cover screen): bottom navigation bar, single-column lists.
+- Medium/expanded (>= 600dp: unfolded foldables ~673dp, tablets): `NavigationRail` on the left (labels under icons; extended rail from 1040dp), course cards in a grid, AI hub in 3-5 columns.
+- `ResponsiveFrame` (MaterialApp.builder) caps the whole app at 1100dp and centres it.
+- `readablePadding` / `ReadableWidth` keep forms, AI exercises, quizzes, profile and payment at a readable width (480-720dp) while scroll areas stay full width.
+- `test/widget/design/responsive_screens_test.dart` renders every screen at 360dp (light/dark), 344dp, 673dp, 800dp and 1280dp and fails on any overflow.
+
 ## Verification
 
 Run flutter analyze and flutter test; integration tests require a separate request.

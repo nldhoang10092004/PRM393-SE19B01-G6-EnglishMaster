@@ -11,8 +11,12 @@ class AiPromptCard extends StatelessWidget {
     required this.title,
     required this.content,
     this.colors,
+    this.longText = false,
   });
   final String title, content;
+
+  /// Long passages (reading) use regular weight and roomier lines.
+  final bool longText;
   final SkillColors? colors;
   @override
   Widget build(BuildContext context) {
@@ -47,7 +51,8 @@ class AiPromptCard extends StatelessWidget {
             SelectableText(
               content,
               style: t.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w700,
+                fontWeight: longText ? FontWeight.w400 : FontWeight.w700,
+                height: longText ? 1.6 : null,
                 color: c.ink,
               ),
             ),

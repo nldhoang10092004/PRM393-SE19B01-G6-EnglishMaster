@@ -32,7 +32,8 @@ class AiQuestionCards extends StatelessWidget {
                   const SizedBox(height: 12),
                   if (question.type == 1)
                     for (final option in question.options)
-                      Padding(
+                      Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Semantics(
                           selected: state.answerFor(question.id) == option,

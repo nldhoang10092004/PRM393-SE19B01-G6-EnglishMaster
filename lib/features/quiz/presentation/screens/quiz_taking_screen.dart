@@ -2,6 +2,9 @@ import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:english_master/core/widgets/chunky_outlined_button.dart';
 import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../core/layout/responsive.dart';
+
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -124,7 +127,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                     ),
                   Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      padding: readablePadding(context, top: 0, bottom: 0),
                       children: [
                         if (state.currentGroup != null) ...[
                           if (state.currentGroup!.instruction.isNotEmpty)

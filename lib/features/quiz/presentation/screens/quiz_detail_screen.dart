@@ -1,6 +1,9 @@
 import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../core/layout/responsive.dart';
+
 import 'package:provider/provider.dart';
 
 import '../../../membership/presentation/widgets/upgrade_membership_banner.dart';
@@ -32,7 +35,12 @@ class QuizDetailScreen extends StatelessWidget {
           error: state.error,
           onRetry: () => state.load(quizId),
           builder: (_) => ListView(
-            padding: const EdgeInsets.all(16),
+            padding: readablePadding(
+              context,
+              horizontal: 16,
+              top: 16,
+              bottom: 16,
+            ),
             children: [
               FlatHeroCard(
                 title: state.quiz!.title,

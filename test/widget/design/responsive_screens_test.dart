@@ -1,3 +1,4 @@
+import 'package:english_master/core/layout/responsive.dart';
 import 'package:english_master/features/quiz/presentation/widgets/quiz_asset_view.dart';
 import 'package:english_master/core/l10n/app_strings.dart';
 import 'package:english_master/features/course/presentation/screens/course_list_screen.dart';
@@ -177,12 +178,22 @@ void main() {
     ),
   };
 
-  for (final dark in [false, true]) {
+  // Phone (light + dark), folded/unfolded foldable, tablet portrait/landscape.
+  const viewports = [
+    ('360dp', Size(360, 740), false),
+    ('360dp', Size(360, 740), true),
+    ('fold-cover 344dp', Size(344, 882), false),
+    ('fold-open 673dp', Size(673, 841), false),
+    ('tablet 800dp', Size(800, 1280), false),
+    ('tablet-landscape 1280dp', Size(1280, 800), false),
+  ];
+  for (final (label, size, dark) in viewports) {
     for (final page in pages.entries) {
-      testWidgets('${page.key} fits 360dp in ${dark ? 'dark' : 'light'} mode', (
+      testWidgets('${page.key} fits $label in ${dark ? 'dark' : 'light'} mode', (
         tester,
       ) async {
-        tester.view.physicalSize = const Size(360, 740);
+        final wide = size.width >= 600;
+        tester.view.physicalSize = size;
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
@@ -432,6 +443,7 @@ void main() {
             ],
             child: MaterialApp(
               theme: dark ? AppTheme.dark() : AppTheme.light(),
+              builder: (_, child) => ResponsiveFrame(child: child!),
               home: RepaintBoundary(key: boundary, child: page.value),
             ),
           ),
@@ -454,7 +466,7 @@ void main() {
             final directory = await Directory('build/design-review')
                 .create(recursive: true);
             await File(
-              '${directory.path}/${page.key}-${dark ? 'dark' : 'light'}.png',
+              '${directory.path}/${page.key}-${label.split(' ').first}-${dark ? 'dark' : 'light'}.png',
             ).writeAsBytes(bytes!.buffer.asUint8List());
             image.dispose();
           });
@@ -469,9 +481,24 @@ void main() {
           expect(tester.takeException(), isNull);
         }
         if (page.key == 'home-shell') {
-          expect(find.byType(NavigationDestination), findsNWidgets(5));
-          await tester.tap(find.byType(NavigationDestination).at(1));
-          await tester.pumpAndSettle();
+          Future<void> selectTab(int i) async {
+            if (wide) {
+              tester
+                  .widget<NavigationRail>(find.byType(NavigationRail))
+                  .onDestinationSelected!(i);
+            } else {
+              await tester.tap(find.byType(NavigationDestination).at(i));
+            }
+            await tester.pumpAndSettle();
+          }
+
+          if (wide) {
+            expect(find.byType(NavigationRail), findsOneWidget);
+            expect(find.byType(NavigationBar), findsNothing);
+          } else {
+            expect(find.byType(NavigationDestination), findsNWidgets(5));
+          }
+          await selectTab(1);
           expect(find.byKey(const Key('course_search')), findsOneWidget);
           await tester.enterText(
             find.byKey(const Key('course_search')),
@@ -484,8 +511,7 @@ void main() {
             findsNothing,
           );
           for (final i in [2, 3, 4, 0, 1]) {
-            await tester.tap(find.byType(NavigationDestination).at(i));
-            await tester.pumpAndSettle();
+            await selectTab(i);
             expect(tester.takeException(), isNull);
           }
           expect(

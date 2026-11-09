@@ -2,6 +2,9 @@ import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:english_master/core/widgets/chunky_outlined_button.dart';
 import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../core/layout/responsive.dart';
+
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -90,7 +93,7 @@ class _MembershipScreenState extends State<MembershipScreen> {
         error: state.error,
         onRetry: state.load,
         builder: (context) => ListView(
-          padding: const EdgeInsets.all(20),
+          padding: readablePadding(context),
           children: [
             Text(
               MembershipStrings.unlockAll,

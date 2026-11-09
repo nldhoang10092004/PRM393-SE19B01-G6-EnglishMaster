@@ -59,6 +59,7 @@ class AiReadingScreen extends StatelessWidget {
                   title: prompt.title,
                   content: prompt.content,
                   colors: AppPalette.of(context).reading,
+                  longText: true,
                 ),
                 const SizedBox(height: 16),
                 AiQuestionCards(state: state),

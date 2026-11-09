@@ -2,6 +2,9 @@ import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:english_master/core/widgets/chunky_outlined_button.dart';
 import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../core/layout/responsive.dart';
+
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -120,7 +123,7 @@ class _PaymentViewState extends State<_PaymentView> {
       body: SafeArea(
         child: state.phase == PaymentPhase.waiting
             ? SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: readablePadding(context, maxWidth: 520),
                 child: _waiting(context, state),
               )
             : _centered(switch (state.phase) {

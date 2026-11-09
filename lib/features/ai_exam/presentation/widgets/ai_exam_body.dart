@@ -1,6 +1,8 @@
 import 'package:english_master/core/widgets/chunky_outlined_button.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/layout/responsive.dart';
+
 import '../../../../core/widgets/async_view.dart';
 import '../../ai_exam_strings.dart';
 import 'ai_generating_view.dart';
@@ -47,7 +49,7 @@ class AiExamBody extends StatelessWidget {
     }
     if (!hasPrompt) return AiGeneratingView(kind: kind);
     final list = ListView(
-      padding: const EdgeInsets.all(20),
+      padding: readablePadding(context),
       children: [
         ...children,
         if (error != null)
@@ -73,7 +75,7 @@ class AiExamBody extends StatelessWidget {
       children: [
         if (pinned != null)
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+            padding: readablePadding(context, top: 8, bottom: 0),
             child: pinned,
           ),
         Expanded(child: list),
@@ -81,7 +83,7 @@ class AiExamBody extends StatelessWidget {
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              padding: readablePadding(context, top: 12),
               child: SizedBox(width: double.infinity, child: footer),
             ),
           ),

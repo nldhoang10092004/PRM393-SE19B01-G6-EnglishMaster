@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'core/layout/responsive.dart';
+
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -95,6 +98,8 @@ class _AccountScope extends StatelessWidget {
         theme: AppTheme.light(),
         darkTheme: AppTheme.dark(),
         onGenerateRoute: AppRoutes.onGenerateRoute,
+        builder: (context, child) =>
+            ResponsiveFrame(child: child ?? const SizedBox.shrink()),
         home: const AuthGate(),
       ),
     );

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../../../core/layout/responsive.dart';
+
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -148,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return RefreshIndicator(
               onRefresh: state.load,
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                padding: readablePadding(context, top: 24, bottom: 24),
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   Text(

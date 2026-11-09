@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../providers/course_list_provider.dart';
-import '../widgets/course_card.dart';
+import '../widgets/course_card_sliver.dart';
 import 'course_detail_screen.dart';
 
 /// Searchable catalog backed by the existing shared course provider.
@@ -84,24 +84,16 @@ class _CourseListScreenState extends State<CourseListScreen> {
                     else
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                        sliver: SliverList.separated(
-                          itemCount: courses.length,
-                          separatorBuilder: (_, _) =>
-                              const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final c = courses[index];
-                            return CourseCard(
-                              course: c,
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => CourseDetailScreen(
-                                    courseId: c.id,
-                                    title: c.name,
-                                  ),
-                                ),
+                        sliver: CourseCardSliver(
+                          courses: courses,
+                          onTap: (c) => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => CourseDetailScreen(
+                                courseId: c.id,
+                                title: c.name,
                               ),
-                            );
-                          },
+                            ),
+                          ),
                         ),
                       ),
                   ],
