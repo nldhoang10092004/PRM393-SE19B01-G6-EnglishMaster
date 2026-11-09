@@ -58,6 +58,7 @@ class _HomeShellState extends State<HomeShell> {
               child: SafeArea(
                 right: false,
                 child: NavigationRail(
+                  groupAlignment: 0.0,
                   selectedIndex: _index,
                   onDestinationSelected: _select,
                   extended: extended,

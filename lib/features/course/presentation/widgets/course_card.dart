@@ -21,27 +21,39 @@ class CourseCard extends StatelessWidget {
     return OutlinedCard(
       onTap: onTap,
       edgeColor: p.outline,
-      padding: const EdgeInsets.all(12),
+      radius: 20,
+      padding: const EdgeInsets.all(14),
       child: Row(
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 56,
+            height: 56,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: colors.background,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: colors.edge, width: 2),
+              border: Border.all(
+                color: colors.edge.withValues(alpha: 0.6),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.edge.withValues(alpha: 0.2),
+                  offset: const Offset(0, 2),
+                  blurRadius: 6,
+                ),
+              ],
             ),
             child: Text(
               course.initials,
               style: theme.textTheme.titleLarge?.copyWith(
-                fontSize: 19,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
                 color: colors.ink,
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,20 +63,46 @@ class CourseCard extends StatelessWidget {
                   course.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
+                  ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  course.teacherName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall,
+                Row(
+                  children: [
+                    Icon(Icons.person_outline_rounded, size: 14, color: p.inkMuted),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        course.teacherName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: p.inkMuted,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          Icon(Icons.chevron_right_rounded, color: p.inkMuted),
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: p.muted.withValues(alpha: 0.7),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.chevron_right_rounded,
+              size: 20,
+              color: p.inkMuted,
+            ),
+          ),
         ],
       ),
     );

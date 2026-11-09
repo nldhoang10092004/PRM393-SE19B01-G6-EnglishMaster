@@ -29,31 +29,49 @@ class StreakCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.local_fire_department_rounded,
-                size: 20,
-                color: p.reward,
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: p.reward.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.local_fire_department_rounded,
+                  size: 20,
+                  color: p.reward,
+                ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Expanded(
                 flex: 3,
                 child: Text(
                   AppStrings.todayGoal,
-                  style: theme.textTheme.titleMedium,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
               Flexible(
                 flex: 2,
-                child: Text(
-                  status == ViewStatus.success
-                      ? AppStrings.streakDays(streak.currentStreak)
-                      : status == ViewStatus.error
-                      ? AppStrings.streakUnavailable
-                      : AppStrings.loadingStreak,
-                  textAlign: TextAlign.end,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: p.ink,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: p.muted,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    status == ViewStatus.success
+                        ? AppStrings.streakDays(streak.currentStreak)
+                        : status == ViewStatus.error
+                        ? AppStrings.streakUnavailable
+                        : AppStrings.loadingStreak,
+                    textAlign: TextAlign.end,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: p.ink,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ),
@@ -66,18 +84,27 @@ class StreakCard extends StatelessWidget {
                 final done = index < activeDays;
                 return Expanded(
                   child: Container(
-                    height: 30,
+                    height: 32,
                     margin: EdgeInsets.only(right: index == 6 ? 0 : 6),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: done ? p.reward : p.muted,
+                      color: done ? p.reward : p.muted.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: done
-                            ? p.onReward.withValues(alpha: .24)
-                            : p.outline,
-                        width: 1.5,
+                            ? p.onReward.withValues(alpha: .2)
+                            : p.outline.withValues(alpha: 0.5),
+                        width: 1,
                       ),
+                      boxShadow: done
+                          ? [
+                              BoxShadow(
+                                color: p.reward.withValues(alpha: 0.3),
+                                offset: const Offset(0, 2),
+                                blurRadius: 4,
+                              ),
+                            ]
+                          : null,
                     ),
                     child: done
                         ? Icon(
@@ -85,7 +112,14 @@ class StreakCard extends StatelessWidget {
                             size: 16,
                             color: p.onReward,
                           )
-                        : null,
+                        : Text(
+                            ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'][index],
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: p.inkMuted,
+                            ),
+                          ),
                   ),
                 );
               }),

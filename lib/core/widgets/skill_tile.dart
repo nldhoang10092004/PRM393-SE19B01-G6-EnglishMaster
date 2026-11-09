@@ -19,12 +19,23 @@ class SkillTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = AppPalette.of(context);
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
+      margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         color: colors.background,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: colors.edge, width: 2),
-        boxShadow: [BoxShadow(color: colors.edge, offset: const Offset(0, 4))],
+        border: Border.all(color: colors.edge.withValues(alpha: 0.6), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: colors.edge.withValues(alpha: 0.25),
+            offset: const Offset(0, 4),
+            blurRadius: 12,
+          ),
+          BoxShadow(
+            color: colors.edge.withValues(alpha: 0.45),
+            offset: const Offset(0, 3),
+            blurRadius: 0,
+          ),
+        ],
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -32,9 +43,9 @@ class SkillTile extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(22),
           child: SizedBox(
-            height: 116,
+            height: 118,
             child: Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -43,19 +54,37 @@ class SkillTile extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 40,
-                        height: 40,
+                        width: 44,
+                        height: 44,
                         decoration: BoxDecoration(
-                          color: p.surface.withValues(alpha: .72),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: colors.edge, width: 1.5),
+                          color: p.surface.withValues(alpha: .85),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: colors.edge.withValues(alpha: 0.4),
+                            width: 1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF0F172A).withValues(alpha: 0.04),
+                              offset: const Offset(0, 2),
+                              blurRadius: 6,
+                            ),
+                          ],
                         ),
                         child: Icon(icon, size: 22, color: colors.ink),
                       ),
-                      Icon(
-                        Icons.north_east_rounded,
-                        size: 18,
-                        color: colors.ink,
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: p.surface.withValues(alpha: 0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.arrow_outward_rounded,
+                          size: 16,
+                          color: colors.ink,
+                        ),
                       ),
                     ],
                   ),
@@ -64,7 +93,8 @@ class SkillTile extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontSize: 19,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
                       color: colors.ink,
                     ),
                   ),
