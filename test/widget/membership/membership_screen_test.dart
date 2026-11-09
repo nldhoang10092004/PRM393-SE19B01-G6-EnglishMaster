@@ -14,6 +14,10 @@ void main() {
   testWidgets('renders plans, current membership and best value', (
     tester,
   ) async {
+    // Layout has separate 360dp coverage; keep lazy plan metadata visible here.
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     final repo = _Repo();
     when(() => repo.plans()).thenAnswer(
       (_) async => const [
@@ -60,10 +64,11 @@ void main() {
       findsOneWidget,
     );
     await tester.scrollUntilVisible(
-      find.textContaining(MembershipStrings.pay),
+      find.textContaining('${MembershipStrings.pay} ·'),
       180,
+      scrollable: find.byType(Scrollable).first,
     );
-    expect(find.textContaining(MembershipStrings.pay), findsOneWidget);
+    expect(find.textContaining('${MembershipStrings.pay} ·'), findsOneWidget);
   });
 
   testWidgets('shows "Chưa có gói" without membership', (tester) async {

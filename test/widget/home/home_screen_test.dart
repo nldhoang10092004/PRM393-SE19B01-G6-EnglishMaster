@@ -52,7 +52,9 @@ void main() {
 
     expect(find.text(AppStrings.streakDays(5)), findsOneWidget);
     expect(find.text(AppStrings.studyToday), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Basic English'), 160);
     expect(find.text('Basic English'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Advanced Grammar'), 120);
     expect(find.text('Advanced Grammar'), findsOneWidget);
   });
 }

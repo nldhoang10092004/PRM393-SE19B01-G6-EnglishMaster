@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 
 import '../../membership_strings.dart';
@@ -20,7 +21,7 @@ class UpgradeMembershipBanner extends StatelessWidget {
             const SizedBox(width: 12),
             const Expanded(child: Text(MembershipStrings.upgradeBanner)),
             const SizedBox(width: 8),
-            FilledButton(
+            ChunkyButton(
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const MembershipScreen()),
               ),

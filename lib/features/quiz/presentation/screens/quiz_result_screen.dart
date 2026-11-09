@@ -1,3 +1,8 @@
+import '../../../../core/widgets/chunky_outlined_button.dart';
+import '../../../../core/theme/app_palette.dart';
+
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,22 +19,68 @@ class QuizResultScreen extends StatelessWidget {
     final state = context.watch<QuizTakingProvider>();
     final result = state.result!;
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.quizResult)),
+      appBar: const AppTopBar(title: Text(AppStrings.quizResult)),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          child: Row(
+            children: [
+              Expanded(
+                child: ChunkyOutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    AppStrings.backToQuizzes,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ChunkyButton(
+                  onPressed: state.busy
+                      ? null
+                      : () async {
+                          final id = state.quiz?.id;
+                          if (id == null) return;
+                          await state.load(id);
+                          if (context.mounted) await state.start();
+                        },
+                  child: const Text(AppStrings.retry),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         children: [
           ScoreRing(
             fraction: result.score / 100,
             label: AppStrings.percentage(result.score),
+            subtitle: AppStrings.correctCount(result.correct, result.total),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+          Text(
+            AppStrings.wellDone,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          if (state.quiz != null)
+            Text(
+              state.quiz!.title,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          const SizedBox(height: 18),
           Row(
             children: [
               Expanded(
                 child: StatTile(
                   value: result.correct.toString(),
                   label: AppStrings.correctAnswers,
-                  icon: Icons.check_circle_outline,
+                  colors: AppPalette.of(context).listening,
                 ),
               ),
               const SizedBox(width: 8),
@@ -37,7 +88,7 @@ class QuizResultScreen extends StatelessWidget {
                 child: StatTile(
                   value: result.wrong.toString(),
                   label: AppStrings.wrongAnswers,
-                  icon: Icons.close_rounded,
+                  colors: AppPalette.of(context).speaking,
                 ),
               ),
               const SizedBox(width: 8),
@@ -51,11 +102,6 @@ class QuizResultScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          Text(
-            AppStrings.correctCount(result.correct, result.total),
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
           Text(
             AppStrings.pendingCount(result.wrong, result.pending),
             textAlign: TextAlign.center,
@@ -103,10 +149,6 @@ class QuizResultScreen extends StatelessWidget {
             }),
           ),
           const SizedBox(height: 24),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text(AppStrings.backToQuizzes),
-          ),
         ],
       ),
     );

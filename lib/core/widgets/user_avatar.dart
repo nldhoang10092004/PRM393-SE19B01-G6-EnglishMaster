@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_palette.dart';
+
 import '../config/app_config.dart';
 import 'app_network_image.dart';
 
 /// Shared, cached avatar with a safe initial for missing or broken images.
 class UserAvatar extends StatelessWidget {
-  const UserAvatar({super.key, this.url, required this.name, this.radius = 24});
+  const UserAvatar({
+    super.key,
+    this.url,
+    required this.name,
+    this.radius = 24,
+    this.colors,
+  });
   final String? url;
   final String name;
   final double radius;
+  final SkillColors? colors;
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +31,10 @@ class UserAvatar extends StatelessWidget {
         : Text(name.trim().characters.first.toUpperCase());
     return CircleAvatar(
       radius: radius,
-      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+      backgroundColor:
+          colors?.background ?? Theme.of(context).colorScheme.primaryContainer,
+      foregroundColor:
+          colors?.ink ?? Theme.of(context).colorScheme.onPrimaryContainer,
       child: valid
           ? ClipOval(
               child: AppNetworkImage(

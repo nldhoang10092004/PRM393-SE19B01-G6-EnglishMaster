@@ -58,10 +58,7 @@ void main() {
     await settle();
 
     BuildContext appContext() => tester.element(find.byType(AuthGate));
-    expect(
-      appContext().read<AuthProvider>().status,
-      AuthStatus.authenticated,
-    );
+    expect(appContext().read<AuthProvider>().status, AuthStatus.authenticated);
     final profileA = appContext().read<ProfileProvider>();
     final streakA = appContext().read<StreakProvider>();
 

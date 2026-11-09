@@ -1,3 +1,8 @@
+import '../../../../core/theme/app_palette.dart';
+
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_outlined_button.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +24,13 @@ class AiListeningScreen extends StatelessWidget {
         AiListeningProvider(context.read<AiExamRepository>())..generate(),
     child: Consumer<AiListeningProvider>(
       builder: (context, state, _) => Scaffold(
-        appBar: AppBar(title: const Text(AiExamStrings.listening)),
+        appBar: AppTopBar(
+          title: Text(
+            state.result == null
+                ? AiExamStrings.listening
+                : AiExamStrings.listeningResult,
+          ),
+        ),
         body: AiExamBody(
           status: state.status,
           error: state.error,
@@ -28,6 +39,7 @@ class AiListeningScreen extends StatelessWidget {
           canGenerate: state.canGenerate,
           onGenerate: state.generate,
           kind: AiGeneratingKind.listening,
+          hasResult: state.result != null,
           generating: state.generating,
           grading: state.grading,
           pinned: state.prompt == null
@@ -36,9 +48,24 @@ class AiListeningScreen extends StatelessWidget {
                   controller: state.audio,
                   audio: state.prompt!.audioUrl,
                 ),
+          footer: state.result != null
+              ? ChunkyButton(
+                  onPressed: state.canGenerate ? state.generate : null,
+                  child: const Text(AiExamStrings.practiceAgain),
+                )
+              : state.prompt != null
+              ? ChunkyButton(
+                  onPressed: state.canSubmit ? state.submit : null,
+                  child: const Text(AiExamStrings.submit),
+                )
+              : null,
           children: [
             if (state.prompt case final prompt?) ...[
-              AiPromptCard(title: prompt.title, content: ''),
+              AiPromptCard(
+                title: prompt.title,
+                content: '',
+                colors: AppPalette.of(context).listening,
+              ),
               const SizedBox(height: 16),
               if (state.result == null) ...[
                 for (final question in prompt.questions)
@@ -62,7 +89,7 @@ class AiListeningScreen extends StatelessWidget {
                                 child: Semantics(
                                   selected:
                                       state.answerFor(question.id) == option,
-                                  child: OutlinedButton.icon(
+                                  child: ChunkyOutlinedButton.icon(
                                     style: OutlinedButton.styleFrom(
                                       backgroundColor:
                                           state.answerFor(question.id) == option
@@ -104,10 +131,6 @@ class AiListeningScreen extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: state.canSubmit ? state.submit : null,
-                  child: const Text(AiExamStrings.submit),
-                ),
               ],
               if (state.result case final result?) ...[
                 Card(

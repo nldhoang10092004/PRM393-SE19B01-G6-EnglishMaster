@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../ai_exam_strings.dart';
+import '../../../../core/widgets/mascot_mimi.dart';
+import '../../../../core/widgets/outlined_card.dart';
+import '../../../../core/theme/app_palette.dart';
 
 /// Which slow AI operation is running; selects the title and estimated steps.
 enum AiGeneratingKind { speaking, listening, writing, grading }
@@ -61,7 +64,6 @@ class _AiGeneratingViewState extends State<AiGeneratingView>
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final steps = _steps;
     // Estimate only: the last step stays pending until the response arrives.
     final active = (_elapsed ~/ widget.stepSeconds).clamp(0, steps.length - 2);
@@ -73,35 +75,17 @@ class _AiGeneratingViewState extends State<AiGeneratingView>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              width: 120,
-              height: 120,
-              child: AnimatedBuilder(
-                animation: _pulse,
-                builder: (context, _) {
-                  final t = Curves.easeInOut.transform(_pulse.value);
-                  return Center(
-                    child: Container(
-                      key: const ValueKey('ai-generating-pulse'),
-                      width: 96 + 20 * t,
-                      height: 96 + 20 * t,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(
-                          colors: [
-                            scheme.primary.withValues(alpha: 0.35 + 0.25 * t),
-                            scheme.primary.withValues(alpha: 0.05),
-                          ],
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.auto_awesome,
-                        size: 40 + 6 * t,
-                        color: scheme.primary,
-                      ),
-                    ),
-                  );
-                },
+            AnimatedBuilder(
+              animation: _pulse,
+              builder: (context, _) => Transform.translate(
+                key: const ValueKey('ai-generating-pulse'),
+                offset: Offset(
+                  0,
+                  MediaQuery.disableAnimationsOf(context)
+                      ? 0
+                      : -3 * _pulse.value,
+                ),
+                child: const MascotMimi(thinking: true, width: 180),
               ),
             ),
             const SizedBox(height: 16),
@@ -118,15 +102,26 @@ class _AiGeneratingViewState extends State<AiGeneratingView>
               style: Theme.of(context).textTheme.bodySmall,
             ),
             const SizedBox(height: 20),
-            for (var i = 0; i < steps.length; i++)
-              _StepRow(
-                label: steps[i],
-                state: i < active
-                    ? _StepState.done
-                    : i == active
-                    ? _StepState.active
-                    : _StepState.pending,
+            OutlinedCard(
+              child: Column(
+                children: [
+                  for (var i = 0; i < steps.length; i++)
+                    _StepRow(
+                      label: steps[i],
+                      state: i < active
+                          ? _StepState.done
+                          : i == active
+                          ? _StepState.active
+                          : _StepState.pending,
+                    ),
+                ],
               ),
+            ),
+            const SizedBox(height: 20),
+            LinearProgressIndicator(
+              value: ((active + 1) / steps.length).clamp(0, .9),
+              minHeight: 12,
+            ),
             const SizedBox(height: 20),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
@@ -180,7 +175,7 @@ class _StepRow extends StatelessWidget {
               _StepState.done => Icon(
                 Icons.check_circle,
                 key: ValueKey('step-done-$label'),
-                color: scheme.primary,
+                color: AppPalette.of(context).listening.ink,
                 size: 22,
               ),
               _StepState.active => Padding(
@@ -199,11 +194,15 @@ class _StepRow extends StatelessWidget {
             },
           ),
           const SizedBox(width: 12),
-          Text(
-            label,
-            style: TextStyle(
-              color: state == _StepState.pending ? scheme.outline : null,
-              fontWeight: state == _StepState.active ? FontWeight.w600 : null,
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: state == _StepState.pending
+                    ? scheme.onSurfaceVariant
+                    : null,
+                fontWeight: state == _StepState.active ? FontWeight.w600 : null,
+              ),
             ),
           ),
         ],

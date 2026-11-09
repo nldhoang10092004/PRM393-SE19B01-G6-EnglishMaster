@@ -1,8 +1,10 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/widgets/gradient_hero_card.dart';
+import '../../../../core/widgets/flat_hero_card.dart';
 import '../../../../core/utils/validators.dart';
 import '../providers/auth_provider.dart';
 
@@ -46,7 +48,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.forgotPassword)),
+      appBar: const AppTopBar(title: Text(AppStrings.forgotPassword)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Form(
@@ -54,7 +56,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const GradientHeroCard(
+              const FlatHeroCard(
                 title: AppStrings.forgotPassword,
                 subtitle: AppStrings.resetHint,
                 icon: Icons.mark_email_read_outlined,
@@ -80,7 +82,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                   ),
                 ),
-              FilledButton(
+              ChunkyButton(
                 onPressed: auth.isBusy ? null : _submit,
                 child: const Text(AppStrings.sendReset),
               ),

@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../../../profile/presentation/providers/profile_provider.dart';
 import '../../../../core/widgets/user_avatar.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../core/widgets/pill_chip.dart';
+import '../../../streak/presentation/providers/streak_provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 
@@ -28,11 +31,13 @@ class HomeGreeting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final p = AppPalette.of(context);
+    final streak = context.watch<StreakProvider?>();
     final profile = context.watch<ProfileProvider?>();
     final name = (userName ?? profile?.profile?.fullName)?.trim() ?? '';
     final greeting = greetingFor((now ?? DateTime.now()).hour);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 18),
       child: Row(
         children: [
           UserAvatar(url: profile?.avatarUrl, name: name),
@@ -41,21 +46,21 @@ class HomeGreeting extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(greeting, style: theme.textTheme.bodySmall),
                 Text(
-                  name.isEmpty
-                      ? greeting
-                      : AppStrings.greetingName(greeting, name),
-                  style: theme.textTheme.headlineSmall,
-                ),
-                Text(
-                  AppStrings.readyToLearn,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
+                  name.isEmpty ? AppStrings.student : name,
+                  style: theme.textTheme.titleLarge?.copyWith(fontSize: 20),
                 ),
               ],
             ),
           ),
+          if (streak != null)
+            PillChip(
+              label: streak.streak.currentStreak.toString(),
+              icon: Icons.local_fire_department_outlined,
+              color: p.reward,
+              foreground: p.onReward,
+            ),
         ],
       ),
     );

@@ -1,9 +1,15 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_outlined_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/chunky_button.dart';
+import '../../../../core/widgets/icon_square_button.dart';
+import '../../../../core/widgets/pill_chip.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../quiz/presentation/widgets/quiz_list_for_course.dart';
 import '../../../video/presentation/screens/video_lesson_screen.dart';
 import '../../data/course_repository.dart';
@@ -41,9 +47,41 @@ class _CourseDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.watch<CourseDetailProvider>();
     final course = p.course;
+    final lessons = [
+      ...?course?.chapters.expand((c) => c.videos),
+      ...?course?.orphanVideos,
+    ];
+    final next =
+        lessons.where((v) => !p.isCompleted(v.id)).firstOrNull ??
+        lessons.firstOrNull;
     final ready = p.status == ViewStatus.success && course != null;
     return Scaffold(
-      appBar: ready ? null : AppBar(title: Text(title ?? AppStrings.course)),
+      appBar: ready ? null : AppTopBar(title: Text(title ?? AppStrings.course)),
+      bottomNavigationBar: !ready || next == null
+          ? null
+          : SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                child: ChunkyButton(
+                  onPressed: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => VideoLessonScreen(
+                          videoId: next.id,
+                          title: next.name,
+                        ),
+                      ),
+                    );
+                    p.loadProgressFor([next], force: true);
+                  },
+                  child: Text(
+                    AppStrings.continueLesson(next.name),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            ),
       body: AsyncView(
         status: p.status,
         error: p.error,
@@ -54,17 +92,7 @@ class _CourseDetailView extends StatelessWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               _Header(course: course!, provider: p),
-              if (course.description.trim().isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    child: Text(
-                      course.description,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                ),
-              _sectionTitle(context, AppStrings.chapters),
+              _sectionTitle(context, AppStrings.courseContent),
               _Chapters(course: course, provider: p),
               _sectionTitle(context, AppStrings.quizzes),
               SliverToBoxAdapter(child: QuizListForCourse(courseId: course.id)),
@@ -81,94 +109,81 @@ class _CourseDetailView extends StatelessWidget {
   SliverToBoxAdapter _sectionTitle(BuildContext context, String text) =>
       SliverToBoxAdapter(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
           child: Text(text, style: Theme.of(context).textTheme.titleLarge),
         ),
       );
 }
 
-/// Collapsing app bar with name, teacher and rating.
+/// Flat course hero using the speaking block from the approved reference.
 class _Header extends StatelessWidget {
   const _Header({required this.course, required this.provider});
-
   final CourseDetail course;
   final CourseDetailProvider provider;
-
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final theme = Theme.of(context);
+    final p = AppPalette.of(context);
+    final t = Theme.of(context);
+    final colors = p.speaking;
     final rating = provider.rating;
-    return SliverAppBar(
-      pinned: true,
-      expandedHeight: 240,
-      backgroundColor: scheme.primary,
-      foregroundColor: scheme.onPrimary,
-      title: Text(
-        course.name,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(color: scheme.onPrimary),
-      ),
-      flexibleSpace: FlexibleSpaceBar(
-        collapseMode: CollapseMode.pin,
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                scheme.primary,
-                Color.alphaBlend(
-                  scheme.primary.withValues(alpha: .8),
-                  scheme.tertiary,
-                ),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+    return SliverToBoxAdapter(
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.background,
+          borderRadius: const BorderRadius.vertical(
+            bottom: Radius.circular(32),
           ),
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          alignment: Alignment.bottomLeft,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                course.name,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: scheme.onPrimary,
-                  fontWeight: FontWeight.bold,
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IconSquareButton(
+                  icon: Icons.chevron_left,
+                  tooltip: AppStrings.previous,
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              Text(
-                course.teacherName.isEmpty
-                    ? AppStrings.appName
-                    : AppStrings.teacherBy(course.teacherName),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: scheme.onPrimary,
+                const SizedBox(height: 14),
+                PillChip(
+                  label: course.teacherName.isEmpty
+                      ? AppStrings.appName
+                      : course.teacherName,
+                  color: p.surface,
+                  foreground: colors.ink,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  RatingStars(rating: rating.average, color: scheme.onPrimary),
-                  const SizedBox(width: 8),
+                const SizedBox(height: 14),
+                Text(
+                  course.name,
+                  style: t.textTheme.headlineSmall?.copyWith(color: colors.ink),
+                ),
+                if (course.description.trim().isNotEmpty) ...[
+                  const SizedBox(height: 10),
                   Text(
-                    rating.total == 0
-                        ? AppStrings.noReviews
-                        : AppStrings.ratingSummary(
-                            rating.average,
-                            rating.total,
-                          ),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: scheme.onPrimary,
-                    ),
+                    course.description,
+                    style: t.textTheme.bodyMedium?.copyWith(color: colors.ink),
                   ),
                 ],
-              ),
-            ],
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    RatingStars(rating: rating.average, color: colors.ink),
+                    Text(
+                      rating.total == 0
+                          ? AppStrings.noReviews
+                          : AppStrings.ratingSummary(
+                              rating.average,
+                              rating.total,
+                            ),
+                      style: t.textTheme.bodySmall?.copyWith(color: colors.ink),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -177,11 +192,29 @@ class _Header extends StatelessWidget {
 }
 
 /// Expandable chapters; completion checks load when a chapter is opened.
-class _Chapters extends StatelessWidget {
+class _Chapters extends StatefulWidget {
   const _Chapters({required this.course, required this.provider});
 
   final CourseDetail course;
   final CourseDetailProvider provider;
+  @override
+  State<_Chapters> createState() => _ChaptersState();
+}
+
+class _ChaptersState extends State<_Chapters> {
+  CourseDetail get course => widget.course;
+  CourseDetailProvider get provider => widget.provider;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        provider.loadProgressFor(
+          course.chapters.firstOrNull?.videos ?? course.orphanVideos,
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,7 +226,7 @@ class _Chapters extends StatelessWidget {
     if (groups.isEmpty) {
       return const SliverToBoxAdapter(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: 20),
           child: Text(AppStrings.noLessons),
         ),
       );
@@ -280,7 +313,7 @@ class _Reviews extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: OutlinedButton.icon(
+            child: ChunkyOutlinedButton.icon(
               onPressed: () async {
                 final messenger = ScaffoldMessenger.of(context);
                 final sent = await showDialog<bool>(

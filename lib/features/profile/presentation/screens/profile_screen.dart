@@ -5,11 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 
 import '../../../membership/presentation/screens/membership_screen.dart';
+import '../../../ai_exam/presentation/screens/ai_exam_hub_screen.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../core/widgets/stat_tile.dart';
-import '../../../../core/widgets/section_header.dart';
+import '../../../../core/widgets/outlined_card.dart';
+import '../../../../core/widgets/chunky_outlined_button.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../quiz/presentation/screens/quiz_history_screen.dart';
@@ -110,233 +113,300 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final state = context.watch<ProfileProvider>();
     final theme = Theme.of(context);
+    final p = AppPalette.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.profile)),
-      body: AsyncView(
-        status: state.status,
-        error: state.error,
-        onRetry: state.load,
-        builder: (_) {
-          final profile = state.profile!;
-          final name = profile.fullName.isEmpty
-              ? AppStrings.student
-              : profile.fullName;
-          final membership = state.membership;
-          return RefreshIndicator(
-            onRefresh: state.load,
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      children: [
-                        Semantics(
-                          label: AppStrings.changeAvatar,
-                          button: true,
-                          child: InkWell(
-                            key: const Key('change_avatar'),
-                            onTap: state.uploadingAvatar ? null : _pickAvatar,
-                            customBorder: const CircleBorder(),
-                            child: SizedBox(
-                              width: 92,
-                              height: 92,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  UserAvatar(
-                                    url: state.avatarUrl,
-                                    name: name,
-                                    radius: 40,
-                                  ),
-                                  if (state.uploadingAvatar)
-                                    const SizedBox(
-                                      width: 88,
-                                      height: 88,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 3,
-                                      ),
+      body: SafeArea(
+        child: AsyncView(
+          status: state.status,
+          error: state.error,
+          onRetry: state.load,
+          builder: (_) {
+            final profile = state.profile!;
+            final name = profile.fullName.isEmpty
+                ? AppStrings.student
+                : profile.fullName;
+            final membership = state.membership;
+            Widget setting(
+              IconData icon,
+              String label,
+              SkillColors colors,
+              VoidCallback onTap,
+            ) => ListTile(
+              leading: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: colors.background,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 18, color: colors.ink),
+              ),
+              title: Text(label),
+              trailing: Icon(Icons.chevron_right, color: p.inkMuted),
+              onTap: onTap,
+            );
+            return RefreshIndicator(
+              onRefresh: state.load,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  Text(
+                    AppStrings.profile,
+                    style: theme.textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Semantics(
+                        label: AppStrings.changeAvatar,
+                        button: true,
+                        child: InkWell(
+                          key: const Key('change_avatar'),
+                          onTap: state.uploadingAvatar ? null : _pickAvatar,
+                          customBorder: const CircleBorder(),
+                          child: SizedBox(
+                            width: 88,
+                            height: 88,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                UserAvatar(
+                                  url: state.avatarUrl,
+                                  name: name,
+                                  radius: 42,
+                                  colors: p.writing,
+                                ),
+                                if (state.uploadingAvatar)
+                                  const SizedBox(
+                                    width: 88,
+                                    height: 88,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 3,
                                     ),
-                                  Positioned(
-                                    right: 0,
-                                    bottom: 0,
-                                    child: CircleAvatar(
-                                      radius: 16,
-                                      backgroundColor:
-                                          theme.colorScheme.primary,
-                                      child: Icon(
-                                        Icons.camera_alt_rounded,
-                                        size: 18,
-                                        color: theme.colorScheme.onPrimary,
-                                      ),
+                                  ),
+                                Positioned(
+                                  right: 0,
+                                  bottom: 0,
+                                  child: CircleAvatar(
+                                    radius: 18,
+                                    backgroundColor: p.primary,
+                                    child: Icon(
+                                      Icons.camera_alt_outlined,
+                                      size: 18,
+                                      color: p.onPrimary,
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          name,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.headlineSmall,
-                        ),
-                        Text(profile.email, textAlign: TextAlign.center),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _stat(
-                              context,
-                              state.stats?.streak,
-                              AppStrings.dayStreak,
-                            ),
-                            _stat(
-                              context,
-                              state.stats?.attempts,
-                              AppStrings.attempts,
-                            ),
-                            _stat(
-                              context,
-                              state.stats?.words,
-                              AppStrings.words,
+                            Text(name, style: theme.textTheme.titleLarge),
+                            Text(
+                              profile.email,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall,
                             ),
                           ],
-                        ),
-                        if (state.statsError != null)
-                          Text(state.statsError!, textAlign: TextAlign.center),
-                      ],
-                    ),
-                  ),
-                ),
-                Card(
-                  child: ListTile(
-                    // Opens plan selection / renewal with PayOS QR payment.
-                    onTap: () async {
-                      await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const MembershipScreen(),
-                        ),
-                      );
-                      if (context.mounted) {
-                        context.read<ProfileProvider>().load();
-                      }
-                    },
-                    trailing: const Icon(Icons.chevron_right),
-                    leading: const Icon(Icons.workspace_premium_outlined),
-                    title: Text(
-                      membership == null
-                          ? AppStrings.membershipUnavailable
-                          : membership.hasMembership
-                          ? AppStrings.activeMembership
-                          : AppStrings.noMembership,
-                    ),
-                    subtitle: Text(
-                      state.membershipError ??
-                          (membership?.endsAt == null
-                              ? AppStrings.quizMembershipRequired
-                              : AppStrings.membershipExpires(
-                                  DateFormat.yMd('vi')
-                                      .format(membership!.endsAt!.toLocal()),
-                                )),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const SectionHeader(title: AppStrings.accountSettings),
-                const SizedBox(height: 8),
-                Card(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: const Icon(Icons.edit_outlined),
-                        title: const Text(AppStrings.editProfile),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () {
-                          state.clearError();
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const EditProfileScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.lock_outline),
-                        title: const Text(AppStrings.changePassword),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () {
-                          state.clearError();
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const ChangePasswordScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.bookmark_border),
-                        title: const Text(AppStrings.vocabulary),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const VocabularyScreen(),
-                            ),
-                          );
-                          if (mounted) await state.load();
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.notifications_outlined),
-                        title: const Text(AppStrings.studyReminder),
-                        subtitle: const Text(AppStrings.manageReminders),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () =>
-                            Navigator.of(context)
-                                .pushNamed('/settings/reminder'),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.history),
-                        title: const Text(AppStrings.quizHistory),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => const QuizHistoryScreen(),
-                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 12),
-                ListTile(
-                  leading: Icon(Icons.logout, color: theme.colorScheme.error),
-                  title: const Text(AppStrings.logout),
-                  onTap: () async {
-                    await context.read<AuthProvider>().logout();
-                    if (context.mounted) {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    }
-                  },
-                ),
-              ],
-            ),
-          );
-        },
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      _stat(
+                        context,
+                        state.stats?.streak,
+                        AppStrings.dayStreak,
+                        reward: true,
+                      ),
+                      _stat(
+                        context,
+                        state.stats?.attempts,
+                        AppStrings.attempts,
+                      ),
+                      _stat(context, state.stats?.words, AppStrings.words),
+                    ],
+                  ),
+                  if (state.statsError != null) Text(state.statsError!),
+                  const SizedBox(height: 16),
+                  OutlinedCard(
+                    color: p.primary,
+                    borderColor: p.primary,
+                    edgeColor: p.primaryEdge,
+                    onTap: () async {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const MembershipScreen(),
+                        ),
+                      );
+                      if (context.mounted) state.load();
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.workspace_premium_outlined,
+                          size: 28,
+                          color: p.onPrimary,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                membership == null
+                                    ? AppStrings.membershipUnavailable
+                                    : membership.hasMembership
+                                    ? AppStrings.activeMembership
+                                    : AppStrings.noMembership,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: p.onPrimary,
+                                ),
+                              ),
+                              Text(
+                                state.membershipError ??
+                                    (membership?.endsAt == null
+                                        ? AppStrings.quizMembershipRequired
+                                        : AppStrings.membershipExpires(
+                                            DateFormat.yMd('vi').format(
+                                              membership!.endsAt!.toLocal(),
+                                            ),
+                                          )),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: p.onPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(Icons.chevron_right, color: p.onPrimary),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  OutlinedCard(
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      children: [
+                        setting(
+                          Icons.edit_outlined,
+                          AppStrings.editProfile,
+                          p.speaking,
+                          () {
+                            state.clearError();
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const EditProfileScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const Divider(height: 2),
+                        setting(
+                          Icons.lock_outline,
+                          AppStrings.changePassword,
+                          p.writing,
+                          () {
+                            state.clearError();
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const ChangePasswordScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const Divider(height: 2),
+                        setting(
+                          Icons.bookmark_border,
+                          AppStrings.vocabulary,
+                          p.listening,
+                          () async {
+                            await Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const VocabularyScreen(),
+                              ),
+                            );
+                            if (mounted) await state.load();
+                          },
+                        ),
+                        const Divider(height: 2),
+                        setting(
+                          Icons.notifications_outlined,
+                          AppStrings.studyReminder,
+                          p.speaking,
+                          () =>
+                              Navigator.of(context)
+                                  .pushNamed('/settings/reminder'),
+                        ),
+                        const Divider(height: 2),
+                        setting(
+                          Icons.history,
+                          AppStrings.quizHistory,
+                          p.writing,
+                          () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const QuizHistoryScreen(),
+                            ),
+                          ),
+                        ),
+                        const Divider(height: 2),
+                        setting(
+                          Icons.auto_awesome_outlined,
+                          AppStrings.aiPracticeTitle,
+                          p.writing,
+                          () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const AiExamHubScreen(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ChunkyOutlinedButton(
+                    onPressed: () async {
+                      await context.read<AuthProvider>().logout();
+                      if (context.mounted) {
+                        Navigator.of(context).popUntil((r) => r.isFirst);
+                      }
+                    },
+                    child: Text(
+                      AppStrings.logout,
+                      style: TextStyle(color: p.error),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 
-  Widget _stat(BuildContext context, int? count, String label) => Expanded(
+  Widget _stat(
+    BuildContext context,
+    int? count,
+    String label, {
+    bool reward = false,
+  }) => Expanded(
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3),
       child: StatTile(
         value: count?.toString() ?? AppStrings.unavailableValue,
         label: label,
+        reward: reward,
       ),
     ),
   );

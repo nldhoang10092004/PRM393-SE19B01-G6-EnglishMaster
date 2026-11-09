@@ -1,9 +1,14 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_outlined_button.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../vocabulary/data/models/saved_word.dart';
@@ -66,7 +71,7 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
             (vocabulary.isSaved(card.id) ||
                 state.progress.any((p) => p.itemId == card.id && p.isSaved));
         return Scaffold(
-          appBar: AppBar(
+          appBar: AppTopBar(
             title: Text(state.set?.title ?? AppStrings.study),
             actions: [
               if (card != null)
@@ -132,13 +137,13 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                         ),
                         const SizedBox(height: 24),
                         if (state.remaining > 0) ...[
-                          FilledButton(
+                          ChunkyButton(
                             onPressed: state.restart,
                             child: const Text(AppStrings.studyUnmastered),
                           ),
                           const SizedBox(height: 12),
                         ],
-                        OutlinedButton(
+                        ChunkyOutlinedButton(
                           onPressed: () => Navigator.of(context).pop(),
                           child: const Text(AppStrings.backToSet),
                         ),
@@ -161,30 +166,6 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                       children: [
                         LinearProgressIndicator(value: state.fraction),
                         const SizedBox(height: 10),
-                        Wrap(
-                          spacing: 5,
-                          runSpacing: 5,
-                          alignment: WrapAlignment.center,
-                          children: List.generate(
-                            math.min(state.total, 12),
-                            (i) => Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color:
-                                    i <=
-                                        (state.fraction *
-                                                math.min(state.total, 12))
-                                            .floor()
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context)
-                                          .colorScheme
-                                          .outlineVariant,
-                              ),
-                            ),
-                          ),
-                        ),
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 12,
@@ -242,20 +223,22 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                                 transform: Matrix4.rotationY(
                                   back ? math.pi : 0,
                                 ),
-                                child: Card(
-                                  margin: const EdgeInsets.all(16),
-                                  elevation: 4,
-                                  shadowColor: Theme.of(context)
-                                      .colorScheme
-                                      .shadow
-                                      .withValues(alpha: .16),
-                                  color: back
-                                      ? Theme.of(context)
-                                            .colorScheme
-                                            .tertiaryContainer
-                                      : Theme.of(context)
-                                            .colorScheme
-                                            .primaryContainer,
+                                child: Container(
+                                  margin: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: AppPalette.of(context).surface,
+                                    borderRadius: BorderRadius.circular(28),
+                                    border: Border.all(
+                                      color: AppPalette.of(context).outline,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppPalette.of(context).outline,
+                                        offset: const Offset(0, 6),
+                                      ),
+                                    ],
+                                  ),
                                   child: SizedBox.expand(
                                     child: Center(
                                       child: SingleChildScrollView(
@@ -358,58 +341,61 @@ class _FlashcardStudyScreenState extends State<FlashcardStudyScreen> {
                     top: false,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Row(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton.outlined(
-                            tooltip: AppStrings.previousCard,
-                            onPressed: state.busy || !state.hasPrevious
-                                ? null
-                                : state.previous,
-                            icon: const Icon(Icons.chevron_left),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: state.busy
-                                  ? null
-                                  : () => state.answer(mastered: false),
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ChunkyOutlinedButton(
+                                  onPressed: state.busy || !state.hasPrevious
+                                      ? null
+                                      : state.previous,
+                                  child: const Text(
+                                    AppStrings.previousCard,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
-                              child: const Text(
-                                AppStrings.again,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: FilledButton(
-                              onPressed: state.busy
-                                  ? null
-                                  : () => state.answer(mastered: true),
-                              style: FilledButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ChunkyOutlinedButton(
+                                  onPressed: state.busy || !state.hasNext
+                                      ? null
+                                      : state.next,
+                                  child: const Text(
+                                    AppStrings.nextCard,
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
-                              child: Text(
-                                textAlign: TextAlign.center,
-                                state.busy
-                                    ? AppStrings.saving
-                                    : AppStrings.gotIt,
-                              ),
-                            ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          IconButton.outlined(
-                            tooltip: AppStrings.nextCard,
-                            onPressed: state.busy || !state.hasNext
-                                ? null
-                                : state.next,
-                            icon: const Icon(Icons.chevron_right),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ChunkyOutlinedButton(
+                                  onPressed: state.busy
+                                      ? null
+                                      : () => state.answer(mastered: false),
+                                  child: const Text(AppStrings.again),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ChunkyButton(
+                                  onPressed: state.busy
+                                      ? null
+                                      : () => state.answer(mastered: true),
+                                  child: Text(
+                                    state.busy
+                                        ? AppStrings.saving
+                                        : AppStrings.gotIt,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

@@ -2,6 +2,25 @@
 class AppStrings {
   AppStrings._();
 
+  static const welcomeBack = 'Chào mừng trở lại!';
+  static const mimiWaiting = 'Mimi đang chờ bạn luyện tiếp hôm nay.';
+  static const brandInitials = 'EM';
+  static const searchCourses = 'Tìm khóa học';
+  static const noMatchingCourses = 'Không tìm thấy khóa học phù hợp.';
+  static const courseContent = 'Nội dung khóa học';
+  static const speaking = 'Nói';
+  static const listening = 'Nghe';
+  static const writing = 'Viết';
+  static const all = 'Tất cả';
+  static const studying = 'Đang học';
+  static const dailyReview = 'Ôn 5 thẻ mỗi ngày';
+  static const dailyReviewHint = 'Học thẻ cũng được tính vào chuỗi ngày học.';
+  static const todayGoal = 'Mục tiêu hôm nay';
+  static const wellDone = 'Làm tốt lắm!';
+
+  /// Label for opening the next available lesson.
+  static String continueLesson(String name) => 'Học tiếp: $name';
+
   // Common
   static const changeAvatar = 'Đổi ảnh đại diện';
   static const choosePhoto = 'Chọn ảnh từ thư viện';
@@ -243,7 +262,7 @@ class AppStrings {
   static const attempts = 'Lượt làm bài';
   static const words = 'Từ vựng';
   static const membershipUnavailable = 'Không thể tải gói hội viên';
-  static const activeMembership = 'Gói hội viên đang có hiệu lực';
+  static const activeMembership = 'Hội viên đang hoạt động';
   static const noMembership = 'Chưa có gói hội viên còn hiệu lực';
   static const quizMembershipRequired =
       'Cần có gói hội viên để làm bài kiểm tra của khóa học.';

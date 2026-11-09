@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,7 @@ class AiReviewDetailScreen extends StatelessWidget {
           ..loadDetail(submissionId),
     child: Consumer<AiReviewProvider>(
       builder: (context, state, _) => Scaffold(
-        appBar: AppBar(title: const Text(AiExamStrings.review)),
+        appBar: const AppTopBar(title: Text(AiExamStrings.review)),
         body: state.status == ViewStatus.error
             ? MessageView(
                 icon: Icons.cloud_off_outlined,

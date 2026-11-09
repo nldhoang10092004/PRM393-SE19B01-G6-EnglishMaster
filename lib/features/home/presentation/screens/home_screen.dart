@@ -2,31 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/section_header.dart';
-import '../../../course/presentation/widgets/course_preview_card.dart';
+import '../../../../core/widgets/skill_tile.dart';
 import '../../../course/presentation/providers/course_list_provider.dart';
 import '../../../course/presentation/screens/course_detail_screen.dart';
+import '../../../course/presentation/screens/course_list_screen.dart';
 import '../../../course/presentation/widgets/course_card.dart';
-import '../../../streak/data/models/streak_status.dart';
 import '../../../streak/presentation/providers/streak_provider.dart';
 import '../../../streak/presentation/widgets/streak_card.dart';
-import '../../../ai_exam/presentation/screens/ai_exam_hub_screen.dart';
+import '../../../ai_exam/presentation/screens/ai_speaking_screen.dart';
+import '../../../ai_exam/presentation/screens/ai_listening_screen.dart';
+import '../../../ai_exam/presentation/screens/ai_writing_screen.dart';
 import '../widgets/home_greeting.dart';
 
-/// Home dashboard: greeting, streak card and the list of courses.
-///
-/// Needs `CourseListProvider` and `StreakProvider` above it in the tree.
-/// Pull down to refresh both.
+/// Dashboard with a real streak, three AI skills and compact course discovery.
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
+  const HomeScreen({super.key, this.onViewCourses});
+  final VoidCallback? onViewCourses;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _catalogKey = GlobalKey();
   @override
   void initState() {
     super.initState();
@@ -41,17 +40,14 @@ class _HomeScreenState extends State<HomeScreen> {
     ]);
   }
 
+  void _open(Widget screen) =>
+      Navigator.of(context)
+          .push(MaterialPageRoute<void>(builder: (_) => screen));
   @override
   Widget build(BuildContext context) {
     final courses = context.watch<CourseListProvider>();
-    // Only the two streak fields the card shows: other StreakProvider changes
-    // do not rebuild the whole home screen.
-    final streakStatus = context.select<StreakProvider, ViewStatus>(
-      (p) => p.status,
-    );
-    final streakValue = context.select<StreakProvider, StreakStatus>(
-      (p) => p.streak,
-    );
+    final streak = context.watch<StreakProvider>();
+    final p = AppPalette.of(context);
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -60,70 +56,61 @@ class _HomeScreenState extends State<HomeScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               const SliverToBoxAdapter(child: HomeGreeting()),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                sliver: SliverToBoxAdapter(
                   child: StreakCard(
-                    status: streakStatus,
-                    streak: streakValue,
-                    onRetry: () => context.read<StreakProvider>().load(),
+                    status: streak.status,
+                    streak: streak.streak,
+                    onRetry: streak.load,
                   ),
                 ),
               ),
-              const SliverToBoxAdapter(child: _AiPracticeCard()),
-              if (courses.courses.isNotEmpty) ...[
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                    child: SectionHeader(
-                      title: AppStrings.continueLearning,
-                      onViewAll: () {
-                        final target = _catalogKey.currentContext;
-                        if (target != null) {
-                          Scrollable.ensureVisible(
-                            target,
-                            duration: const Duration(milliseconds: 250),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 220,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: courses.courses.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 12),
-                      itemBuilder: (context, index) {
-                        final course = courses.courses[index];
-                        return SizedBox(
-                          width: 256,
-                          child: CoursePreviewCard(
-                            course: course,
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => CourseDetailScreen(
-                                  courseId: course.id,
-                                  title: course.name,
-                                ),
-                              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SectionHeader(title: AppStrings.aiPracticeTitle),
+                      const SizedBox(height: 16),
+                      SkillTile(
+                        label: AppStrings.speaking,
+                        icon: Icons.mic_none_rounded,
+                        colors: p.speaking,
+                        onTap: () => _open(const AiSpeakingScreen()),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SkillTile(
+                              label: AppStrings.listening,
+                              icon: Icons.headphones_rounded,
+                              colors: p.listening,
+                              onTap: () => _open(const AiListeningScreen()),
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-                  child: SectionHeader(
-                    key: _catalogKey,
-                    title: AppStrings.allCourses,
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: SkillTile(
+                              label: AppStrings.writing,
+                              icon: Icons.edit_outlined,
+                              colors: p.writing,
+                              onTap: () => _open(const AiWritingScreen()),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      SectionHeader(
+                        title: AppStrings.continueLearning,
+                        onViewAll:
+                            widget.onViewCourses ??
+                            () => _open(const CourseListScreen()),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                   ),
                 ),
               ),
@@ -134,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: AsyncView(
                     status: courses.status,
                     error: courses.error,
-                    onRetry: () => context.read<CourseListProvider>().load(),
+                    onRetry: courses.load,
                     isEmpty: courses.courses.isEmpty,
                     emptyMessage: AppStrings.noCourses,
                     builder: (_) => const SizedBox.shrink(),
@@ -142,21 +129,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                   sliver: SliverList.separated(
                     itemCount: courses.courses.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, i) {
-                      final course = courses.courses[i];
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final c = courses.courses[index];
                       return CourseCard(
-                        course: course,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder: (_) => CourseDetailScreen(
-                              courseId: course.id,
-                              title: course.name,
-                            ),
-                          ),
+                        course: c,
+                        onTap: () => _open(
+                          CourseDetailScreen(courseId: c.id, title: c.name),
                         ),
                       );
                     },
@@ -164,37 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Shortcut card to the AI exam practice hub (Speaking, Listening, Writing).
-class _AiPracticeCard extends StatelessWidget {
-  const _AiPracticeCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Card(
-        color: scheme.tertiaryContainer,
-        child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
-          leading: CircleAvatar(
-            backgroundColor: scheme.tertiary,
-            child: Icon(Icons.auto_awesome, color: scheme.onTertiary),
-          ),
-          title: const Text(AppStrings.aiPracticeTitle),
-          subtitle: const Text(AppStrings.aiPracticeSubtitle),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => const AiExamHubScreen())),
         ),
       ),
     );

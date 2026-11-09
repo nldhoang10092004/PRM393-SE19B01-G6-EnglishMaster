@@ -1,75 +1,66 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_palette.dart';
+import '../../../../core/widgets/outlined_card.dart';
 import '../../data/models/course_summary.dart';
 
-/// Course list item: colored initials block, name and teacher.
+/// Course row showing API titles and teachers with a coloured initial tile.
 class CourseCard extends StatelessWidget {
   const CourseCard({super.key, required this.course, required this.onTap});
-
   final CourseSummary course;
   final VoidCallback onTap;
-
   @override
   Widget build(BuildContext context) {
+    final p = AppPalette.of(context);
     final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-    final palette = [
-      (scheme.primaryContainer, scheme.onPrimaryContainer),
-      (scheme.tertiaryContainer, scheme.onTertiaryContainer),
-      (scheme.secondaryContainer, scheme.onSecondaryContainer),
-    ];
-    final (bg, fg) = palette[course.id.abs() % palette.length];
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 64,
-                height: 72,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: bg,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Text(
-                  course.initials,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: fg,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+    final colors = [
+      p.speaking,
+      p.listening,
+      p.writing,
+    ][(course.id - 1).abs() % 3];
+    return OutlinedCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: colors.background,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Text(
+              course.initials,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontSize: 20,
+                color: colors.ink,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      course.name,
-                      style: theme.textTheme.titleMedium,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      course.teacherName,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: scheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right_rounded, color: scheme.outline),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  course.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  course.teacherName,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

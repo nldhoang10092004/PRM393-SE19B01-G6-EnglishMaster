@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -87,7 +88,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
           onPressed: _busy ? null : () => Navigator.of(context).pop(false),
           child: const Text(AppStrings.cancel),
         ),
-        FilledButton(
+        ChunkyButton(
           onPressed: _busy ? null : _submit,
           child: _busy
               ? const SizedBox(

@@ -1,11 +1,14 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../membership/presentation/widgets/upgrade_membership_banner.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/async_view.dart';
-import '../../../../core/widgets/gradient_hero_card.dart';
+import '../../../../core/widgets/flat_hero_card.dart';
 import '../../data/quiz_repository.dart';
 import '../providers/quiz_provider.dart';
 import 'quiz_taking_screen.dart';
@@ -21,7 +24,9 @@ class QuizDetailScreen extends StatelessWidget {
         QuizTakingProvider(context.read<QuizRepository>())..load(quizId),
     child: Consumer<QuizTakingProvider>(
       builder: (context, state, _) => Scaffold(
-        appBar: AppBar(title: Text(state.quiz?.title ?? AppStrings.quizDetail)),
+        appBar: AppTopBar(
+          title: Text(state.quiz?.title ?? AppStrings.quizDetail),
+        ),
         body: AsyncView(
           status: state.status,
           error: state.error,
@@ -29,8 +34,13 @@ class QuizDetailScreen extends StatelessWidget {
           builder: (_) => ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              GradientHeroCard(
+              FlatHeroCard(
                 title: state.quiz!.title,
+                colors: state.quiz!.type == 1
+                    ? AppPalette.of(context).listening
+                    : state.quiz!.type == 2
+                    ? AppPalette.of(context).reading
+                    : null,
                 subtitle: state.quiz!.description,
                 icon: Icons.quiz_rounded,
               ),
@@ -59,7 +69,7 @@ class QuizDetailScreen extends StatelessWidget {
                   child: UpgradeMembershipBanner(),
                 ),
               const SizedBox(height: 24),
-              FilledButton(
+              ChunkyButton(
                 onPressed: state.busy || state.questions.isEmpty
                     ? null
                     : () async {

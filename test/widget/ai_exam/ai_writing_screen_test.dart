@@ -65,7 +65,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Điểm tổng: 7.5/9'), findsOneWidget);
+    expect(find.text('7.5'), findsWidgets);
+    expect(find.text('/9'), findsOneWidget);
     expect(find.text('Bài viết có luận điểm rõ ràng.'), findsOneWidget);
     expect(find.text('Nhận xét chung'), findsOneWidget);
     verify(() => repository.submitWriting(9, essay)).called(1);

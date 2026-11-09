@@ -17,15 +17,19 @@ class AiExamStrings {
   static const review = 'Chi tiết chấm bài';
   static const generate = 'Tạo đề mới';
   static const generating = 'Đang tạo đề…';
-  static const submit = 'Nộp bài chấm điểm';
+  static const submit = 'Nộp bài để AI chấm';
   static const submitting = 'AI đang chấm bài…';
   static const retry = 'Thử lại';
-  static const prompt = 'Đề bài';
+  static const prompt = 'Đề bài do AI tạo';
   static const answer = 'Bài làm của bạn';
   static const writingHint = 'Nhập bài viết bằng tiếng Anh…';
   static const minimumWords = 'Bài viết cần ít nhất 150 từ để chấm điểm.';
   static const result = 'Kết quả chấm bài';
-  static const feedback = 'Nhận xét';
+  static const practiceAgain = 'Luyện lại';
+  static const speakingResult = 'Kết quả luyện nói';
+  static const listeningResult = 'Kết quả luyện nghe';
+  static const writingResult = 'Kết quả luyện viết';
+  static const feedback = 'Nhận xét của AI';
   static const aiReview = 'Nhận xét của AI';
   static const noFeedback = 'Chưa có nhận xét chi tiết.';
   static const noHistory = 'Bạn chưa có bài chấm nào trong lịch sử.';
@@ -93,10 +97,11 @@ class AiExamStrings {
   static const rewind10 = 'Lùi 10 giây';
   static const audioLoading = 'Đang tải âm thanh…';
   static const generatingSpeaking = 'AI đang soạn đề nói…';
-  static const generatingListening = 'AI đang soạn bài nghe và tạo audio…';
+  static const generatingListening = 'AI đang tạo đề cho bạn';
   static const generatingWriting = 'AI đang soạn đề viết…';
   static const grading = 'AI đang chấm bài…';
-  static const estimateNote = 'Có thể mất 10–40 giây.';
+  static const estimateNote =
+      'Thường mất 10–20 giây. Đừng tắt ứng dụng nhé. Các bước chỉ là ước tính.';
   static const tipLabel = 'Mẹo học tập';
   static const stepSpeaking = ['Chọn chủ đề', 'Soạn câu hỏi', 'Hoàn tất'];
   static const stepWriting = ['Chọn chủ đề', 'Soạn đề bài', 'Hoàn tất'];

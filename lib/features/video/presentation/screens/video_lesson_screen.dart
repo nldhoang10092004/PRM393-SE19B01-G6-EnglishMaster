@@ -1,3 +1,6 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
+
 import 'dart:async';
 
 import 'package:chewie/chewie.dart';
@@ -167,7 +170,7 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
         navigator.pop(true);
       },
       child: Scaffold(
-        appBar: AppBar(
+        appBar: AppTopBar(
           title: Text(video?.name ?? widget.title ?? AppStrings.lesson),
         ),
         body: provider.needsMembership
@@ -218,7 +221,7 @@ class _VideoLessonBodyState extends State<_VideoLessonBody> {
                                   ),
                                   label: const Text(AppStrings.completed),
                                 )
-                              : FilledButton.icon(
+                              : ChunkyButton.icon(
                                   onPressed: _chewie == null
                                       ? null
                                       : _markCompleted,

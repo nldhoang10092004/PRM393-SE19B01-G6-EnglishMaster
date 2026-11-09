@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,19 +29,20 @@ class _QuizListScreenState extends State<QuizListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    return const DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(AppStrings.quizzes),
-          bottom: const TabBar(
+        appBar: AppTopBar(
+          large: true,
+          title: Text(AppStrings.quizzes),
+          bottom: TabBar(
             tabs: [
               Tab(text: AppStrings.systemQuizzes),
               Tab(text: AppStrings.attemptHistory),
             ],
           ),
         ),
-        body: const TabBarView(children: [QuizCatalog(), QuizHistoryList()]),
+        body: TabBarView(children: [QuizCatalog(), QuizHistoryList()]),
       ),
     );
   }

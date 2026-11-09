@@ -1,3 +1,5 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +48,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     final state = context.watch<ProfileProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.changePassword)),
+      appBar: const AppTopBar(title: Text(AppStrings.changePassword)),
       body: Form(
         key: _form,
         child: ListView(
@@ -101,7 +103,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 ),
               ),
             const SizedBox(height: 24),
-            FilledButton(
+            ChunkyButton(
               onPressed: state.busy ? null : _save,
               child: Text(
                 state.busy ? AppStrings.saving : AppStrings.changePassword,

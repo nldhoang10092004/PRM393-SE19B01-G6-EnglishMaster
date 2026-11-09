@@ -60,7 +60,7 @@ void main() {
       expect(find.text(AppStrings.quizResult), findsOneWidget);
       expect(find.text(AppStrings.percentage(50)), findsOneWidget);
       expect(find.text(AppStrings.correctCount(1, 2)), findsOneWidget);
-      await tester.ensureVisible(find.text(AppStrings.reviewAnswers));
+      await tester.scrollUntilVisible(find.text(AppStrings.reviewAnswers), 160);
       await tester.tap(find.text(AppStrings.reviewAnswers));
       await tester.pumpAndSettle();
       expect(

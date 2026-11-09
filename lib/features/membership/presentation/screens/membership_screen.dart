@@ -1,9 +1,14 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_outlined_button.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/widgets/async_view.dart';
-import '../../../../core/widgets/gradient_hero_card.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../core/widgets/pill_chip.dart';
+import '../../../../core/widgets/outlined_card.dart';
 import '../../data/models/membership_models.dart';
 import '../../membership_strings.dart';
 import '../providers/membership_provider.dart';
@@ -57,19 +62,71 @@ class _MembershipScreenState extends State<MembershipScreen> {
   Widget build(BuildContext context) {
     final state = context.watch<MembershipProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text(MembershipStrings.title)),
+      appBar: const AppTopBar(title: Text(MembershipStrings.title)),
+      bottomNavigationBar: state.plans.isEmpty
+          ? null
+          : SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                child: ChunkyButton(
+                  onPressed: state.selected == null || state.creating
+                      ? null
+                      : () => _pay(state),
+                  child: state.creating
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(
+                          '${MembershipStrings.pay} · ${formatVnd(state.payable)}',
+                        ),
+                ),
+              ),
+            ),
       body: AsyncView(
         status: state.status,
         error: state.error,
         onRetry: state.load,
         builder: (context) => ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           children: [
-            const GradientHeroCard(
-              title: MembershipStrings.title,
-              subtitle: MembershipStrings.choosePlan,
-              icon: Icons.workspace_premium_rounded,
-              warm: true,
+            Text(
+              MembershipStrings.unlockAll,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              MembershipStrings.benefits,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                PillChip(
+                  label: MembershipStrings.speakingBenefit,
+                  color: AppPalette.of(context).speaking.background,
+                  foreground: AppPalette.of(context).speaking.ink,
+                ),
+                PillChip(
+                  label: MembershipStrings.listeningBenefit,
+                  color: AppPalette.of(context).listening.background,
+                  foreground: AppPalette.of(context).listening.ink,
+                ),
+                PillChip(
+                  label: MembershipStrings.writingBenefit,
+                  color: AppPalette.of(context).writing.background,
+                  foreground: AppPalette.of(context).writing.ink,
+                ),
+                PillChip(
+                  label: MembershipStrings.videoBenefit,
+                  color: AppPalette.of(context).primarySoft,
+                  foreground: AppPalette.of(context).onPrimarySoft,
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             _CurrentCard(info: state.current),
@@ -96,20 +153,11 @@ class _MembershipScreenState extends State<MembershipScreen> {
               const SizedBox(height: 12),
               _VoucherBox(controller: _voucher, state: state),
               const SizedBox(height: 16),
-              FilledButton(
-                onPressed: state.selected == null || state.creating
-                    ? null
-                    : () => _pay(state),
-                child: state.creating
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(
-                        '${MembershipStrings.pay} · ${formatVnd(state.payable)}',
-                      ),
+              const Text(
+                MembershipStrings.payosNote,
+                textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 12),
             ],
           ],
         ),
@@ -182,70 +230,72 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      color: selected
-          ? scheme.primaryContainer
-          : best
-          ? scheme.secondaryContainer
-          : scheme.surfaceContainerLow,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: selected ? scheme.primary : scheme.outlineVariant,
-          width: selected ? 2 : 1,
-        ),
-      ),
-      child: InkWell(
-        key: ValueKey('plan-${plan.id}'),
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(
-                selected ? Icons.radio_button_checked : Icons.radio_button_off,
-                color: scheme.primary,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Wrap keeps the badge on its own line on narrow screens.
-                    Wrap(
-                      spacing: 8,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          plan.name,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        if (best)
-                          Chip(
-                            label: const Text(MembershipStrings.bestValue),
-                            visualDensity: VisualDensity.compact,
-                            backgroundColor: scheme.secondaryContainer,
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${MembershipStrings.duration(plan.durationDays)} · '
-                      '${MembershipStrings.perDay(formatVnd(plan.pricePerDay))}',
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      formatVnd(plan.price),
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ],
+    final p = AppPalette.of(context);
+    final t = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.only(top: best ? 18 : 8, bottom: 8),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          OutlinedCard(
+            key: ValueKey('plan-${plan.id}'),
+            onTap: onTap,
+            color: selected ? p.primarySoft : p.surface,
+            borderColor: selected ? p.primary : p.outline,
+            edgeColor: selected ? p.primary : null,
+            child: Row(
+              children: [
+                Icon(
+                  selected
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
+                  color: selected ? p.primary : p.inkMuted,
                 ),
-              ),
-            ],
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        plan.name,
+                        style: t.textTheme.titleMedium?.copyWith(
+                          color: selected ? p.onPrimarySoft : p.ink,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        MembershipStrings.duration(plan.durationDays),
+                        style: t.textTheme.bodySmall?.copyWith(
+                          color: selected ? p.onPrimarySoft : p.inkMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    formatVnd(plan.price),
+                    style: t.textTheme.titleMedium?.copyWith(
+                      color: selected ? p.onPrimarySoft : p.ink,
+                    ),
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+          if (best)
+            Positioned(
+              top: -14,
+              left: 16,
+              child: PillChip(
+                label: MembershipStrings.bestValue,
+                color: p.reward,
+                foreground: p.onReward,
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -277,7 +327,7 @@ class _VoucherBox extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            OutlinedButton(
+            ChunkyOutlinedButton(
               onPressed: state.applyingVoucher
                   ? null
                   : () => state.applyVoucher(controller.text),

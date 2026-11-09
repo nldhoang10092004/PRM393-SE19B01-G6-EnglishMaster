@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,7 @@ class AiReviewHistoryScreen extends StatelessWidget {
         AiReviewProvider(context.read<AiExamRepository>())..loadHistory(),
     child: Consumer<AiReviewProvider>(
       builder: (context, state, _) => Scaffold(
-        appBar: AppBar(title: const Text(AiExamStrings.history)),
+        appBar: const AppTopBar(title: Text(AiExamStrings.history)),
         body: state.status == ViewStatus.error
             ? MessageView(
                 icon: Icons.cloud_off_outlined,

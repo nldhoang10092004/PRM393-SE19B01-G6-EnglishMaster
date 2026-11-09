@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +17,7 @@ class FlashcardHistoryScreen extends StatelessWidget {
         FlashcardHistoryProvider(context.read<FlashcardRepository>())..load(),
     child: Consumer<FlashcardHistoryProvider>(
       builder: (_, state, _) => Scaffold(
-        appBar: AppBar(title: const Text(AppStrings.studyHistory)),
+        appBar: const AppTopBar(title: Text(AppStrings.studyHistory)),
         body: AsyncView(
           status: state.status,
           error: state.error,

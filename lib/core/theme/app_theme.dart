@@ -1,116 +1,143 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-/// Central Material 3 palette, typography and component geometry.
+import 'app_palette.dart';
+export 'app_palette.dart';
+
+/// Material 3 mapping of the approved flat, bordered design system.
 class AppTheme {
   AppTheme._();
-  static const Color seed = Color(0xFF3D5AFE);
-  static const Color rewardSeed = Color(0xFFFF9B26);
+  static const seed = Color(0xFF3D5AFE);
+  static const rewardSeed = Color(0xFFFF9B26);
+  static const qrPaper = Color(0xFFFFFFFF);
+  static const qrInk = Color(0xFF171923);
 
-  /// Scan-friendly QR colors, independent of the display theme.
-  static const Color qrPaper = Color(0xFFFFFFFF);
-  static const Color qrInk = Color(0xFF171923);
+  /// Builds the warm light appearance.
+  static ThemeData light() => _build(Brightness.light, AppPalette.light);
 
-  /// Builds the light theme used by the app.
-  static ThemeData light() => _build(Brightness.light);
-
-  /// Builds the dark theme used by the app.
-  static ThemeData dark() => _build(Brightness.dark);
-
-  static ThemeData _build(Brightness brightness) {
-    final warm = ColorScheme.fromSeed(
-      seedColor: rewardSeed,
-      brightness: brightness,
-    );
-    final scheme =
-        ColorScheme.fromSeed(
-          seedColor: seed,
-          brightness: brightness,
-          primary: brightness == Brightness.light ? seed : null,
-          onPrimary: brightness == Brightness.light ? qrPaper : null,
-        ).copyWith(
-          secondary: warm.primary,
-          onSecondary: warm.onPrimary,
-          secondaryContainer: warm.primaryContainer,
-          onSecondaryContainer: warm.onPrimaryContainer,
+  /// Builds the contrast-safe dark appearance.
+  static ThemeData dark() => _build(Brightness.dark, AppPalette.dark);
+  static ThemeData _build(Brightness brightness, AppPalette p) {
+    final scheme = ColorScheme.fromSeed(seedColor: seed, brightness: brightness)
+        .copyWith(
+          primary: p.primary,
+          onPrimary: p.onPrimary,
+          primaryContainer: p.primarySoft,
+          onPrimaryContainer: p.onPrimarySoft,
+          secondary: p.primary,
+          onSecondary: p.onPrimary,
+          secondaryContainer: p.primarySoft,
+          onSecondaryContainer: p.onPrimarySoft,
+          tertiary: p.primary,
+          onTertiary: p.onPrimary,
+          tertiaryContainer: p.primarySoft,
+          onTertiaryContainer: p.onPrimarySoft,
+          surface: p.surface,
+          onSurface: p.ink,
+          onSurfaceVariant: p.inkMuted,
+          surfaceContainerLowest: p.surface,
+          surfaceContainerLow: p.surface,
+          surfaceContainer: p.muted,
+          surfaceContainerHigh: p.muted,
+          surfaceContainerHighest: p.muted,
+          outline: p.inkMuted,
+          outlineVariant: p.outline,
+          error: p.error,
+          surfaceTint: p.surface,
         );
-    final base = ThemeData(useMaterial3: true, colorScheme: scheme);
-    GoogleFonts.config.allowRuntimeFetching = false;
-    final text = GoogleFonts.beVietnamProTextTheme(
-      base.textTheme.copyWith(
-        headlineMedium: base.textTheme.headlineMedium?.copyWith(
-          fontWeight: FontWeight.w700,
-        ),
-        headlineSmall: base.textTheme.headlineSmall?.copyWith(
-          fontWeight: FontWeight.w700,
-        ),
-        titleLarge: base.textTheme.titleLarge?.copyWith(
-          fontWeight: FontWeight.w700,
-        ),
-        titleMedium: base.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
-        labelLarge: base.textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+    final base = ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      fontFamily: 'Be Vietnam Pro',
     );
+    final text = base.textTheme
+        .copyWith(
+          headlineLarge: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w800,
+            color: p.ink,
+          ),
+          headlineMedium: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -.5,
+            color: p.ink,
+          ),
+          headlineSmall: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -.4,
+            color: p.ink,
+          ),
+          titleLarge: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: p.ink,
+          ),
+          titleMedium: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: p.ink,
+          ),
+          titleSmall: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: p.ink,
+          ),
+          bodyLarge: TextStyle(fontSize: 16, height: 1.5, color: p.ink),
+          bodyMedium: TextStyle(fontSize: 15, height: 1.5, color: p.ink),
+          bodySmall: TextStyle(fontSize: 13, height: 1.5, color: p.inkMuted),
+          labelLarge: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: p.ink,
+          ),
+          labelMedium: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: p.inkMuted,
+          ),
+          labelSmall: TextStyle(fontSize: 12, color: p.inkMuted),
+        )
+        .apply(fontFamily: 'Be Vietnam Pro');
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(16),
     );
-    final border = OutlineInputBorder(borderRadius: BorderRadius.circular(14));
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(color: p.outline, width: 2),
+    );
     return base.copyWith(
-      scaffoldBackgroundColor: scheme.surface,
-      textTheme: text.copyWith(
-        headlineMedium: text.headlineMedium?.copyWith(
-          fontWeight: FontWeight.w700,
-          letterSpacing: -.8,
-        ),
-        headlineSmall: text.headlineSmall?.copyWith(
-          fontWeight: FontWeight.w700,
-          letterSpacing: -.5,
-        ),
-        titleLarge: text.titleLarge?.copyWith(
-          fontSize: 21,
-          fontWeight: FontWeight.w700,
-        ),
-        titleMedium: text.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-        bodyLarge: text.bodyLarge?.copyWith(height: 1.5),
-        bodyMedium: text.bodyMedium?.copyWith(height: 1.5),
-      ),
+      extensions: [p],
+      scaffoldBackgroundColor: p.background,
+      textTheme: text,
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
-        backgroundColor: scheme.surface,
-        foregroundColor: scheme.onSurface,
-        surfaceTintColor: scheme.surface,
         scrolledUnderElevation: 0,
-        titleTextStyle: text.titleLarge?.copyWith(
-          fontSize: 20,
-          height: 1.3,
-          fontWeight: FontWeight.w700,
-          color: scheme.onSurface,
-        ),
+        backgroundColor: p.background,
+        foregroundColor: p.ink,
+        surfaceTintColor: p.background,
+        titleTextStyle: text.titleLarge?.copyWith(fontSize: 18),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
-        color: scheme.surfaceContainerLow,
+        color: p.surface,
+        surfaceTintColor: p.surface,
         margin: const EdgeInsets.symmetric(vertical: 6),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: scheme.outlineVariant.withValues(alpha: .35)),
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: p.outline, width: 2),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         border: border,
-        enabledBorder: border.copyWith(
-          borderSide: BorderSide(color: scheme.outlineVariant),
-        ),
+        enabledBorder: border,
         focusedBorder: border.copyWith(
-          borderSide: BorderSide(color: scheme.primary, width: 2),
+          borderSide: BorderSide(color: p.primary, width: 2),
         ),
         filled: true,
-        fillColor: scheme.surfaceContainerLow,
+        fillColor: p.surface,
+        labelStyle: text.bodySmall,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 16,
@@ -118,54 +145,83 @@ class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size(64, 50),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          textStyle: text.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+          minimumSize: const Size(64, 56),
+          elevation: 0,
           shape: shape,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          textStyle: text.labelLarge,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size(64, 50),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          minimumSize: const Size(64, 56),
+          backgroundColor: p.surface,
+          foregroundColor: p.ink,
+          side: BorderSide(color: p.outline, width: 2),
           shape: shape,
-          side: BorderSide(color: scheme.outlineVariant),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          textStyle: text.labelLarge,
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        height: 76,
-        backgroundColor: scheme.surfaceContainerLow,
-        indicatorColor: scheme.primaryContainer,
-        labelTextStyle: WidgetStatePropertyAll(
-          text.labelSmall?.copyWith(fontWeight: FontWeight.w600),
+        height: 80,
+        elevation: 0,
+        backgroundColor: p.surface,
+        surfaceTintColor: p.surface,
+        indicatorColor: p.primarySoft,
+        indicatorShape: const StadiumBorder(),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (s) => text.labelSmall!.copyWith(
+            fontSize: 11,
+            fontWeight: s.contains(WidgetState.selected)
+                ? FontWeight.w800
+                : FontWeight.w600,
+            color: s.contains(WidgetState.selected) ? p.primary : p.inkMuted,
+          ),
+        ),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (s) => IconThemeData(
+            size: 22,
+            color: s.contains(WidgetState.selected) ? p.primary : p.inkMuted,
+          ),
         ),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: scheme.primary,
-        linearTrackColor: scheme.surfaceContainerHighest,
-        circularTrackColor: scheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(20),
-        linearMinHeight: 6,
+        color: p.primary,
+        linearTrackColor: p.muted,
+        circularTrackColor: p.muted,
+        linearMinHeight: 10,
+        borderRadius: BorderRadius.circular(999),
       ),
       chipTheme: base.chipTheme.copyWith(
-        side: BorderSide.none,
-        backgroundColor: scheme.surfaceContainer,
         shape: const StadiumBorder(),
+        side: BorderSide.none,
+        backgroundColor: p.muted,
+        selectedColor: p.primarySoft,
+        labelStyle: text.labelMedium,
       ),
+      dividerTheme: DividerThemeData(color: p.outline, thickness: 2),
       listTileTheme: ListTileThemeData(
-        iconColor: scheme.primary,
+        iconColor: p.primary,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         showDragHandle: true,
-        backgroundColor: scheme.surfaceContainerLow,
+        backgroundColor: p.surface,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        shape: shape,
       ),
     );
   }

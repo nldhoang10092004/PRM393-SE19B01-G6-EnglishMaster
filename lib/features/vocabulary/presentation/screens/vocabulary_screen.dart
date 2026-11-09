@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +31,7 @@ class _VocabularyScreenState extends State<VocabularyScreen> {
     final state = context.watch<VocabularyProvider>();
     final words = state.words;
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.vocabulary)),
+      appBar: const AppTopBar(title: Text(AppStrings.vocabulary)),
       body: Column(
         children: [
           Padding(

@@ -1,8 +1,11 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_outlined_button.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/widgets/gradient_hero_card.dart';
+import '../../../../core/widgets/flat_hero_card.dart';
 import '../../../../core/utils/validators.dart';
 import '../providers/auth_provider.dart';
 
@@ -74,7 +77,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.createAccount)),
+      appBar: const AppTopBar(title: Text(AppStrings.createAccount)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -83,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const GradientHeroCard(
+                const FlatHeroCard(
                   title: AppStrings.createAccount,
                   subtitle: AppStrings.tagline,
                   icon: Icons.rocket_launch_rounded,
@@ -144,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    OutlinedButton(
+                    ChunkyOutlinedButton(
                       onPressed: auth.isBusy ? null : _sendOtp,
                       child: Text(
                         _otpSent ? AppStrings.resend : AppStrings.sendOtp,
@@ -160,7 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 12),
                 ],
-                FilledButton(
+                ChunkyButton(
                   onPressed: auth.isBusy ? null : _submit,
                   child: auth.isBusy
                       ? const SizedBox(

@@ -1,44 +1,67 @@
 import 'package:flutter/material.dart';
 
-/// Large score ring using a tonal track and a scalable centered label.
-class ScoreRing extends StatelessWidget {
-  const ScoreRing({super.key, required this.fraction, required this.label});
-  final double fraction;
-  final String label;
+import '../theme/app_palette.dart';
 
+/// Primary score ring with scalable text, including compact mastery rings.
+class ScoreRing extends StatelessWidget {
+  const ScoreRing({
+    super.key,
+    required this.fraction,
+    required this.label,
+    this.size = 196,
+    this.subtitle,
+    this.color,
+    this.trackColor,
+    this.labelColor,
+  });
+  final double fraction, size;
+  final String label;
+  final String? subtitle;
+  final Color? color, trackColor, labelColor;
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final p = AppPalette.of(context);
     return Center(
-      child: Container(
-        width: 188,
-        height: 188,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: theme.colorScheme.secondaryContainer,
-        ),
+      child: SizedBox(
+        width: size,
+        height: size,
         child: Stack(
           alignment: Alignment.center,
           children: [
-            SizedBox.expand(
-              child: CircularProgressIndicator(
-                value: fraction.clamp(0, 1),
-                strokeWidth: 10,
-                strokeCap: StrokeCap.round,
-                color: theme.colorScheme.secondary,
-                backgroundColor: theme.colorScheme.surface,
+            Positioned.fill(
+              child: Padding(
+                padding: EdgeInsets.all(size * .05),
+                child: CircularProgressIndicator(
+                  value: fraction.clamp(0, 1),
+                  strokeWidth: size * .1,
+                  strokeCap: StrokeCap.butt,
+                  color: color ?? p.primary,
+                  backgroundColor: trackColor ?? p.muted,
+                ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
-              child: FittedBox(
-                child: Text(
-                  label,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: theme.colorScheme.onSecondaryContainer,
+              padding: EdgeInsets.all(size * .16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FittedBox(
+                    child: Text(
+                      label,
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(
+                            fontSize: size * .265,
+                            color: labelColor ?? p.primary,
+                          ),
+                    ),
                   ),
-                ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                ],
               ),
             ),
           ],

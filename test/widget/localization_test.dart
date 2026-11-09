@@ -43,6 +43,7 @@ void main() {
     );
     expect(WidgetsLocalizations.of(context).textDirection, TextDirection.ltr);
     expect(DateFormat.yMd('vi').format(DateTime(2026, 12, 31)), '31/12/2026');
+    await tester.ensureVisible(find.byKey(const Key('login_submit')));
     await tester.tap(find.byKey(const Key('login_submit')));
     await tester.pump();
     expect(

@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/chunky_outlined_button.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/widgets/async_view.dart';
@@ -19,6 +20,8 @@ class AiExamBody extends StatelessWidget {
     this.generating = false,
     this.grading = false,
     this.pinned,
+    this.footer,
+    this.hasResult = false,
   });
   final ViewStatus status;
   final String? error;
@@ -27,6 +30,8 @@ class AiExamBody extends StatelessWidget {
 
   /// Shown above the scrollable list and never scrolled away.
   final Widget? pinned;
+  final Widget? footer;
+  final bool hasResult;
   final VoidCallback onGenerate;
   final List<Widget> children;
 
@@ -42,7 +47,7 @@ class AiExamBody extends StatelessWidget {
     }
     if (!hasPrompt) return AiGeneratingView(kind: kind);
     final list = ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       children: [
         ...children,
         if (error != null)
@@ -55,25 +60,33 @@ class AiExamBody extends StatelessWidget {
             ),
           ),
         const SizedBox(height: 16),
-        OutlinedButton.icon(
-          onPressed: canGenerate ? onGenerate : null,
-          icon: const Icon(Icons.auto_awesome_outlined),
-          label: const Text(AiExamStrings.generate),
-        ),
+        if (!hasResult)
+          ChunkyOutlinedButton.icon(
+            onPressed: canGenerate ? onGenerate : null,
+            icon: const Icon(Icons.auto_awesome_outlined),
+            label: const Text(AiExamStrings.generate),
+          ),
         const SizedBox(height: 16),
       ],
     );
-    final content = pinned == null
-        ? list
-        : Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: pinned,
-              ),
-              Expanded(child: list),
-            ],
-          );
+    final content = Column(
+      children: [
+        if (pinned != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+            child: pinned,
+          ),
+        Expanded(child: list),
+        if (footer != null)
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              child: SizedBox(width: double.infinity, child: footer),
+            ),
+          ),
+      ],
+    );
     if (!(generating || grading)) return content;
     // Keep the form mounted underneath so drafts and scroll are retained.
     return Stack(

@@ -1,3 +1,5 @@
+import 'quiz_audio_controller.dart';
+
 import 'package:flutter/foundation.dart';
 
 import '../../../../core/l10n/app_strings.dart';
@@ -82,6 +84,18 @@ class QuizProvider extends ChangeNotifier {
 class QuizTakingProvider extends ChangeNotifier {
   QuizTakingProvider(this.repository);
   final QuizRepository repository;
+  final _audio = <String, QuizAudioController>{};
+
+  /// Shares each attachment's player across questions in this attempt.
+  QuizAudioController audioFor(QuizAsset asset) =>
+      _audio.putIfAbsent(asset.url, () => QuizAudioController(asset.url));
+  void _clearAudio() {
+    for (final c in _audio.values) {
+      c.dispose();
+    }
+    _audio.clear();
+  }
+
   ViewStatus status = ViewStatus.idle;
   String? error;
   Quiz? quiz;
@@ -129,6 +143,7 @@ class QuizTakingProvider extends ChangeNotifier {
     error = null;
     notifyListeners();
     try {
+      _clearAudio();
       quiz = await repository.detail(id);
       index = 0;
       attemptId = null;
@@ -238,6 +253,9 @@ class QuizTakingProvider extends ChangeNotifier {
     notifyListeners();
     try {
       result = await repository.submit(attemptId!, answerPayload);
+      for (final c in _audio.values) {
+        await c.pause();
+      }
       return true;
     } on ApiException catch (e) {
       error = e.message;
@@ -259,6 +277,7 @@ class QuizTakingProvider extends ChangeNotifier {
   @override
   void dispose() {
     _disposed = true;
+    _clearAudio();
     super.dispose();
   }
 }

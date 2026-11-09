@@ -1,3 +1,5 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +22,7 @@ class FlashcardDetailScreen extends StatelessWidget {
           ..load(setId),
     child: Consumer<FlashcardStudyProvider>(
       builder: (context, state, _) => Scaffold(
-        appBar: AppBar(
+        appBar: AppTopBar(
           title: Text(state.set?.title ?? AppStrings.flashcardSet),
         ),
         body: AsyncView(
@@ -55,7 +57,7 @@ class FlashcardDetailScreen extends StatelessWidget {
                         if (state.progressError != null)
                           Text(state.progressError!),
                         const SizedBox(height: 16),
-                        FilledButton.icon(
+                        ChunkyButton.icon(
                           icon: const Icon(Icons.play_arrow_rounded),
                           label: const Text(AppStrings.studySet),
                           onPressed: set.items.isEmpty

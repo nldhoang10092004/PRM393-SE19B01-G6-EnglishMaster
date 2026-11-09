@@ -1,7 +1,9 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:flutter/material.dart';
 
 import '../../ai_exam_strings.dart';
-import '../../../../core/widgets/gradient_hero_card.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../core/widgets/flat_hero_card.dart';
 import 'ai_listening_screen.dart';
 import 'ai_review_history_screen.dart';
 import 'ai_speaking_screen.dart';
@@ -40,13 +42,13 @@ class AiExamHubScreen extends StatelessWidget {
       ),
     ];
     return Scaffold(
-      appBar: AppBar(title: const Text(AiExamStrings.hub)),
+      appBar: const AppTopBar(title: Text(AiExamStrings.hub)),
       body: CustomScrollView(
         slivers: [
           const SliverPadding(
             padding: EdgeInsets.all(16),
             sliver: SliverToBoxAdapter(
-              child: GradientHeroCard(
+              child: FlatHeroCard(
                 title: AiExamStrings.hub,
                 subtitle: AiExamStrings.intro,
                 icon: Icons.auto_awesome_rounded,
@@ -66,14 +68,15 @@ class AiExamHubScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final (title, subtitle, icon, page) = cards[index];
                 final scheme = Theme.of(context).colorScheme;
+                final p = AppPalette.of(context);
                 final palette = [
-                  scheme.primaryContainer,
-                  scheme.tertiaryContainer,
-                  scheme.secondaryContainer,
-                  scheme.surfaceContainerHigh,
+                  p.speaking,
+                  p.listening,
+                  p.writing,
+                  SkillColors(p.muted, p.ink, p.outline),
                 ];
                 return Card(
-                  color: palette[index],
+                  color: palette[index].background,
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     onTap: () => Navigator.of(context)
@@ -87,18 +90,20 @@ class AiExamHubScreen extends StatelessWidget {
                             backgroundColor: scheme.surface.withValues(
                               alpha: .7,
                             ),
-                            child: Icon(icon, color: scheme.onSurface),
+                            child: Icon(icon, color: palette[index].ink),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             title,
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(color: palette[index].ink),
                           ),
                           const SizedBox(height: 8),
                           Expanded(
                             child: Text(
                               subtitle,
-                              style: Theme.of(context).textTheme.bodySmall,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: palette[index].ink),
                             ),
                           ),
                           const Align(

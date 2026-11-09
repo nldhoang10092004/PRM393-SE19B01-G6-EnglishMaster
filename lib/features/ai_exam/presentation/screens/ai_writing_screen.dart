@@ -1,3 +1,7 @@
+import '../../../../core/theme/app_palette.dart';
+
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +23,13 @@ class AiWritingScreen extends StatelessWidget {
         AiWritingProvider(context.read<AiExamRepository>())..generate(),
     child: Consumer<AiWritingProvider>(
       builder: (context, state, _) => Scaffold(
-        appBar: AppBar(title: const Text(AiExamStrings.writing)),
+        appBar: AppTopBar(
+          title: Text(
+            state.result == null
+                ? AiExamStrings.writing
+                : AiExamStrings.writingResult,
+          ),
+        ),
         body: AiExamBody(
           status: state.status,
           error: state.error,
@@ -28,43 +38,58 @@ class AiWritingScreen extends StatelessWidget {
           canGenerate: state.canGenerate,
           onGenerate: state.generate,
           kind: AiGeneratingKind.writing,
+          hasResult: state.result != null,
           generating: state.generating,
           grading: state.grading,
+          footer: state.result != null
+              ? ChunkyButton(
+                  onPressed: state.canGenerate ? state.generate : null,
+                  child: const Text(AiExamStrings.practiceAgain),
+                )
+              : state.prompt != null
+              ? ChunkyButton(
+                  onPressed: state.canSubmit ? state.submit : null,
+                  child: const Text(AiExamStrings.submit),
+                )
+              : null,
           children: [
             if (state.prompt case final prompt?) ...[
-              AiPromptCard(title: prompt.title, content: prompt.content),
-              const SizedBox(height: 16),
-              TextFormField(
-                key: ObjectKey(prompt),
-                initialValue: state.answer,
-                minLines: 8,
-                maxLines: 16,
-                readOnly: state.busy || state.result != null,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(
-                  labelText: AiExamStrings.answer,
-                  hintText: AiExamStrings.writingHint,
-                  alignLabelWithHint: true,
+              if (state.result == null)
+                AiPromptCard(
+                  title: prompt.title,
+                  content: prompt.content,
+                  colors: AppPalette.of(context).writing,
                 ),
-                onChanged: state.setAnswer,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AiExamStrings.wordCount(state.wordCount),
-                key: const ValueKey('ai-writing-word-count'),
-              ),
-              const Text(AiExamStrings.minimumWords),
               const SizedBox(height: 16),
               if (state.result == null) ...[
-                FilledButton.icon(
-                  onPressed: state.canSubmit ? state.submit : null,
-                  icon: const Icon(Icons.auto_awesome_outlined),
-                  label: const Text(AiExamStrings.submit),
+                TextFormField(
+                  key: ObjectKey(prompt),
+                  initialValue: state.answer,
+                  minLines: 8,
+                  maxLines: 16,
+                  readOnly: state.busy || state.result != null,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    labelText: AiExamStrings.answer,
+                    hintText: AiExamStrings.writingHint,
+                    alignLabelWithHint: true,
+                  ),
+                  onChanged: state.setAnswer,
                 ),
+                const SizedBox(height: 8),
+                Text(
+                  AiExamStrings.wordCount(state.wordCount),
+                  key: const ValueKey('ai-writing-word-count'),
+                ),
+                const Text(AiExamStrings.minimumWords),
+                const SizedBox(height: 16),
               ],
               if (state.result case final result?) ...[
                 const SizedBox(height: 16),
-                AiScoreCard(score: result),
+                AiScoreCard(
+                  score: result,
+                  colors: AppPalette.of(context).writing,
+                ),
               ],
             ],
           ],

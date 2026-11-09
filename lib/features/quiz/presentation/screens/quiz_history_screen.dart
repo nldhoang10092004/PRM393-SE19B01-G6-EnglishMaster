@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,9 +14,9 @@ class QuizHistoryScreen extends StatelessWidget {
   Widget build(BuildContext context) => ChangeNotifierProvider(
     create: (context) =>
         QuizProvider(context.read<QuizRepository>())..loadHistory(),
-    child: Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.quizHistory)),
-      body: const QuizHistoryList(),
+    child: const Scaffold(
+      appBar: AppTopBar(title: Text(AppStrings.quizHistory)),
+      body: QuizHistoryList(),
     ),
   );
 }

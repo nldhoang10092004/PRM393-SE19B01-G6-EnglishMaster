@@ -1,3 +1,4 @@
+import 'package:english_master/core/widgets/chunky_outlined_button.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/app_strings.dart';
@@ -92,7 +93,10 @@ class MessageView extends StatelessWidget {
             ),
             if (actionLabel != null) ...[
               const SizedBox(height: 16),
-              OutlinedButton(onPressed: onAction, child: Text(actionLabel!)),
+              ChunkyOutlinedButton(
+                onPressed: onAction,
+                child: Text(actionLabel!),
+              ),
             ],
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../ai_exam_strings.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../data/ai_exam_audio_controller.dart';
 
 /// Compact controls for a provider-owned [AiExamAudioController]. The widget
@@ -40,7 +41,7 @@ class _AiExamAudioPlayerState extends State<AiExamAudioPlayer> {
 
   // Deferred so the controller's notifications never fire during a build.
   void _load() => WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (!mounted) return;
+    if (!mounted || widget.audio.trim().isEmpty) return;
     widget.controller.load(widget.audio, local: widget.localFile);
   });
 
@@ -56,6 +57,8 @@ class _AiExamAudioPlayerState extends State<AiExamAudioPlayer> {
       final canSeek = maximum > 0 && !c.busy;
       return Card(
         margin: EdgeInsets.zero,
+        color: AppPalette.of(context).listening.background,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Column(
@@ -68,7 +71,11 @@ class _AiExamAudioPlayerState extends State<AiExamAudioPlayer> {
                     tooltip: AiExamStrings.rewind10,
                     icon: const Icon(Icons.replay_10_rounded),
                   ),
-                  IconButton.filledTonal(
+                  IconButton.filled(
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppPalette.of(context).primary,
+                      foregroundColor: AppPalette.of(context).onPrimary,
+                    ),
                     onPressed: c.busy ? null : c.toggle,
                     tooltip: c.playing
                         ? AiExamStrings.pause
@@ -107,7 +114,8 @@ class _AiExamAudioPlayerState extends State<AiExamAudioPlayer> {
                   ),
                   Text(
                     '${_time(c.position)} / ${_time(c.duration)}',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: AppPalette.of(context).listening.ink),
                   ),
                   const SizedBox(width: 4),
                 ],

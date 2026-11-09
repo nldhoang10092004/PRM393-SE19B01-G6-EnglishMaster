@@ -1,8 +1,12 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_outlined_button.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../providers/quiz_provider.dart';
 import '../widgets/quiz_asset_view.dart';
 import 'quiz_result_screen.dart';
@@ -30,7 +34,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
             onPressed: () => Navigator.pop(context, false),
             child: const Text(AppStrings.keepReviewing),
           ),
-          FilledButton(
+          ChunkyButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text(AppStrings.submit),
           ),
@@ -74,7 +78,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: Text(state.quiz?.title ?? AppStrings.quiz)),
+        appBar: AppTopBar(title: Text(state.quiz?.title ?? AppStrings.quiz)),
         body: question == null
             ? const MessageView(
                 icon: Icons.quiz_outlined,
@@ -83,7 +87,7 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
             : Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
                         LinearProgressIndicator(
@@ -99,9 +103,28 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                       ],
                     ),
                   ),
+                  if (state.currentGroup != null ||
+                      question.assets.any((a) => a.isAudio))
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Column(
+                        key: const Key('pinned_listening_player'),
+                        children: [
+                          for (final asset in [
+                            ...?state.currentGroup?.assets,
+                            ...question.assets,
+                          ].where((a) => a.isAudio && a.url.trim().isNotEmpty))
+                            QuizAssetView(
+                              key: ValueKey('pinned-audio-${asset.id}'),
+                              asset: asset,
+                              audio: state.audioFor(asset),
+                            ),
+                        ],
+                      ),
+                    ),
                   Expanded(
                     child: ListView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       children: [
                         if (state.currentGroup != null) ...[
                           if (state.currentGroup!.instruction.isNotEmpty)
@@ -111,70 +134,99 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                                 child: Text(state.currentGroup!.instruction),
                               ),
                             ),
-                          ...state.currentGroup!.assets.map(
-                            (asset) => QuizAssetView(
-                              key: ValueKey('group-${asset.id}'),
-                              asset: asset,
-                            ),
-                          ),
+                          ...state.currentGroup!.assets
+                              .where((a) => !a.isAudio || a.url.trim().isEmpty)
+                              .map(
+                                (asset) => QuizAssetView(
+                                  key: ValueKey('group-${asset.id}'),
+                                  asset: asset,
+                                ),
+                              ),
                         ],
                         Card(
-                          color: Theme.of(context).colorScheme.primaryContainer,
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          shape: const RoundedRectangleBorder(),
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Text(
                               question.content,
-                              style: Theme.of(context).textTheme.titleMedium,
+                              style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ),
                         ),
-                        ...question.assets.map(
-                          (asset) => QuizAssetView(
-                            key: ValueKey(
-                              'question-${question.id}-${asset.id}',
+                        ...question.assets
+                            .where((a) => !a.isAudio)
+                            .map(
+                              (asset) => QuizAssetView(
+                                key: ValueKey(
+                                  'question-${question.id}-${asset.id}',
+                                ),
+                                asset: asset,
+                              ),
                             ),
-                            asset: asset,
-                          ),
-                        ),
                         const SizedBox(height: 12),
                         if (question.isChoice)
                           ...question.options.map((option) {
                             final selected =
                                 state.selected(question.id) == option.id;
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.only(bottom: 12),
                               child: Semantics(
                                 selected: selected,
                                 button: true,
-                                child: Material(
-                                  color: selected
-                                      ? Theme.of(context)
-                                            .colorScheme
-                                            .primaryContainer
-                                      : Theme.of(context).colorScheme.surface,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
+                                child: ChunkyOutlinedButton(
+                                  key: ValueKey('option-${option.id}'),
+                                  style: OutlinedButton.styleFrom(
+                                    alignment: Alignment.centerLeft,
+                                    backgroundColor: selected
+                                        ? AppPalette.of(context).primarySoft
+                                        : AppPalette.of(context).surface,
+                                    foregroundColor: selected
+                                        ? AppPalette.of(context).onPrimarySoft
+                                        : AppPalette.of(context).ink,
                                     side: BorderSide(
                                       color: selected
-                                          ? Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                          : Theme.of(context)
-                                                .colorScheme
-                                                .outlineVariant,
+                                          ? AppPalette.of(context).primary
+                                          : AppPalette.of(context).outline,
+                                      width: 2,
                                     ),
                                   ),
-                                  child: ListTile(
-                                    key: ValueKey('option-${option.id}'),
-                                    leading: Icon(
-                                      selected
-                                          ? Icons.radio_button_checked
-                                          : Icons.radio_button_off,
-                                    ),
-                                    title: Text(option.content),
-                                    onTap: state.busy
-                                        ? null
-                                        : () => state.select(option.id),
+                                  onPressed: state.busy
+                                      ? null
+                                      : () => state.select(option.id),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: selected
+                                              ? AppPalette.of(context).primary
+                                              : AppPalette.of(context).muted,
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          String.fromCharCode(
+                                            65 +
+                                                question.options.indexOf(
+                                                  option,
+                                                ),
+                                          ),
+                                          style: TextStyle(
+                                            color: selected
+                                                ? AppPalette.of(context)
+                                                      .onPrimary
+                                                : AppPalette.of(context).ink,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(child: Text(option.content)),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -214,14 +266,14 @@ class _QuizTakingScreenState extends State<QuizTakingScreen> {
                       child: Row(
                         children: [
                           if (state.index > 0) ...[
-                            OutlinedButton(
+                            ChunkyOutlinedButton(
                               onPressed: state.busy ? null : state.previous,
                               child: const Text(AppStrings.previous),
                             ),
                             const SizedBox(width: 12),
                           ],
                           Expanded(
-                            child: FilledButton(
+                            child: ChunkyButton(
                               key: const Key('quiz_next_submit'),
                               onPressed: state.busy
                                   ? null

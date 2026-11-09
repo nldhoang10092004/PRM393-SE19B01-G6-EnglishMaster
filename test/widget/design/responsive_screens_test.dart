@@ -1,3 +1,10 @@
+import 'package:english_master/features/quiz/presentation/widgets/quiz_asset_view.dart';
+import 'package:english_master/core/l10n/app_strings.dart';
+import 'package:english_master/features/course/presentation/screens/course_list_screen.dart';
+import 'package:english_master/features/home/presentation/screens/home_shell.dart';
+import 'package:english_master/features/ai_exam/presentation/screens/ai_listening_screen.dart';
+import 'package:english_master/features/ai_exam/presentation/widgets/ai_generating_view.dart';
+
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -90,18 +97,38 @@ void main() {
     final icons = FontLoader('MaterialIcons')
       ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
     await icons.load();
+    final textFont = FontLoader('Be Vietnam Pro');
+    for (final weight in [
+      'Regular',
+      'Medium',
+      'SemiBold',
+      'Bold',
+      'ExtraBold',
+    ]) {
+      textFont.addFont(
+        rootBundle.load('assets/fonts/BeVietnamPro-$weight.ttf'),
+      );
+    }
+    await textFont.load();
   });
   final pages = <String, Widget>{
     'login': const LoginScreen(),
     'register': const RegisterScreen(),
     'forgot': const ForgotPasswordScreen(),
     'home': const HomeScreen(),
+    'home-shell': const HomeShell(),
+    'course-list': const CourseListScreen(),
+    'ai-listening': const AiListeningScreen(),
+    'ai-loading': const Scaffold(
+      body: AiGeneratingView(kind: AiGeneratingKind.listening),
+    ),
     'course': const CourseDetailScreen(courseId: 1),
     'flashcard-sets': const FlashcardSetsScreen(),
     'flashcard-study': const FlashcardStudyScreen(setId: 1),
     'quiz-list': const QuizListScreen(),
     'quiz-detail': const QuizDetailScreen(quizId: 7),
     'quiz-taking': const QuizTakingScreen(),
+    'quiz-listening': const QuizTakingScreen(),
     'quiz-result': const QuizResultScreen(),
     'ai-hub': const AiExamHubScreen(),
     'ai-speaking': const AiSpeakingScreen(),
@@ -295,9 +322,54 @@ void main() {
             ),
           );
         }
+        when(() => ai.generate(AiExamSkill.listening)).thenAnswer(
+          (_) async => const AiExamPrompt(
+            id: 2,
+            title: 'At the train station',
+            content: '',
+            questions: [
+              AiListeningQuestion(
+                id: 1,
+                type: 1,
+                content: 'Where does the woman want to go?',
+                options: [
+                  'To the airport',
+                  'To the city centre',
+                  'To the museum',
+                ],
+              ),
+            ],
+          ),
+        );
         final attempt = QuizTakingProvider(quiz)
           ..quiz = fixtureQuiz()
           ..status = ViewStatus.success;
+        if (page.key == 'quiz-listening') {
+          attempt.quiz = Quiz(
+            id: 7,
+            title: 'Listening: Booking a Study Room',
+            type: 1,
+            groups: [
+              QuizGroup(
+                id: 3,
+                instruction: List.filled(
+                  12,
+                  'Listen carefully and choose the best answer.',
+                ).join(' '),
+                assets: const [
+                  QuizAsset(
+                    id: 90,
+                    type: 1,
+                    url: 'https://example.test/listening.mp3',
+                    caption: 'Booking a Study Room',
+                  ),
+                ],
+                questions: fixtureQuiz().questions,
+              ),
+            ],
+          );
+          attempt.attemptId = 40;
+        }
         if (page.key == 'quiz-result') {
           attempt.result = QuizResult(
             score: 75,
@@ -340,7 +412,11 @@ void main() {
             ),
           ),
         );
-        await tester.pumpAndSettle();
+        if (page.key == 'ai-loading') {
+          await tester.pump(const Duration(seconds: 1));
+        } else {
+          await tester.pumpAndSettle();
+        }
         expect(tester.takeException(), isNull);
         if (const bool.fromEnvironment('UPDATE_DESIGN_PREVIEWS')) {
           final repaint =
@@ -359,13 +435,91 @@ void main() {
             image.dispose();
           });
         }
-        if (find.byType(Scrollable).evaluate().isNotEmpty) {
+        if (page.key != 'ai-loading' &&
+            find.byType(Scrollable).evaluate().isNotEmpty) {
           await tester.drag(
             find.byType(Scrollable).first,
             const Offset(0, -450),
           );
           await tester.pumpAndSettle();
           expect(tester.takeException(), isNull);
+        }
+        if (page.key == 'home-shell') {
+          expect(find.byType(NavigationDestination), findsNWidgets(5));
+          await tester.tap(find.byType(NavigationDestination).at(1));
+          await tester.pumpAndSettle();
+          expect(find.byKey(const Key('course_search')), findsOneWidget);
+          await tester.enterText(
+            find.byKey(const Key('course_search')),
+            'Trần Minh',
+          );
+          await tester.pumpAndSettle();
+          expect(find.text('Chinh phục ngữ pháp tiếng Anh'), findsOneWidget);
+          expect(
+            find.text('Tiếng Anh giao tiếp dành cho người mới bắt đầu'),
+            findsNothing,
+          );
+          for (final i in [2, 3, 4, 0, 1]) {
+            await tester.tap(find.byType(NavigationDestination).at(i));
+            await tester.pumpAndSettle();
+            expect(tester.takeException(), isNull);
+          }
+          expect(
+            tester
+                    .widget<TextField>(find.byKey(const Key('course_search')))
+                    .controller
+                    ?.text ??
+                'Trần Minh',
+            'Trần Minh',
+          );
+          expect(find.text('Chinh phục ngữ pháp tiếng Anh'), findsOneWidget);
+        }
+        if (page.key == 'course-list') {
+          await tester.enterText(
+            find.byKey(const Key('course_search')),
+            'Trần Minh',
+          );
+          await tester.pumpAndSettle();
+          expect(find.text('Chinh phục ngữ pháp tiếng Anh'), findsOneWidget);
+          expect(
+            find.text('Tiếng Anh giao tiếp dành cho người mới bắt đầu'),
+            findsNothing,
+          );
+          await tester.enterText(
+            find.byKey(const Key('course_search')),
+            'no matching course',
+          );
+          await tester.pumpAndSettle();
+          expect(find.text(AppStrings.noMatchingCourses), findsOneWidget);
+          await tester.enterText(find.byKey(const Key('course_search')), '');
+          await tester.pumpAndSettle();
+          FocusManager.instance.primaryFocus?.unfocus();
+          await tester.tap(
+            find.text('Tiếng Anh giao tiếp dành cho người mới bắt đầu'),
+          );
+          await tester.pumpAndSettle();
+          expect(find.byType(CourseDetailScreen), findsOneWidget);
+        }
+        if (page.key == 'quiz-listening') {
+          final pinned = find.byKey(const Key('pinned_listening_player'));
+          final top = tester.getTopLeft(pinned);
+          final element = tester.element(find.byType(QuizAssetView).first);
+          final controller = attempt.audioFor(
+            attempt.currentGroup!.assets.first,
+          );
+          await tester.drag(find.byType(ListView).first, const Offset(0, -200));
+          await tester.pumpAndSettle();
+          expect(tester.getTopLeft(pinned), top);
+          attempt.next();
+          await tester.pumpAndSettle();
+          expect(
+            tester.element(find.byType(QuizAssetView).first),
+            same(element),
+          );
+          expect(
+            attempt.audioFor(attempt.currentGroup!.assets.first),
+            same(controller),
+          );
         }
         if (page.key == 'flashcard-study') {
           await tester.tap(find.text('Perseverance'));

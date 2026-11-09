@@ -1,3 +1,8 @@
+import '../../../../core/theme/app_palette.dart';
+
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_button.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -53,7 +58,13 @@ class _SpeakingViewState extends State<_SpeakingView>
     final time =
         '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
     return Scaffold(
-      appBar: AppBar(title: const Text(AiExamStrings.speaking)),
+      appBar: AppTopBar(
+        title: Text(
+          state.result == null
+              ? AiExamStrings.speaking
+              : AiExamStrings.speakingResult,
+        ),
+      ),
       body: AiExamBody(
         status: state.status,
         error: state.error,
@@ -62,13 +73,34 @@ class _SpeakingViewState extends State<_SpeakingView>
         canGenerate: state.canGenerate,
         onGenerate: state.generate,
         kind: AiGeneratingKind.speaking,
+        hasResult: state.result != null,
         generating: state.generating,
         grading: state.grading,
+        footer: state.result != null
+            ? ChunkyButton(
+                onPressed: state.canGenerate ? state.generate : null,
+                child: const Text(AiExamStrings.practiceAgain),
+              )
+            : state.prompt != null
+            ? ChunkyButton(
+                onPressed: state.canSubmit ? state.submit : null,
+                child: const Text(AiExamStrings.submit),
+              )
+            : null,
         children: [
           if (state.prompt case final prompt?) ...[
-            AiPromptCard(title: prompt.title, content: prompt.content),
+            if (state.result == null)
+              AiPromptCard(
+                title: prompt.title,
+                content: prompt.content,
+                colors: AppPalette.of(context).speaking,
+              ),
             const SizedBox(height: 16),
-            const Text(AiExamStrings.recordingHint),
+            if (state.result == null)
+              const Text(
+                AiExamStrings.recordingHint,
+                textAlign: TextAlign.center,
+              ),
             const SizedBox(height: 16),
             if (state.result == null) ...[
               Center(
@@ -98,17 +130,26 @@ class _SpeakingViewState extends State<_SpeakingView>
                 ),
               ),
               const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: state.busy ? null : state.toggleRecording,
-                icon: Icon(
-                  state.recording ? Icons.stop_rounded : Icons.mic_rounded,
-                ),
-                label: Text(
-                  state.recording
+              Center(
+                child: Tooltip(
+                  message: state.recording
                       ? AiExamStrings.stopRecording
                       : state.audioPath == null
                       ? AiExamStrings.startRecording
                       : AiExamStrings.recordAgain,
+                  child: ChunkyButton(
+                    radius: 48,
+                    style: FilledButton.styleFrom(
+                      fixedSize: const Size(96, 96),
+                      minimumSize: const Size(96, 96),
+                      padding: EdgeInsets.zero,
+                    ),
+                    onPressed: state.busy ? null : state.toggleRecording,
+                    child: Icon(
+                      state.recording ? Icons.stop_rounded : Icons.mic_rounded,
+                      size: 32,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -120,16 +161,12 @@ class _SpeakingViewState extends State<_SpeakingView>
                   audio: path,
                   localFile: true,
                 ),
-            if (state.result == null) ...[
-              FilledButton.icon(
-                onPressed: state.canSubmit ? state.submit : null,
-                icon: const Icon(Icons.upload_rounded),
-                label: const Text(AiExamStrings.submit),
-              ),
-            ],
             if (state.result case final result?) ...[
               const SizedBox(height: 16),
-              AiScoreCard(score: result),
+              AiScoreCard(
+                score: result,
+                colors: AppPalette.of(context).speaking,
+              ),
             ],
           ],
         ],

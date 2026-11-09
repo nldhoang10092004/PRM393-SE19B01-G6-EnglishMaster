@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../ai_exam_strings.dart';
+import '../../../../core/theme/app_palette.dart';
+import '../../../../core/widgets/outlined_card.dart';
+import '../../../../core/widgets/score_ring.dart';
 import '../../data/models/ai_exam.dart';
 
 /// Shows available score criteria and structured or plain-text AI feedback.
@@ -9,9 +12,11 @@ class AiScoreCard extends StatelessWidget {
     super.key,
     required this.score,
     this.title = AiExamStrings.result,
+    this.colors,
   });
   final AiExamScore score;
   final String title;
+  final SkillColors? colors;
 
   List<Widget> _feedback(BuildContext context, Object? value, [int depth = 0]) {
     if (value == null || value == '' || depth > 8) return const [];
@@ -53,56 +58,101 @@ class AiScoreCard extends StatelessWidget {
       AiExamStrings.pronunciation: score.pronunciation,
     };
     final feedback = _feedback(context, score.feedback);
-    return Card(
-      color: Theme.of(context).colorScheme.tertiaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 12),
-            Text(
-              '${AiExamStrings.overall}: ${score.overall.toStringAsFixed(1)}/9',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 12),
-            LinearProgressIndicator(value: (score.overall / 9).clamp(0, 1)),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final entry in criteria.entries)
-                  if (entry.value != null)
-                    Chip(
-                      label: Text(
-                        '${entry.key}: ${entry.value!.toStringAsFixed(1)}',
-                      ),
+    final p = AppPalette.of(context);
+    final c = colors ?? p.speaking;
+    final t = Theme.of(context);
+    final entries = criteria.entries.where((e) => e.value != null).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: c.background,
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: Row(
+            children: [
+              ScoreRing(
+                size: 104,
+                fraction: score.overall / 9,
+                label: score.overall.toStringAsFixed(1),
+                subtitle: '/9',
+                trackColor: p.surface,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: t.textTheme.titleLarge?.copyWith(
+                    fontSize: 20,
+                    color: c.ink,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        LayoutBuilder(
+          builder: (context, constraints) => Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final e in entries)
+                SizedBox(
+                  width: (constraints.maxWidth - 10) / 2,
+                  child: OutlinedCard(
+                    padding: const EdgeInsets.all(12),
+                    radius: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(e.key, style: t.textTheme.bodySmall),
+                        const SizedBox(height: 8),
+                        Text(
+                          e.value!.toStringAsFixed(1),
+                          style: t.textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: (e.value! / 9).clamp(0, 1),
+                          minHeight: 8,
+                        ),
+                      ],
                     ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        if (score.transcript.isNotEmpty) ...[
+          OutlinedCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(AiExamStrings.transcript, style: t.textTheme.titleMedium),
+                const SizedBox(height: 8),
+                SelectableText(score.transcript),
               ],
             ),
-            if (score.transcript.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Text(
-                AiExamStrings.transcript,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              SelectableText(score.transcript),
+          ),
+          const SizedBox(height: 14),
+        ],
+        OutlinedCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(AiExamStrings.aiReview, style: t.textTheme.titleMedium),
+              if (feedback.isEmpty)
+                const Text(AiExamStrings.noFeedback)
+              else
+                ...feedback,
             ],
-            const Divider(height: 32),
-            Text(
-              AiExamStrings.feedback,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            if (feedback.isEmpty)
-              const Text(AiExamStrings.noFeedback)
-            else
-              ...feedback,
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

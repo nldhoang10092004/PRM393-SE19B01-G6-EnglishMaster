@@ -16,7 +16,7 @@ class MembershipStrings {
 
   /// Approximate per-day price label for a plan.
   static String perDay(String price) => '≈ $price/ngày';
-  static const bestValue = 'Tiết kiệm nhất';
+  static const bestValue = 'Đề xuất';
   static const voucherLabel = 'Mã giảm giá';
   static const voucherHint = 'Nhập mã giảm giá (nếu có)';
   static const apply = 'Áp dụng';
@@ -35,8 +35,30 @@ class MembershipStrings {
   static const createError = 'Không tạo được đơn thanh toán. Vui lòng thử lại.';
   static const retry = 'Thử lại';
 
+  static const unlockAll = 'Mở khóa toàn bộ';
+  static const benefits =
+      'Tất cả video, bài kiểm tra nghe – đọc và luyện thi AI không giới hạn.';
+  static const speakingBenefit = 'Luyện nói AI';
+  static const listeningBenefit = 'Bài nghe có audio';
+  static const writingBenefit = 'Chấm bài viết';
+  static const videoBenefit = 'Video cao cấp';
+  static const payosNote = 'Thanh toán bằng mã QR ngân hàng qua PayOS.';
+  static const saveQr = 'Lưu mã QR về máy';
+  static const savedQr = 'Đã lưu mã QR';
+  static const saveQrHint = 'Hoặc nhấn giữ mã QR để lưu ảnh';
+  static const saveQrError = 'Không thể lưu mã QR. Vui lòng thử lại.';
+  static const galleryPermission = 'Vui lòng cấp quyền lưu ảnh vào thư viện.';
+  static const cancelOrder = 'Hủy đơn';
+  static const paymentHint =
+      'Chuyển khoản xong, bấm "Tôi đã thanh toán" để kích hoạt';
+  static const instructions = 'Hướng dẫn';
+  static const paymentSteps = [
+    '1. Mở ứng dụng ngân hàng, chọn quét mã QR.',
+    '2. Kiểm tra số tiền và nội dung chuyển khoản.',
+    '3. Xác nhận, hội viên được kích hoạt ngay.',
+  ];
   // Payment screen
-  static const paymentTitle = 'Thanh toán';
+  static const paymentTitle = 'Quét mã để thanh toán';
   static const amount = 'Số tiền';
   static const scanInstruction = 'Mở app ngân hàng, quét mã để thanh toán';
   static const orderDescription = 'Nội dung chuyển khoản';

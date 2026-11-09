@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../providers/quiz_provider.dart';
 import '../screens/quiz_detail_screen.dart';
@@ -50,20 +51,25 @@ class QuizCatalog extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final quiz = state.quizzes[index];
                   final best = state.bestScore(quiz.id);
+                  final colors = quiz.type == 1
+                      ? AppPalette.of(context).listening
+                      : quiz.type == 2
+                      ? AppPalette.of(context).reading
+                      : SkillColors(
+                          AppPalette.of(context).primarySoft,
+                          AppPalette.of(context).onPrimarySoft,
+                          AppPalette.of(context).outline,
+                        );
                   return Card(
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
                       leading: CircleAvatar(
-                        backgroundColor: Theme.of(context)
-                            .colorScheme
-                            .primaryContainer,
+                        backgroundColor: colors.background,
                         child: Icon(
                           quiz.type == 1
                               ? Icons.headphones_outlined
                               : Icons.quiz_outlined,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer,
+                          color: colors.ink,
                         ),
                       ),
                       title: Text(

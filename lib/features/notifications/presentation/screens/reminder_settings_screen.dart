@@ -1,8 +1,10 @@
+import 'package:english_master/core/widgets/app_top_bar.dart';
+import 'package:english_master/core/widgets/chunky_outlined_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/l10n/app_strings.dart';
-import '../../../../core/widgets/gradient_hero_card.dart';
+import '../../../../core/widgets/flat_hero_card.dart';
 import '../providers/reminder_provider.dart';
 
 /// Route name of [ReminderSettingsScreen]; the integrator registers it.
@@ -18,13 +20,13 @@ class ReminderSettingsScreen extends StatelessWidget {
     final settings = p.settings;
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.studyReminder)),
+      appBar: const AppTopBar(title: Text(AppStrings.studyReminder)),
       body: !p.isLoaded
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const GradientHeroCard(
+                const FlatHeroCard(
                   title: AppStrings.studyReminder,
                   subtitle: AppStrings.dailyReminderHint,
                   icon: Icons.notifications_active_rounded,
@@ -65,7 +67,7 @@ class ReminderSettingsScreen extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: OutlinedButton.icon(
+                  child: ChunkyOutlinedButton.icon(
                     onPressed: () =>
                         context.read<ReminderProvider>().sendTest(),
                     icon: const Icon(Icons.send_outlined),
