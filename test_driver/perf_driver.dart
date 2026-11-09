@@ -2,7 +2,7 @@ import 'package:flutter_driver/flutter_driver.dart';
 import 'package:integration_test/integration_test_driver.dart';
 
 /// Writes the frame build/raster summary of every traced phase to
-/// `build/PHASE.timeline_summary.json` (see docs/PERFORMANCE.md).
+/// `build/PHASE.timeline_summary.json`.
 Future<void> main() {
   return integrationDriver(
     responseDataCallback: (data) async {

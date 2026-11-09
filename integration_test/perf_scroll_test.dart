@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-/// Frame-timing benchmark that drives the real app (see docs/PERFORMANCE.md).
+/// Frame-timing benchmark that drives the real app.
 ///
 /// Run with `flutter drive --no-dds --profile
 /// --driver=test_driver/perf_driver.dart
