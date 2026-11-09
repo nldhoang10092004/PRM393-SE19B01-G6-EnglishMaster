@@ -47,7 +47,8 @@ class FlashcardSetTile extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 4),
           decoration: BoxDecoration(
             color: colors.background,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: colors.edge, width: 2),
             boxShadow: [
               BoxShadow(color: colors.edge, offset: const Offset(0, 4)),
             ],
@@ -55,7 +56,7 @@ class FlashcardSetTile extends StatelessWidget {
           child: Material(
             type: MaterialType.transparency,
             child: InkWell(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(22),
               onTap: () async {
                 await Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -69,20 +70,27 @@ class FlashcardSetTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: ScoreRing(
-                        size: 56,
-                        fraction: total == null || total == 0
-                            ? 0
-                            : mastered / total,
-                        label: total == null
-                            ? AppStrings.unavailableValue
-                            : '$mastered/$total',
-                        color: colors.ink,
-                        trackColor: p.surface,
-                        labelColor: colors.ink,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        ScoreRing(
+                          size: 56,
+                          fraction: total == null || total == 0
+                              ? 0
+                              : mastered / total,
+                          label: total == null
+                              ? AppStrings.unavailableValue
+                              : '$mastered/$total',
+                          color: colors.ink,
+                          trackColor: p.surface,
+                          labelColor: colors.ink,
+                        ),
+                        Icon(
+                          Icons.north_east_rounded,
+                          size: 18,
+                          color: colors.ink,
+                        ),
+                      ],
                     ),
                     const Spacer(),
                     Text(

@@ -133,6 +133,9 @@ class _Header extends StatelessWidget {
           borderRadius: const BorderRadius.vertical(
             bottom: Radius.circular(32),
           ),
+          border: Border(
+            bottom: BorderSide(color: colors.edge, width: 3),
+          ),
         ),
         child: SafeArea(
           bottom: false,

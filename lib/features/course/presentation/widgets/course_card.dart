@@ -20,21 +20,23 @@ class CourseCard extends StatelessWidget {
     ][(course.id - 1).abs() % 3];
     return OutlinedCard(
       onTap: onTap,
+      edgeColor: p.outline,
       padding: const EdgeInsets.all(12),
       child: Row(
         children: [
           Container(
-            width: 64,
-            height: 64,
+            width: 60,
+            height: 60,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: colors.background,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: colors.edge, width: 2),
             ),
             child: Text(
               course.initials,
               style: theme.textTheme.titleLarge?.copyWith(
-                fontSize: 20,
+                fontSize: 19,
                 color: colors.ink,
               ),
             ),
@@ -43,6 +45,7 @@ class CourseCard extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   course.name,
@@ -50,16 +53,18 @@ class CourseCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleMedium,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   course.teacherName,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall,
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
+          Icon(Icons.chevron_right_rounded, color: p.inkMuted),
         ],
       ),
     );

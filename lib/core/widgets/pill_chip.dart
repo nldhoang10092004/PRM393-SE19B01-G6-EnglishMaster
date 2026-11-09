@@ -22,14 +22,21 @@ class PillChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = AppPalette.of(context);
     final fg = foreground ?? (selected ? p.onPrimary : p.ink);
+    final bg = color ?? (selected ? p.primary : p.muted);
+    final border = selected ? p.primaryEdge : p.outline;
     return Semantics(
       selected: onTap == null ? null : selected,
       child: Material(
-        color: color ?? (selected ? p.primary : p.muted),
-        borderRadius: BorderRadius.circular(999),
+        color: bg,
+        shape: StadiumBorder(
+          side: BorderSide(
+            color: color != null ? fg.withValues(alpha: .22) : border,
+            width: 1.5,
+          ),
+        ),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(999),
+          customBorder: const StadiumBorder(),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(

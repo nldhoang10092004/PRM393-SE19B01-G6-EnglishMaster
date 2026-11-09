@@ -24,10 +24,13 @@ class AiPromptCard extends StatelessWidget {
     final c = colors ?? p.speaking;
     final t = Theme.of(context);
     return Container(
+      margin: const EdgeInsets.only(bottom: 4),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: c.background,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: c.edge, width: 2),
+        boxShadow: [BoxShadow(color: c.edge, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

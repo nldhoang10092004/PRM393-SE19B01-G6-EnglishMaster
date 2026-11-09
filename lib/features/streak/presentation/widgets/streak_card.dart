@@ -21,12 +21,20 @@ class StreakCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = AppPalette.of(context);
     final theme = Theme.of(context);
+    final activeDays = streak.currentStreak.clamp(0, 7);
     return OutlinedCard(
+      edgeColor: p.outline,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
+              Icon(
+                Icons.local_fire_department_rounded,
+                size: 20,
+                color: p.reward,
+              ),
+              const SizedBox(width: 8),
               Expanded(
                 flex: 3,
                 child: Text(
@@ -42,7 +50,11 @@ class StreakCard extends StatelessWidget {
                       : status == ViewStatus.error
                       ? AppStrings.streakUnavailable
                       : AppStrings.loadingStreak,
-                  style: theme.textTheme.bodySmall,
+                  textAlign: TextAlign.end,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: p.ink,
+                  ),
                 ),
               ),
             ],
@@ -50,21 +62,33 @@ class StreakCard extends StatelessWidget {
           if (status == ViewStatus.success) ...[
             const SizedBox(height: 12),
             Row(
-              children: List.generate(
-                7,
-                (index) => Expanded(
+              children: List.generate(7, (index) {
+                final done = index < activeDays;
+                return Expanded(
                   child: Container(
                     height: 30,
                     margin: EdgeInsets.only(right: index == 6 ? 0 : 6),
+                    alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: index < streak.currentStreak.clamp(0, 7)
-                          ? p.reward
-                          : p.muted,
+                      color: done ? p.reward : p.muted,
                       borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: done
+                            ? p.onReward.withValues(alpha: .24)
+                            : p.outline,
+                        width: 1.5,
+                      ),
                     ),
+                    child: done
+                        ? Icon(
+                            Icons.check_rounded,
+                            size: 16,
+                            color: p.onReward,
+                          )
+                        : null,
                   ),
-                ),
-              ),
+                );
+              }),
             ),
             const SizedBox(height: 8),
             Text(

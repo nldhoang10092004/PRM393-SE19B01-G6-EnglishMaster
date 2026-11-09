@@ -88,42 +88,61 @@ class AiExamHubScreen extends StatelessWidget {
                   p.reading,
                   SkillColors(p.muted, p.ink, p.outline),
                 ];
-                return Card(
-                  color: palette[index].background,
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: () => Navigator.of(context)
-                        .push(MaterialPageRoute<void>(builder: (_) => page)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: scheme.surface.withValues(
-                              alpha: .7,
+                final c = palette[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 4),
+                  decoration: BoxDecoration(
+                    color: c.background,
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: c.edge, width: 2),
+                    boxShadow: [
+                      BoxShadow(color: c.edge, offset: const Offset(0, 4)),
+                    ],
+                  ),
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(22),
+                      onTap: () => Navigator.of(context)
+                          .push(MaterialPageRoute<void>(builder: (_) => page)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: scheme.surface.withValues(alpha: .76),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: c.edge, width: 1.5),
+                              ),
+                              child: Icon(icon, color: c.ink),
                             ),
-                            child: Icon(icon, color: palette[index].ink),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            title,
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(color: palette[index].ink),
-                          ),
-                          const SizedBox(height: 8),
-                          Expanded(
-                            child: Text(
-                              subtitle,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: palette[index].ink),
+                            const SizedBox(height: 16),
+                            Text(
+                              title,
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(color: c.ink),
                             ),
-                          ),
-                          const Align(
-                            alignment: Alignment.centerRight,
-                            child: Icon(Icons.arrow_forward_rounded),
-                          ),
-                        ],
+                            const SizedBox(height: 8),
+                            Expanded(
+                              child: Text(
+                                subtitle,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: c.ink),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Icon(
+                                Icons.arrow_forward_rounded,
+                                color: c.ink,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

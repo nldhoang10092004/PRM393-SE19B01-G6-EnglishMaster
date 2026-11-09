@@ -22,15 +22,17 @@ class StatTile extends StatelessWidget {
     final theme = Theme.of(context);
     final p = AppPalette.of(context);
     final ink = reward ? p.onReward : colors?.ink ?? p.ink;
+    final edge = reward
+        ? p.onReward.withValues(alpha: .28)
+        : colors?.edge ?? p.outline;
     return Container(
+      margin: const EdgeInsets.only(bottom: 3),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
         color: reward ? p.reward : colors?.background ?? p.surface,
-        border: Border.all(
-          color: reward ? p.reward : colors?.background ?? p.outline,
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: edge, width: 2),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [BoxShadow(color: edge, offset: const Offset(0, 3))],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

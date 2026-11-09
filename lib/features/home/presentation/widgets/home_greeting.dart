@@ -46,7 +46,15 @@ class HomeGreeting extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(greeting, style: theme.textTheme.bodySmall),
+                Text(
+                  greeting,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: p.primary,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                const SizedBox(height: 2),
                 Text(
                   name.isEmpty ? AppStrings.student : name,
                   style: theme.textTheme.titleLarge?.copyWith(fontSize: 20),

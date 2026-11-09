@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T19:55:00+07:00",
+  "title": "Design System: EnglishMaster — Botanical Study Ledger",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Botanical Emerald",
+        "canonical": "oklch(48% 0.088 186)",
+        "tonalRamp": [
+          "#072420",
+          "#0C3B36",
+          "#104943",
+          "#1B6E66",
+          "#2B8F85",
+          "#5DCAC0",
+          "#A8E2DC",
+          "#D8F0EC"
+        ]
+      },
+      "reward": {
+        "role": "secondary",
+        "displayName": "Warm Amber Seal",
+        "canonical": "oklch(75% 0.165 65)",
+        "tonalRamp": [
+          "#211100",
+          "#3B1C00",
+          "#7A4300",
+          "#B56200",
+          "#F2911B",
+          "#FFB03A",
+          "#FFD58A",
+          "#FFF0D4"
+        ]
+      },
+      "speaking": {
+        "role": "tertiary",
+        "displayName": "Terracotta Clay (Speaking)",
+        "canonical": "oklch(91% 0.045 55)",
+        "tonalRamp": [
+          "#311B0F",
+          "#5C2D12",
+          "#8A4620",
+          "#B86438",
+          "#E6B99C",
+          "#F2D2BE",
+          "#FCE4D2",
+          "#FFF3EA"
+        ]
+      },
+      "listening": {
+        "role": "tertiary",
+        "displayName": "Eucalyptus Mint (Listening)",
+        "canonical": "oklch(92% 0.042 158)",
+        "tonalRamp": [
+          "#132E22",
+          "#0F5238",
+          "#1B7A54",
+          "#3BA378",
+          "#94CFB2",
+          "#B8E2CD",
+          "#D4F0E2",
+          "#EDFBF4"
+        ]
+      },
+      "writing": {
+        "role": "tertiary",
+        "displayName": "Iris Vellum (Writing)",
+        "canonical": "oklch(91% 0.042 292)",
+        "tonalRamp": [
+          "#241C38",
+          "#3D2C7A",
+          "#5B44A8",
+          "#826BC9",
+          "#BEB2ED",
+          "#D5CCF5",
+          "#E6E0FA",
+          "#F5F2FD"
+        ]
+      },
+      "reading": {
+        "role": "tertiary",
+        "displayName": "Mineral Cobalt (Reading)",
+        "canonical": "oklch(91% 0.040 245)",
+        "tonalRamp": [
+          "#14273D",
+          "#17427A",
+          "#2563AE",
+          "#4B89D1",
+          "#9BC0EE",
+          "#BDD6F5",
+          "#DAE9FA",
+          "#F0F6FD"
+        ]
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Herbarium Vellum",
+        "canonical": "oklch(97% 0.006 155)",
+        "tonalRamp": [
+          "#0E1412",
+          "#161F1C",
+          "#202B27",
+          "#2E3D37",
+          "#475750",
+          "#9FB0A8",
+          "#D2DDD6",
+          "#F6F7F4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display / Hero Score",
+        "purpose": "Large tabular score numerals and hero titles with tight tracking."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Top-level screen headers and section banners (Be Vietnam Pro ExtraBold 800)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card headings, course names, and skill specimen titles (ExtraBold/Bold)."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Vietnamese-first study prose, AI feedback, and reading passages (height 1.5)."
+      },
+      "label": {
+        "displayName": "Label & Metric",
+        "purpose": "Buttons, pill chips, and tabular-figure counters."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tactile-button-edge",
+        "value": "0 4px 0 #104943",
+        "purpose": "Crisp 4dp solid bottom edge under primary ChunkyButton at rest; collapses to 0dp on press."
+      },
+      {
+        "name": "tactile-card-edge",
+        "value": "0 3px 0 #D2DDD6",
+        "purpose": "3dp solid ledger bottom edge under OutlinedCard and StatTile containers."
+      },
+      {
+        "name": "tactile-specimen-edge",
+        "value": "0 4px 0 var(--skill-edge)",
+        "purpose": "4dp semantic pigment bottom edge under SkillTile, FlatHeroCard, and AI prompt/score cards."
+      }
+    ],
+    "motion": [
+      {
+        "name": "press-mechanical",
+        "value": "90ms cubic-bezier(0.2, 0.0, 0.0, 1.0)",
+        "purpose": "Physical 4dp vertical translation on button press and release."
+      }
+    ],
+    "breakpoints": [
+      { "name": "compact-fold", "value": "344px" },
+      { "name": "compact-phone", "value": "360px" },
+      { "name": "medium-foldable", "value": "600px" },
+      { "name": "expanded-tablet", "value": "840px" },
+      { "name": "max-frame", "value": "1100px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Chunky Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary 56dp tactile CTA with a 4dp solid #104943 bottom edge that physically depresses on tap.",
+      "html": "<button class=\"ds-btn-primary\">Tiếp tục học</button>",
+      "css": ".ds-btn-primary { background: #1B6E66; color: #FFFFFF; min-height: 52px; padding: 14px 24px; border: none; border-radius: 16px; box-shadow: 0 4px 0 #104943; font-family: 'Be Vietnam Pro', sans-serif; font-size: 16px; font-weight: 800; cursor: pointer; transition: transform 90ms ease, box-shadow 90ms ease; } .ds-btn-primary:hover { background: #175E57; } .ds-btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 #104943; } .ds-btn-primary:focus-visible { outline: 2px solid #1B6E66; outline-offset: 2px; }"
+    },
+    {
+      "name": "Chunky Outlined Button",
+      "kind": "button",
+      "refersTo": "button-outlined",
+      "description": "Secondary tactile button on pure paper surface with a 2dp border and 4dp bottom ledger edge.",
+      "html": "<button class=\"ds-btn-outlined\">Xem lịch sử</button>",
+      "css": ".ds-btn-outlined { background: #FFFFFF; color: #15201C; min-height: 52px; padding: 14px 20px; border: 2px solid #D2DDD6; border-radius: 16px; box-shadow: 0 4px 0 #D2DDD6; font-family: 'Be Vietnam Pro', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: transform 90ms ease, box-shadow 90ms ease; } .ds-btn-outlined:hover { border-color: #1B6E66; } .ds-btn-outlined:active { transform: translateY(4px); box-shadow: 0 0 0 #D2DDD6; }"
+    },
+    {
+      "name": "Skill Specimen Tile",
+      "kind": "card",
+      "refersTo": "card-skill-specimen",
+      "description": "116dp semantic skill block (Speaking/Listening/Writing/Reading) with 2dp pigment border, 4dp bottom edge, and framed icon box.",
+      "html": "<div class=\"ds-skill-tile\"><div class=\"ds-skill-top\"><span class=\"ds-skill-icon\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\"><path d=\"M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z\"/><path d=\"M19 10v2a7 7 0 0 1-14 0v-2\"/><line x1=\"12\" y1=\"19\" x2=\"12\" y2=\"22\"/></svg></span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\"><line x1=\"7\" y1=\"17\" x2=\"17\" y2=\"7\"/><polyline points=\"7 7 17 7 17 17\"/></svg></div><div class=\"ds-skill-title\">Luyện nói</div></div>",
+      "css": ".ds-skill-tile { background: #FCE4D2; color: #5C2D12; border: 2px solid #E6B99C; border-radius: 24px; box-shadow: 0 4px 0 #E6B99C; padding: 14px; width: 140px; height: 112px; display: flex; flex-direction: column; justify-content: space-between; font-family: 'Be Vietnam Pro', sans-serif; cursor: pointer; transition: transform 90ms ease; } .ds-skill-tile:hover { transform: translateY(-1px); } .ds-skill-top { display: flex; justify-content: space-between; align-items: flex-start; } .ds-skill-icon { width: 38px; height: 38px; border-radius: 12px; background: rgba(255,255,255,0.62); border: 1.5px solid #E6B99C; display: inline-flex; align-items: center; justify-content: center; } .ds-skill-title { font-size: 14px; font-weight: 700; line-height: 1.2; }"
+    },
+    {
+      "name": "Outlined Study Ledger Card",
+      "kind": "card",
+      "refersTo": "card-outlined",
+      "description": "Flat bordered study card with 24dp radius, 2dp #D2DDD6 border, and 3dp solid bottom edge.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-badge\">NGỮ PHÁP</div><div class=\"ds-card-title\">IELTS Academic Foundation</div><div class=\"ds-card-meta\">GV. Nguyễn Minh · 12 bài học</div></div>",
+      "css": ".ds-card { background: #FFFFFF; color: #15201C; border: 2px solid #D2DDD6; border-radius: 24px; box-shadow: 0 3px 0 #D2DDD6; padding: 16px; font-family: 'Be Vietnam Pro', sans-serif; } .ds-card-badge { display: inline-block; background: #D8F0EC; color: #0C3B36; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; margin-bottom: 8px; } .ds-card-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; } .ds-card-meta { font-size: 13px; color: #475750; }"
+    },
+    {
+      "name": "Pill Chip",
+      "kind": "chip",
+      "refersTo": "chip-pill",
+      "description": "Stadium-rounded filter and status badge with 1.5dp structural border.",
+      "html": "<span class=\"ds-chip-selected\">Đang học · 12</span>",
+      "css": ".ds-chip-selected { display: inline-flex; align-items: center; background: #1B6E66; color: #FFFFFF; border: 1.5px solid #104943; border-radius: 999px; padding: 8px 14px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Study Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Filled paper input with 16dp corners and 2dp outline that shifts to Botanical Emerald on focus.",
+      "html": "<input class=\"ds-input\" type=\"text\" value=\"student@englishmaster.vn\" readonly />",
+      "css": ".ds-input { background: #FFFFFF; color: #15201C; border: 2px solid #D2DDD6; border-radius: 16px; padding: 14px 16px; font-family: 'Be Vietnam Pro', sans-serif; font-size: 15px; font-weight: 500; width: 260px; outline: none; } .ds-input:focus { border-color: #1B6E66; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Botanical Study Ledger",
+    "overview": "EnglishMaster is crafted as a tactile botanical study ledger and modern language press. Instead of noisy gamified gradients or sterile corporate gray, every screen rests on warm herbarium vellum paper (#F6F7F4) with deep pine-charcoal ink (#15201C), anchored by Botanical Emerald (#1B6E66) for primary actions and Warm Amber Seal (#F2911B) for streaks and rewards.\n\nEach of the four English skills owns a strict, museum-grade natural pigment family across the entire app: Terracotta Clay for Speaking, Eucalyptus Mint for Listening, Iris Vellum for Writing, and Mineral Cobalt for Reading. Depth is mechanical rather than atmospheric: zero blurred drop shadows or gradients; every interactive button and specimen card carries a crisp 2dp border and a solid 3–4dp bottom edge that depresses physically under the thumb.",
+    "keyCharacteristics": [
+      "Warm herbarium vellum paper ground (#F6F7F4 light / #0E1412 dark) with ≥ 4.5:1 WCAG AA contrast across all 12 semantic text/surface pairs",
+      "Strict 4-skill natural pigment color-coding (Speaking Terracotta, Listening Mint, Writing Iris, Reading Cobalt) with matching 2dp borders and 4dp bottom edges",
+      "Zero gradients and zero blurred box-shadows; tactile mechanical depth via 3–4dp solid bottom edges",
+      "Be Vietnam Pro local typography (weights 400–800) with tabular figures (tnum) across all scores, timers, streaks, and VND prices"
+    ],
+    "rules": [
+      {
+        "name": "The Four-Pigment Canon Rule",
+        "body": "Speaking is always Terracotta Clay (#FCE4D2 / #5C2D12), Listening is always Eucalyptus Mint (#D4F0E2 / #0F5238), Writing is always Iris Vellum (#E6E0FA / #3D2C7A), and Reading is always Mineral Cobalt (#DAE9FA / #17427A). Never swap skill pigments or use literal hex codes outside AppPalette.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Ledger Rule",
+        "body": "Every numeric score, IELTS band, countdown timer, streak day counter, flashcard mastery ratio, and VND price uses FontFeature.tabularFigures() so columns and rings never jitter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mechanical Edge Rule",
+        "body": "Surfaces never cast blurred drop shadows or linear gradients. Depth is expressed exclusively through 2dp structural borders and 3–4dp solid bottom edges that collapse to 0dp when pressed.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do source every surface, ink, border, and skill pigment from AppPalette.of(context) so Light and Dark modes stay in lockstep.",
+      "Do pair every colored skill surface with its matching 2dp colors.edge border and colors.ink foreground.",
+      "Do preserve white (#FFFFFF) paper and dark (#171923) ink on QR payment codes in both Light and Dark themes for reliable scanning.",
+      "Do test responsive layouts across 344dp (Fold cover), 360dp (phone), 673dp (unfolded foldable), 800dp (tablet), and 1280dp (desktop/large tablet)."
+    ],
+    "donts": [
+      "Don't introduce linear/radial gradients, glassmorphic blurs, or blurred BoxShadow elevations anywhere in the widget tree.",
+      "Don't fabricate progress percentages, countdown timers, or activity totals that are not returned by the real API.",
+      "Don't allow any semantic text-on-surface pair to fall below 4.5:1 WCAG AA contrast in either Light or Dark mode."
+    ]
+  }
+}
+
