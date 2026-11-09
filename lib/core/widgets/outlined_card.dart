@@ -28,22 +28,9 @@ class OutlinedCard extends StatelessWidget {
         color: color ?? p.surface,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
-          color: borderColor ?? p.outline.withValues(alpha: 0.8),
-          width: 1.2,
+          color: borderColor ?? p.outline,
+          width: 1.0,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.04),
-            offset: const Offset(0, 4),
-            blurRadius: 16,
-          ),
-          if (edgeColor != null)
-            BoxShadow(
-              color: edgeColor!.withValues(alpha: 0.2),
-              offset: const Offset(0, 3),
-              blurRadius: 0,
-            ),
-        ],
       ),
       child: Material(
         type: MaterialType.transparency,

@@ -6,8 +6,8 @@ export 'app_palette.dart';
 /// Material 3 mapping of the “Botanical Study Ledger” flat, bordered design system.
 class AppTheme {
   AppTheme._();
-  static const seed = Color(0xFF4338CA);
-  static const rewardSeed = Color(0xFFF59E0B);
+  static const seed = Color(0xFF18181B);
+  static const rewardSeed = Color(0xFFD97706);
   static const qrPaper = Color(0xFFFFFFFF);
   static const qrInk = Color(0xFF171923);
 

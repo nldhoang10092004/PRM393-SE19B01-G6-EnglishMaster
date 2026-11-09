@@ -14,21 +14,23 @@ class SectionHeader extends StatelessWidget {
     final p = AppPalette.of(context);
     return Row(
       children: [
-        Container(
-          width: 4,
-          height: 20,
-          margin: const EdgeInsets.only(right: 10),
-          decoration: BoxDecoration(
-            color: p.primary,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
         Expanded(
-          child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              fontSize: 17,
+              letterSpacing: -0.3,
+            ),
+          ),
         ),
         if (onViewAll != null)
           TextButton(
             onPressed: onViewAll,
+            style: TextButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              foregroundColor: p.inkMuted,
+            ),
             child: const Text(AppStrings.viewAll),
           ),
       ],

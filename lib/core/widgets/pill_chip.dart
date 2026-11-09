@@ -23,15 +23,15 @@ class PillChip extends StatelessWidget {
     final p = AppPalette.of(context);
     final fg = foreground ?? (selected ? p.onPrimary : p.ink);
     final bg = color ?? (selected ? p.primary : p.muted);
-    final border = selected ? p.primaryEdge : p.outline;
+    final border = selected ? p.primary : p.outline;
     return Semantics(
       selected: onTap == null ? null : selected,
       child: Material(
         color: bg,
         shape: StadiumBorder(
           side: BorderSide(
-            color: color != null ? fg.withValues(alpha: .22) : border,
-            width: 1.5,
+            color: color != null ? fg.withValues(alpha: .18) : border,
+            width: 1.0,
           ),
         ),
         child: InkWell(
