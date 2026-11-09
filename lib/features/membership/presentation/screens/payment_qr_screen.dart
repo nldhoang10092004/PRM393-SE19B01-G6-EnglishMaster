@@ -106,10 +106,12 @@ class _PaymentViewState extends State<_PaymentView> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ChunkyButton(
-                        onPressed: state.checking ? null : () => state.check(),
+                        onPressed: state.confirming
+                            ? null
+                            : () => state.check(),
                         child: Text(
-                          state.checking
-                              ? MembershipStrings.waiting
+                          state.confirming
+                              ? MembershipStrings.checkingPayment
                               : MembershipStrings.iHavePaid,
                           textAlign: TextAlign.center,
                         ),
