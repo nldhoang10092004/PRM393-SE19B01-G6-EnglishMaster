@@ -3,6 +3,7 @@ import 'package:english_master/core/l10n/app_strings.dart';
 import 'package:english_master/features/course/presentation/screens/course_list_screen.dart';
 import 'package:english_master/features/home/presentation/screens/home_shell.dart';
 import 'package:english_master/features/ai_exam/presentation/screens/ai_listening_screen.dart';
+import 'package:english_master/features/ai_exam/presentation/screens/ai_reading_screen.dart';
 import 'package:english_master/features/ai_exam/presentation/widgets/ai_generating_view.dart';
 
 import 'dart:io';
@@ -119,6 +120,7 @@ void main() {
     'home-shell': const HomeShell(),
     'course-list': const CourseListScreen(),
     'ai-listening': const AiListeningScreen(),
+    'ai-reading': const AiReadingScreen(),
     'ai-loading': const Scaffold(
       body: AiGeneratingView(kind: AiGeneratingKind.listening),
     ),
@@ -322,6 +324,28 @@ void main() {
             ),
           );
         }
+        when(() => ai.generate(AiExamSkill.reading)).thenAnswer(
+          (_) async => AiExamPrompt(
+            id: 3,
+            title: 'The Rise of Electric Cars',
+            content: List.filled(
+              40,
+              'Electric cars are getting cheaper.',
+            ).join(' '),
+            questions: const [
+              AiListeningQuestion(
+                id: 1,
+                type: 1,
+                content: 'What is the main idea of the passage?',
+                options: [
+                  'Prices are falling',
+                  'Cars are slower',
+                  'Fuel is free',
+                ],
+              ),
+            ],
+          ),
+        );
         when(() => ai.generate(AiExamSkill.listening)).thenAnswer(
           (_) async => const AiExamPrompt(
             id: 2,

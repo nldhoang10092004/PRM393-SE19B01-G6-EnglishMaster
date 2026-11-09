@@ -168,8 +168,11 @@ class AiWritingProvider extends AiExamProvider<AiExamScore> {
 
 /// Listening answers retain exact option content and are graded on the server.
 class AiListeningProvider extends AiExamProvider<AiListeningResult> {
-  AiListeningProvider(AiExamRepository repository, {super.audioPlayerFactory})
-    : super(repository, AiExamSkill.listening);
+  AiListeningProvider(
+    AiExamRepository repository, {
+    super.audioPlayerFactory,
+    AiExamSkill skill = AiExamSkill.listening,
+  }) : super(repository, skill);
   final Map<int, String> _answers = {};
 
   /// Returns the saved answer for a question, or an empty string.
@@ -209,9 +212,18 @@ class AiListeningProvider extends AiExamProvider<AiListeningResult> {
       return false;
     }
     return perform(() async {
-      result = await repository.submitListening(prompt!.id, Map.of(_answers));
+      result = await repository.submitListening(
+        prompt!.id,
+        Map.of(_answers),
+        skill: skill,
+      );
     }, isGrading: true);
   }
+}
+
+/// Reading: an AI passage with multiple-choice questions, graded like listening.
+class AiReadingProvider extends AiListeningProvider {
+  AiReadingProvider(super.repository) : super(skill: AiExamSkill.reading);
 }
 
 /// Captures a timed answer, retains playback on failed uploads, and grades audio.

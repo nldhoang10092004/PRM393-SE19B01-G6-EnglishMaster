@@ -11,6 +11,7 @@ class AppStrings {
   static const speaking = 'Nói';
   static const listening = 'Nghe';
   static const writing = 'Viết';
+  static const reading = 'Đọc';
   static const all = 'Tất cả';
   static const studying = 'Đang học';
   static const dailyReview = 'Ôn 5 thẻ mỗi ngày';

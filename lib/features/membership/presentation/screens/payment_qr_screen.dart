@@ -118,23 +118,24 @@ class _PaymentViewState extends State<_PaymentView> {
             )
           : null,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: switch (state.phase) {
-            PaymentPhase.waiting => _waiting(context, state),
-            PaymentPhase.paid => _paid(context, state),
-            PaymentPhase.canceled => _failure(
-              context,
-              MembershipStrings.canceledTitle,
-              MembershipStrings.canceledBody,
-            ),
-            PaymentPhase.expired => _failure(
-              context,
-              MembershipStrings.expiredTitle,
-              MembershipStrings.expiredBody,
-            ),
-          },
-        ),
+        child: state.phase == PaymentPhase.waiting
+            ? SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: _waiting(context, state),
+              )
+            : _centered(switch (state.phase) {
+                PaymentPhase.paid => _paid(context, state),
+                PaymentPhase.canceled => _failure(
+                  context,
+                  MembershipStrings.canceledTitle,
+                  MembershipStrings.canceledBody,
+                ),
+                _ => _failure(
+                  context,
+                  MembershipStrings.expiredTitle,
+                  MembershipStrings.expiredBody,
+                ),
+              }),
       ),
     );
   }
@@ -276,11 +277,31 @@ class _PaymentViewState extends State<_PaymentView> {
     );
   }
 
+  /// Result states sit in the middle of the screen, still scrollable when short.
+  Widget _centered(Widget child) => LayoutBuilder(
+    builder: (context, box) => SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: box.maxWidth - 40,
+          minHeight: box.maxHeight - 40,
+        ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: child,
+          ),
+        ),
+      ),
+    ),
+  );
+
   Widget _paid(BuildContext context, PaymentStatusProvider state) {
     final end = context.watch<MembershipProvider>().current.endsAt;
     return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(height: 40),
         Icon(
           Icons.check_circle,
           color: Theme.of(context).colorScheme.tertiary,
@@ -290,6 +311,7 @@ class _PaymentViewState extends State<_PaymentView> {
         Text(
           MembershipStrings.paidTitle,
           style: Theme.of(context).textTheme.headlineSmall,
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         Text(
@@ -311,8 +333,8 @@ class _PaymentViewState extends State<_PaymentView> {
 
   Widget _failure(BuildContext context, String title, String body) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(height: 40),
         Icon(
           Icons.error_outline,
           color: Theme.of(context).colorScheme.error,

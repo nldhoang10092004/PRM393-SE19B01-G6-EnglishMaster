@@ -7,13 +7,24 @@ class AiExamStrings {
   static const speaking = 'Luyện nói';
   static const listening = 'Luyện nghe';
   static const writing = 'Luyện viết';
+  static const reading = 'Luyện đọc';
+  static const readingDescription = 'Đọc bài do AI viết và trả lời câu hỏi.';
+  static const readingResult = 'Kết quả luyện đọc';
+  static const passage = 'Bài đọc';
+  static const generatingReading = 'AI đang viết bài đọc…';
+  static const stepReading = [
+    'Chọn chủ đề',
+    'Viết bài đọc',
+    'Tạo câu hỏi',
+    'Hoàn tất',
+  ];
   static const speakingDescription = 'Nhận đề, ghi âm và cải thiện bài nói.';
   static const listeningDescription = 'Nghe hội thoại và trả lời câu hỏi.';
   static const writingDescription = 'Viết bài luận và nhận góp ý chi tiết.';
   static const history = 'Lịch sử chấm bài';
   static const historyDescription = 'Xem lại bài đã nộp và nhận xét của AI';
   static const historyNote =
-      'Lịch sử lưu các bài nói và bài viết đã nộp. Bài nghe không được lưu.';
+      'Lịch sử lưu các bài nói và bài viết đã nộp. Bài nghe và bài đọc không được lưu.';
   static const review = 'Chi tiết chấm bài';
   static const generate = 'Tạo đề mới';
   static const generating = 'Đang tạo đề…';

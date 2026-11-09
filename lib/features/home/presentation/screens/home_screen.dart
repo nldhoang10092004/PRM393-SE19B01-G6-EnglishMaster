@@ -14,6 +14,7 @@ import '../../../streak/presentation/providers/streak_provider.dart';
 import '../../../streak/presentation/widgets/streak_card.dart';
 import '../../../ai_exam/presentation/screens/ai_speaking_screen.dart';
 import '../../../ai_exam/presentation/screens/ai_listening_screen.dart';
+import '../../../ai_exam/presentation/screens/ai_reading_screen.dart';
 import '../../../ai_exam/presentation/screens/ai_writing_screen.dart';
 import '../widgets/home_greeting.dart';
 
@@ -74,11 +75,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const SectionHeader(title: AppStrings.aiPracticeTitle),
                       const SizedBox(height: 16),
-                      SkillTile(
-                        label: AppStrings.speaking,
-                        icon: Icons.mic_none_rounded,
-                        colors: p.speaking,
-                        onTap: () => _open(const AiSpeakingScreen()),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SkillTile(
+                              label: AppStrings.speaking,
+                              icon: Icons.mic_none_rounded,
+                              colors: p.speaking,
+                              onTap: () => _open(const AiSpeakingScreen()),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: SkillTile(
+                              label: AppStrings.reading,
+                              icon: Icons.menu_book_rounded,
+                              colors: p.reading,
+                              onTap: () => _open(const AiReadingScreen()),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       Row(

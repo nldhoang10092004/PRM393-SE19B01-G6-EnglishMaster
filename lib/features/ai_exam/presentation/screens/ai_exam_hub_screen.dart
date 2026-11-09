@@ -5,11 +5,12 @@ import '../../ai_exam_strings.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/flat_hero_card.dart';
 import 'ai_listening_screen.dart';
+import 'ai_reading_screen.dart';
 import 'ai_review_history_screen.dart';
 import 'ai_speaking_screen.dart';
 import 'ai_writing_screen.dart';
 
-/// Entry point for the three AI skills and saved submission history.
+/// Entry point for the four AI skills and saved submission history.
 class AiExamHubScreen extends StatelessWidget {
   const AiExamHubScreen({super.key});
 
@@ -33,6 +34,12 @@ class AiExamHubScreen extends StatelessWidget {
         AiExamStrings.writingDescription,
         Icons.edit_note_rounded,
         const AiWritingScreen(),
+      ),
+      (
+        AiExamStrings.reading,
+        AiExamStrings.readingDescription,
+        Icons.menu_book_rounded,
+        const AiReadingScreen(),
       ),
       (
         AiExamStrings.history,
@@ -73,6 +80,7 @@ class AiExamHubScreen extends StatelessWidget {
                   p.speaking,
                   p.listening,
                   p.writing,
+                  p.reading,
                   SkillColors(p.muted, p.ink, p.outline),
                 ];
                 return Card(

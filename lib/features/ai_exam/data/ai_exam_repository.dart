@@ -5,7 +5,7 @@ import '../ai_exam_strings.dart';
 import 'models/ai_exam.dart';
 
 /// The supported student skills and their backend route suffixes.
-enum AiExamSkill { speaking, listening, writing }
+enum AiExamSkill { speaking, listening, writing, reading }
 
 /// Maps all AI HTTP contracts; the shared client supplies authentication.
 class AiExamRepository {
@@ -26,7 +26,8 @@ class AiExamRepository {
     if (prompt.id <= 0 ||
         (skill != AiExamSkill.listening && prompt.content.trim().isEmpty) ||
         (skill == AiExamSkill.listening &&
-            (prompt.audioUrl.isEmpty || prompt.questions.isEmpty))) {
+            (prompt.audioUrl.isEmpty || prompt.questions.isEmpty)) ||
+        (skill == AiExamSkill.reading && prompt.questions.isEmpty)) {
       throw ApiException(AiExamStrings.invalidResponse);
     }
     return prompt;
@@ -62,13 +63,15 @@ class AiExamRepository {
       );
 
   /// Multiple-choice answers contain option text, never a letter or option ID.
+  /// Reading reuses the same contract and result shape as listening.
   Future<AiListeningResult> submitListening(
     int promptId,
-    Map<int, String> answers,
-  ) async {
+    Map<int, String> answers, {
+    AiExamSkill skill = AiExamSkill.listening,
+  }) async {
     final json = _object(
       await api.postSlow(
-        '/api/user/ai-listening/submit',
+        '/api/user/ai-${skill.name}/submit',
         body: {
           'promptId': promptId,
           'answers': answers.entries

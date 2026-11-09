@@ -16,20 +16,21 @@ void main() {
 
   test('all generators use a bodyless slow POST', () async {
     for (final skill in AiExamSkill.values) {
-      when(() => api.postSlow('/api/user/ai-${skill.name}/generate'))
-          .thenAnswer(
-            (_) async => {
-              'promptId': 10,
-              'title': 'Topic',
-              'content': 'Question',
-              if (skill == AiExamSkill.listening) ...{
-                'audioUrl': 'https://example/audio.mp3',
-                'questions': [
-                  {'questionId': 1, 'type': 2, 'content': 'Name?'},
-                ],
-              },
-            },
-          );
+      when(
+        () => api.postSlow('/api/user/ai-${skill.name}/generate'),
+      ).thenAnswer(
+        (_) async => {
+          'promptId': 10,
+          'title': 'Topic',
+          'content': 'Question',
+          if (skill == AiExamSkill.listening)
+            'audioUrl': 'https://example/audio.mp3',
+          if (skill == AiExamSkill.listening || skill == AiExamSkill.reading)
+            'questions': [
+              {'questionId': 1, 'type': 2, 'content': 'Name?'},
+            ],
+        },
+      );
       expect((await repository.generate(skill)).id, 10);
       verify(() => api.postSlow('/api/user/ai-${skill.name}/generate'))
           .called(1);

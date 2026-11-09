@@ -8,7 +8,7 @@ import '../../../../core/widgets/outlined_card.dart';
 import '../../../../core/theme/app_palette.dart';
 
 /// Which slow AI operation is running; selects the title and estimated steps.
-enum AiGeneratingKind { speaking, listening, writing, grading }
+enum AiGeneratingKind { speaking, listening, writing, reading, grading }
 
 /// Progress view for slow AI calls: pulse animation, estimated steps, elapsed
 /// time, rotating tips and a cancel button. It owns no request, so a rebuild
@@ -52,6 +52,7 @@ class _AiGeneratingViewState extends State<AiGeneratingView>
     AiGeneratingKind.speaking => AiExamStrings.generatingSpeaking,
     AiGeneratingKind.listening => AiExamStrings.generatingListening,
     AiGeneratingKind.writing => AiExamStrings.generatingWriting,
+    AiGeneratingKind.reading => AiExamStrings.generatingReading,
     AiGeneratingKind.grading => AiExamStrings.grading,
   };
 
@@ -59,6 +60,7 @@ class _AiGeneratingViewState extends State<AiGeneratingView>
     AiGeneratingKind.speaking => AiExamStrings.stepSpeaking,
     AiGeneratingKind.listening => AiExamStrings.stepListening,
     AiGeneratingKind.writing => AiExamStrings.stepWriting,
+    AiGeneratingKind.reading => AiExamStrings.stepReading,
     AiGeneratingKind.grading => AiExamStrings.stepGrading,
   };
 
