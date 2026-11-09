@@ -24,6 +24,11 @@ class AiExamStrings {
   static const answer = 'Bài làm của bạn';
   static const writingHint = 'Nhập bài viết bằng tiếng Anh…';
   static const minimumWords = 'Bài viết cần ít nhất 150 từ để chấm điểm.';
+  static const leaveWritingTitle = 'Rời bài viết?';
+  static const leaveWritingBody =
+      'Bài viết chưa nộp sẽ bị mất nếu bạn rời khỏi màn hình này.';
+  static const keepWriting = 'Viết tiếp';
+  static const discardWriting = 'Rời đi';
   static const result = 'Kết quả chấm bài';
   static const practiceAgain = 'Luyện lại';
   static const speakingResult = 'Kết quả luyện nói';

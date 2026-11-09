@@ -22,77 +22,102 @@ class AiWritingScreen extends StatelessWidget {
     create: (context) =>
         AiWritingProvider(context.read<AiExamRepository>())..generate(),
     child: Consumer<AiWritingProvider>(
-      builder: (context, state, _) => Scaffold(
-        appBar: AppTopBar(
-          title: Text(
-            state.result == null
-                ? AiExamStrings.writing
-                : AiExamStrings.writingResult,
-          ),
-        ),
-        body: AiExamBody(
-          status: state.status,
-          error: state.error,
-          hasPrompt: state.prompt != null,
-          busy: state.busy,
-          canGenerate: state.canGenerate,
-          onGenerate: state.generate,
-          kind: AiGeneratingKind.writing,
-          hasResult: state.result != null,
-          generating: state.generating,
-          grading: state.grading,
-          footer: state.result != null
-              ? ChunkyButton(
-                  onPressed: state.canGenerate ? state.generate : null,
-                  child: const Text(AiExamStrings.practiceAgain),
-                )
-              : state.prompt != null
-              ? ChunkyButton(
-                  onPressed: state.canSubmit ? state.submit : null,
-                  child: const Text(AiExamStrings.submit),
-                )
-              : null,
-          children: [
-            if (state.prompt case final prompt?) ...[
-              if (state.result == null)
-                AiPromptCard(
-                  title: prompt.title,
-                  content: prompt.content,
-                  colors: AppPalette.of(context).writing,
+      builder: (context, state, _) => PopScope(
+        // An unsubmitted draft is lost on exit, so back asks first.
+        canPop: state.result != null || state.answer.trim().isEmpty,
+        onPopInvokedWithResult: (didPop, _) async {
+          if (didPop || state.busy) return;
+          final leave = await showDialog<bool>(
+            context: context,
+            builder: (dialog) => AlertDialog(
+              title: const Text(AiExamStrings.leaveWritingTitle),
+              content: const Text(AiExamStrings.leaveWritingBody),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialog, false),
+                  child: const Text(AiExamStrings.keepWriting),
                 ),
-              const SizedBox(height: 16),
-              if (state.result == null) ...[
-                TextFormField(
-                  key: ObjectKey(prompt),
-                  initialValue: state.answer,
-                  minLines: 8,
-                  maxLines: 16,
-                  readOnly: state.busy || state.result != null,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    labelText: AiExamStrings.answer,
-                    hintText: AiExamStrings.writingHint,
-                    alignLabelWithHint: true,
-                  ),
-                  onChanged: state.setAnswer,
+                TextButton(
+                  onPressed: () => Navigator.pop(dialog, true),
+                  child: const Text(AiExamStrings.discardWriting),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  AiExamStrings.wordCount(state.wordCount),
-                  key: const ValueKey('ai-writing-word-count'),
-                ),
-                const Text(AiExamStrings.minimumWords),
-                const SizedBox(height: 16),
               ],
-              if (state.result case final result?) ...[
+            ),
+          );
+          if (leave == true && context.mounted) Navigator.of(context).pop();
+        },
+        child: Scaffold(
+          appBar: AppTopBar(
+            title: Text(
+              state.result == null
+                  ? AiExamStrings.writing
+                  : AiExamStrings.writingResult,
+            ),
+          ),
+          body: AiExamBody(
+            status: state.status,
+            error: state.error,
+            hasPrompt: state.prompt != null,
+            busy: state.busy,
+            canGenerate: state.canGenerate,
+            onGenerate: state.generate,
+            kind: AiGeneratingKind.writing,
+            hasResult: state.result != null,
+            generating: state.generating,
+            grading: state.grading,
+            footer: state.result != null
+                ? ChunkyButton(
+                    onPressed: state.canGenerate ? state.generate : null,
+                    child: const Text(AiExamStrings.practiceAgain),
+                  )
+                : state.prompt != null
+                ? ChunkyButton(
+                    onPressed: state.canSubmit ? state.submit : null,
+                    child: const Text(AiExamStrings.submit),
+                  )
+                : null,
+            children: [
+              if (state.prompt case final prompt?) ...[
+                if (state.result == null)
+                  AiPromptCard(
+                    title: prompt.title,
+                    content: prompt.content,
+                    colors: AppPalette.of(context).writing,
+                  ),
                 const SizedBox(height: 16),
-                AiScoreCard(
-                  score: result,
-                  colors: AppPalette.of(context).writing,
-                ),
+                if (state.result == null) ...[
+                  TextFormField(
+                    key: ObjectKey(prompt),
+                    initialValue: state.answer,
+                    minLines: 8,
+                    maxLines: 16,
+                    readOnly: state.busy || state.result != null,
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: const InputDecoration(
+                      labelText: AiExamStrings.answer,
+                      hintText: AiExamStrings.writingHint,
+                      alignLabelWithHint: true,
+                    ),
+                    onChanged: state.setAnswer,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    AiExamStrings.wordCount(state.wordCount),
+                    key: const ValueKey('ai-writing-word-count'),
+                  ),
+                  const Text(AiExamStrings.minimumWords),
+                  const SizedBox(height: 16),
+                ],
+                if (state.result case final result?) ...[
+                  const SizedBox(height: 16),
+                  AiScoreCard(
+                    score: result,
+                    colors: AppPalette.of(context).writing,
+                  ),
+                ],
               ],
             ],
-          ],
+          ),
         ),
       ),
     ),
